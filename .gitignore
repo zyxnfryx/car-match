@@ -13,6 +13,7 @@ Recordings/
 /[Aa]ssets/AssetStoreTools*
 
 *.csproj
+!tools/**/*.csproj
 *.unityproj
 *.sln
 *.suo
