@@ -1,0 +1,131 @@
+{
+  "levels": [
+    {
+      "id": "first-lot",
+      "title": "First Lot",
+      "blurb": "Tap a car with a clear lane.",
+      "lanes": [
+        ["coral", "coral", "coral"],
+        ["teal", "teal", "teal"]
+      ]
+    },
+    {
+      "id": "split-shift",
+      "title": "Split Shift",
+      "blurb": "Colors can share a lane.",
+      "lanes": [
+        ["coral", "teal", "coral"],
+        ["teal", "coral", "teal"]
+      ]
+    },
+    {
+      "id": "three-streets",
+      "title": "Three Streets",
+      "blurb": "Three colors, three lanes.",
+      "lanes": [
+        ["coral", "amber", "coral"],
+        ["amber", "lime", "amber"],
+        ["lime", "coral", "lime"]
+      ]
+    },
+    {
+      "id": "mystery-row",
+      "title": "Mystery Row",
+      "blurb": "A '?' car shows its color once the car in front leaves.",
+      "lanes": [
+        ["coral", "?amber", "coral"],
+        ["amber", "?coral", "amber"],
+        ["lime", "?lime", "lime"]
+      ]
+    },
+    {
+      "id": "tunnel-mouth",
+      "title": "Tunnel Mouth",
+      "blurb": "Empty the tunnel before the cars behind it can leave.",
+      "lanes": [
+        ["tunnel:coral,coral,coral", "lime", "lime", "lime"],
+        ["amber", "amber", "amber"]
+      ]
+    },
+    {
+      "id": "twin-tubes",
+      "title": "Twin Tubes",
+      "blurb": "Two tunnels. The count is how many cars are still inside.",
+      "lanes": [
+        ["tunnel:coral,coral,coral", "amber", "amber"],
+        ["tunnel:lime,lime,lime", "amber"],
+        ["teal", "teal", "teal"]
+      ]
+    },
+    {
+      "id": "curb-cut",
+      "title": "Curb Cut",
+      "blurb": "The side lot opens when the lane mouth is clear.",
+      "lanes": [
+        ["coral", "coral", "coral"],
+        ["amber", "amber", "amber"]
+      ],
+      "sides": [
+        { "lane": 0, "at": 0, "cars": ["lime", "lime", "lime"] }
+      ]
+    },
+    {
+      "id": "covered-side",
+      "title": "Covered Side",
+      "blurb": "A side lot further up the lane waits longer.",
+      "lanes": [
+        ["coral", "?amber", "coral"],
+        ["amber", "?coral", "?amber"]
+      ],
+      "sides": [
+        { "lane": 1, "at": 1, "cars": ["?lime", "lime", "lime"] }
+      ]
+    },
+    {
+      "id": "four-corners",
+      "title": "Four Corners",
+      "blurb": "Four colors. Match before the bar fills.",
+      "lanes": [
+        ["coral", "coral", "coral", "amber"],
+        ["amber", "amber", "lime", "lime"],
+        ["lime", "violet", "violet", "violet"]
+      ]
+    },
+    {
+      "id": "tight-garage",
+      "title": "Tight Garage",
+      "blurb": "Take a third when you already have two in the bar.",
+      "lanes": [
+        ["coral", "amber", "coral", "amber", "coral"],
+        ["amber", "lime", "lime"],
+        ["lime", "violet", "violet"],
+        ["violet"]
+      ]
+    },
+    {
+      "id": "tube-and-curb",
+      "title": "Tube And Curb",
+      "blurb": "The side lot stays shut while the tunnel holds the mouth.",
+      "lanes": [
+        ["tunnel:coral,coral,coral", "?amber", "amber"],
+        ["amber", "violet", "violet", "violet"]
+      ],
+      "sides": [
+        { "lane": 0, "at": 0, "cars": ["lime", "?lime", "lime"] }
+      ]
+    },
+    {
+      "id": "full-lot",
+      "title": "Full Lot",
+      "blurb": "Tunnels, hidden cars, and a side lot together.",
+      "lanes": [
+        ["tunnel:coral,?amber,coral", "coral", "?amber"],
+        ["lime", "?violet", "lime", "violet"],
+        ["teal", "?teal", "teal"]
+      ],
+      "sides": [
+        { "lane": 1, "at": 0, "cars": ["violet", "amber", "lime"] }
+      ]
+    }
+  ]
+}
