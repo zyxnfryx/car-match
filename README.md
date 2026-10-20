@@ -68,4 +68,22 @@ One helper per behavior. The screen, the solver, and the tests call these. They 
 | `LevelJson` | The player and the tests read the same JSON |
 | `RuleChecks` | EditMode tests and `tools/SolveCheck` |
 
-`IAdService` is the ad seam. `StubAdService` waits a beat and grants the reward. No ad SDK is wired up.
+`IAdService` is the ad seam. `AdServices.Create()` is the only place that picks one: `LevelPlayAdService` on an iOS/Android device once real keys are set, otherwise `StubAdService` (editor, desktop, placeholder keys).
+
+## Rewarded ads (Unity LevelPlay)
+
+This uses the same flow as ZFX Casino / More More More Keno (`www/core/ads.js` + `LevelPlayRewarded.swift`), built on the Unity package `com.unity.services.levelplay` **9.5.1** (wraps LevelPlay SDK 9.6.0) plus `com.unity.ads.ios-support` 1.2.0 for ATT. It's rewarded only, like keno: no banner, no interstitial.
+
+- Flow: ATT prompt before the first request (iOS) → test suite + `ValidateIntegration` when `TestMode` is on → `LevelPlay.Init(appKey)` → one reusable `LevelPlayRewardedAd`. The reward comes only from `OnAdRewarded`, with a 0.5 s grace after close. No fill, an early close, or a failed show grants nothing and goes back to the fail screen. The next ad preloads after each close. If init fails, it retries on the next request.
+- Keys live in one asset: `Assets/_Project/Resources/AdConfig.asset`. Every value is `REPLACE_ME` until Brandon fills them in. **Do not reuse the ZFX Casino keys.**
+- iOS: `Editor/IosAdPlist.cs` adds `NSUserTrackingUsageDescription`, keno's 77 Unity/LevelPlay `SKAdNetworkItems`, `ITSAppUsesNonExemptEncryption=NO`, and `-ObjC`. Minimum iOS is 13; build with Xcode 26+.
+- Android: the bundle is `com.zfxgames.carmatch`, IL2CPP, ARM64+ARMv7, min API 25. The LevelPlay package merges its own manifest (INTERNET, AD_ID, activities) and resolves Gradle deps through the External Dependency Manager it bundles. Run **Assets → External Dependency Manager → Android Resolver → Force Resolve** with Custom Main Gradle Template / Gradle Properties Template enabled (Player Settings → Publishing Settings), as the LevelPlay docs say.
+
+### Brandon: LevelPlay dashboard TODO
+1. LevelPlay → Apps → add **Lot Loop iOS** (bundle `com.zfxgames.carmatch`) and **Lot Loop Android** (package `com.zfxgames.carmatch`). Copy each App Key.
+2. Setup → Ad Units: make one **Rewarded** unit per app (for example "continue"). Copy the ad unit IDs.
+3. Paste all four values into `AdConfig.asset`.
+4. Turn on test mode / register test devices. Before store builds, set `TestMode` to false.
+5. Adapters: open **Ads Mediation → Network Manager** in Unity, then install the Unity Ads adapter (and any other networks you turn on in the dashboard). If you add networks, add their SKAdNetwork IDs to `IosAdPlist.cs`.
+6. App Store Connect / Play Console: declare ads and advertising ID / data use.
+

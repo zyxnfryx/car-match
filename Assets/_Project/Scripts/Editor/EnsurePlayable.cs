@@ -29,6 +29,16 @@ namespace CarMatch.Editor
             const string id = "com.zfxgames.carmatch";
             if (PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.iOS) != id)
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, id);
+            if (PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android) != id)
+                PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, id);
+            // LevelPlay 9.5.x: Android API 23+ (we keep 25), IL2CPP + ARM64 for Play, iOS 13+ / Xcode 26+.
+            if (PlayerSettings.Android.minSdkVersion < AndroidSdkVersions.AndroidApiLevel25)
+                PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel25;
+            if (PlayerSettings.GetScriptingBackend(NamedBuildTarget.Android) != ScriptingImplementation.IL2CPP)
+                PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.ARMv7;
+            if (string.CompareOrdinal(PlayerSettings.iOS.targetOSVersionString, "13.0") < 0)
+                PlayerSettings.iOS.targetOSVersionString = "13.0";
             if (PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Standalone) != id)
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone, id);
             if (PlayerSettings.defaultInterfaceOrientation != UIOrientation.Portrait)

@@ -37,6 +37,8 @@
     "com.unity.modules.xr": "1.0.0",
     "com.unity.render-pipelines.universal": "17.3.0",
     "com.unity.cinemachine": "3.1.4",
-    "com.unity.inputsystem": "1.14.2"
+    "com.unity.inputsystem": "1.14.2",
+    "com.unity.services.levelplay": "9.5.1",
+    "com.unity.ads.ios-support": "1.2.0"
   }
 }
