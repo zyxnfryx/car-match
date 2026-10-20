@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448d04448ddb47bfb0a2a6c2e36c3fff, type: 3}
   m_Name: AdConfig
   m_EditorClassIdentifier: 
-  IosAppKey: REPLACE_ME
-  IosRewardedAdUnitId: REPLACE_ME
-  AndroidAppKey: REPLACE_ME
-  AndroidRewardedAdUnitId: REPLACE_ME
+  IosAppKey: 28e26e80d
+  IosRewardedAdUnitId: 7q8pk883a0ppo0dt
+  AndroidAppKey: 28e275b1d
+  AndroidRewardedAdUnitId: wwszvtrebbh4dl2j
   TestMode: 1
   StubWhenUnavailable: 1
