@@ -17,6 +17,9 @@ public static class CliBuild
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled; // plain python http.server
         PlayerSettings.WebGL.decompressionFallback = false;
         PlayerSettings.WebGL.dataCaching = false;
+        PlayerSettings.WebGL.template = "PROJECT:LotLoop"; // portrait 390x844 letterboxed
+        PlayerSettings.defaultWebScreenWidth = 390;
+        PlayerSettings.defaultWebScreenHeight = 844;
         var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
         var outPath = Environment.GetEnvironmentVariable("CM_WEBGL_PATH");
         if (string.IsNullOrEmpty(outPath)) outPath = "Builds/WebGL";

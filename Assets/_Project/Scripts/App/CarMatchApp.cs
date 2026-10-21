@@ -269,9 +269,11 @@ namespace CarMatch
             float gap = 8f;
             float availW = 1064f - gutter * 2f;
             float cellW = (availW - gap * (lanes - 1)) / lanes;
-            if (cellW > 196f) cellW = 196f;
-            float cellH = cellW * 1.04f;
+            if (cellW > 300f) cellW = 300f;
             float availH = 1000f;
+            // Fill the width: cars grow until the deepest lane would overflow the lot height.
+            if (cellW * 1.04f * depth > availH) cellW = Mathf.Max(availH / (1.04f * depth), Mathf.Min(cellW, 150f));
+            float cellH = cellW * 1.04f;
             if (cellH * depth > availH) cellH = availH / depth;
             float boardW = lanes * cellW + (lanes - 1) * gap;
             float left = -boardW * 0.5f + cellW * 0.5f;
@@ -475,7 +477,7 @@ namespace CarMatch
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = car.Hidden ? HiddenSprite() : CarArt.For(car.Color, open);
             image.preserveAspect = true;
-            image.color = open ? Color.white : new Color(0.62f, 0.62f, 0.66f, 1f);
+            image.color = open ? Color.white : new Color(0.84f, 0.84f, 0.84f, 1f) /* keep hue, slight darken */;
             AnimateEyes(rt, image, car, open, tap);
             if (queueCount > 1)
             {
@@ -707,8 +709,14 @@ namespace CarMatch
             for (int c = cell - 1; c >= 0; c--)
                 points.Add(LaneAnchor(lane, c));
             var mouth = LaneAnchor(lane, 0);
-            points.Add(new Vector2(mouth.x, mouth.y - _metrics.CellH));
-            points.Add(BarSlotCenter(slotIndex));
+            var slotPos = BarSlotCenter(slotIndex);
+            var exit = new Vector2(mouth.x, mouth.y - _metrics.CellH);
+            points.Add(exit);
+            // Real turn on the exit road: pull out, swing toward the slot, then nose into the bar.
+            float roadY = Mathf.Lerp(exit.y, slotPos.y, 0.45f);
+            points.Add(new Vector2(Mathf.Lerp(exit.x, slotPos.x, 0.25f), roadY));
+            points.Add(new Vector2(slotPos.x, Mathf.Lerp(roadY, slotPos.y, 0.5f)));
+            points.Add(slotPos);
             return points;
         }
 
@@ -770,8 +778,7 @@ namespace CarMatch
                 yield return null;
             }
             float elapsed = 0f;
-            float lineClock = 0f;
-            Vector2 last = flyer.anchoredPosition;
+                        Vector2 last = flyer.anchoredPosition;
             while (elapsed < DriveSeconds)
             {
                 float dt = Time.unscaledDeltaTime;
@@ -792,12 +799,6 @@ namespace CarMatch
                 last = pos;
                 float stretch = Mathf.Clamp01(speed / 4000f) * 0.10f;
                 Steer(flyer, image, color, hidden, heading, lean, 1f - stretch * 0.5f, 1f + stretch);
-                lineClock += dt;
-                if (lineClock > 0.04f && speed > 900f)
-                {
-                    lineClock = 0f;
-                    SpeedLine(pos - facing.normalized * flyer.sizeDelta.y * 0.45f, facing);
-                }
                 yield return null;
             }
             flyer.anchoredPosition = points[points.Count - 1];
@@ -888,6 +889,8 @@ namespace CarMatch
             img.raycastTarget = false;
             var puff = rt.gameObject.AddComponent<Puff>();
             puff.Velocity = velocity;
+            // Dust sits under the car so it never washes the sprite out.
+            rt.SetSiblingIndex(Mathf.Max(0, _screen.childCount - 2));
         }
 
         void SpeedLine(Vector2 pos, Vector2 dir)
