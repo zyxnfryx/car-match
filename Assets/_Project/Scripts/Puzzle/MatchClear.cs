@@ -14,6 +14,19 @@ namespace CarMatch
             public bool Matched;
             public bool Overflow;
             public CarColor Cleared;
+            // Where the car went in, and (when Matched) the first of the three cleared slots.
+            public int Index;
+            public int ClearedFrom;
+        }
+
+        // Like Car Match: a car goes right after the last car of its color so colors stay grouped;
+        // a new color goes to the end.
+        public static int InsertIndex(IList<CarColor> bar, CarColor color)
+        {
+            if (bar == null) return 0;
+            for (int i = bar.Count - 1; i >= 0; i--)
+                if (bar[i] == color) return i + 1;
+            return bar.Count;
         }
 
         public static int Count(IList<CarColor> bar, CarColor color)
@@ -27,24 +40,24 @@ namespace CarMatch
 
         public static Result Push(List<CarColor> bar, CarColor color)
         {
-            bar.Add(color);
+            int index = InsertIndex(bar, color);
+            bar.Insert(index, color);
             int n = Count(bar, color);
             bool matched = n >= Set;
+            int from = -1;
             if (matched)
             {
-                int left = Set;
-                for (int i = bar.Count - 1; i >= 0 && left > 0; i--)
-                {
-                    if (bar[i] != color) continue;
-                    bar.RemoveAt(i);
-                    left--;
-                }
+                // Grouped, so the set is the three slots ending at the new car.
+                from = index - (Set - 1);
+                bar.RemoveRange(from, Set);
             }
             return new Result
             {
                 Matched = matched,
                 Overflow = bar.Count >= BarCap,
-                Cleared = color
+                Cleared = color,
+                Index = index,
+                ClearedFrom = from
             };
         }
     }

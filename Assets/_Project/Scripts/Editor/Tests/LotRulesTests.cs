@@ -18,6 +18,18 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Bar_InsertsAfterSameColorAndSlides()
+        {
+            RuleChecks.BarKeepsColorsGrouped();
+        }
+
+        [Test]
+        public void Progression_WinOpensExactlyTheNextLevel()
+        {
+            RuleChecks.ProgressionNeverSkips();
+        }
+
+        [Test]
         public void BarOverflow_SeventhCarFails()
         {
             RuleChecks.SeventhCarFails();

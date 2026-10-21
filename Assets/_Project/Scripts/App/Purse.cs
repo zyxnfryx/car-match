@@ -91,10 +91,11 @@ namespace CarMatch
             Save();
         }
 
-        public static void Advance(int count)
+        // Moves to the level after the one that was actually won (see Progress.AfterWin).
+        public static void Advance(int wonIndex, int count)
         {
             if (count < 1) return;
-            if (LevelIndex < count - 1) LevelIndex += 1;
+            LevelIndex = Progress.AfterWin(LevelIndex, wonIndex, count);
             Save();
         }
 
