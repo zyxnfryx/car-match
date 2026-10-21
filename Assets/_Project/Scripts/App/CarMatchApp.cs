@@ -711,11 +711,11 @@ namespace CarMatch
             // Gentle S-curve out of the lane: a small swing away from the slot side, then a lean toward it,
             // so the car rolls through the in-between headings instead of driving dead straight.
             var start = points[points.Count - 1];
-            float side = Mathf.Sign(slotPos.x - mouth.x);
-            if (Mathf.Abs(slotPos.x - mouth.x) < 1f) side = lane % 2 == 0 ? 1f : -1f;
+            float sway = Mathf.Sign(slotPos.x - mouth.x);
+            if (Mathf.Abs(slotPos.x - mouth.x) < 1f) sway = lane % 2 == 0 ? 1f : -1f;
             float swing = _metrics.CellW * 0.14f;
-            var exit = new Vector2(mouth.x + side * swing * 1.8f, mouth.y - _metrics.CellH);
-            points.Add(new Vector2(mouth.x - side * swing, Mathf.Lerp(start.y, exit.y, 0.45f)));
+            var exit = new Vector2(mouth.x + sway * swing * 1.8f, mouth.y - _metrics.CellH);
+            points.Add(new Vector2(mouth.x - sway * swing, Mathf.Lerp(start.y, exit.y, 0.45f)));
             points.Add(exit);
             // Real turn on the exit road: pull out, swing toward the slot, then nose into the bar.
             float roadY = Mathf.Lerp(exit.y, slotPos.y, 0.45f);
