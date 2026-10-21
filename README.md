@@ -13,7 +13,9 @@ The player-facing name is **Lot Loop**. The repo is `car-match`. Art, the mascot
 3. Press Play, or **Car Match → Play** (that menu also pins the Game view to 1080×1920).
 4. The home screen builds itself at runtime. No baked board is required.
 
-Tap a car, tunnel mouth, or side-lot car that has a clear path to the bottom. It enters the bar. Three of a color leave. The gold ring marks what you can tap. A `?` cover flips when the cell in front of it empties. A tunnel shows how many cars are still inside. A side lot stays shut until its lane cell and every cell closer to the exit are empty.
+Tap a car, tunnel mouth, or side-lot car that has a clear path to the bottom. It drives along that path off its spot and into the next open slot of the bar (about 0.4s, easing, turned to face the way it is moving). Input stays locked while it is moving. Three of a color leave only after it arrives. The gold ring marks what you can tap. Open eyes mean that same clear exit. Closed eyes mean the car is blocked. A `?` cover still hides the car until the cell in front of it empties; the eyes show up on the redraw after that reveal. A tunnel shows how many cars are still inside. A side lot stays shut until its lane cell and every cell closer to the exit are empty.
+
+Every car is asked again after a move, undo, shuffle, magnet, or reveal. Painted pairs, when you add them, are `Assets/_Project/Art/Cars/car_<color>_open.png` and `car_<color>_closed.png` for `coral`, `amber`, `lime`, `teal`, `violet`, `rose`, `sky`, and `gold`. Missing files use the code-drawn car, with a horizontal line for a closed eye. The drive is view-only: `BoardRules.Play` still applies the move in one step, so the solver and the edit-mode tests do not wait on the animation.
 
 Boosters, paid from the same wallet the home screen shows:
 
@@ -58,6 +60,7 @@ One helper per behavior. The screen, the solver, and the tests call these. They 
 | --- | --- |
 | `MatchClear` | Every tap. Inserts into the 7-slot bar and clears a set of three |
 | `ExitPath` | Input, the gold-ring highlight, and the solver |
+| `EyeState` | The board view and the tests. Open means `ExitPath` says that tap is legal. Sprite names are `car_<color>_open.png` / `car_<color>_closed.png` |
 | `HiddenReveal` | Level load, every removal, and shuffle |
 | `TunnelSpawn` | Taps and the magnet, including the painted count |
 | `SideLotGate` | Input, highlight, reveal, and the solver |

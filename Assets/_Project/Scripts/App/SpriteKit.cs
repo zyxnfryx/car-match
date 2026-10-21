@@ -12,7 +12,8 @@ namespace CarMatch
         static Sprite _coin;
         static Sprite _heart;
         static Sprite _sky;
-        static Sprite[] _cars;
+        static Sprite[] _open;
+        static Sprite[] _closed;
 
         public static Sprite Round => _round;
         public static Sprite Hidden => _hidden;
@@ -24,10 +25,16 @@ namespace CarMatch
 
         public static Sprite Car(CarColor color)
         {
+            return Car(color, true);
+        }
+
+        public static Sprite Car(CarColor color, bool eyesOpen)
+        {
             Warm();
+            var set = eyesOpen ? _open : _closed;
             int i = (int)color;
-            if (_cars == null || (uint)i >= (uint)_cars.Length) return _round;
-            return _cars[i];
+            if (set == null || (uint)i >= (uint)set.Length) return _round;
+            return set[i];
         }
 
         public static void Warm()
@@ -40,9 +47,14 @@ namespace CarMatch
             _coin = Make(CoinPixels(), 64, 64);
             _heart = Make(HeartPixels(), 64, 64);
             _sky = Make(SkyPixels(), 16, 64);
-            _cars = new Sprite[Palette.Count];
-            for (int i = 0; i < _cars.Length; i++)
-                _cars[i] = Make(CarPixels(Body((CarColor)i)), 96, 128);
+            _open = new Sprite[Palette.Count];
+            _closed = new Sprite[Palette.Count];
+            for (int i = 0; i < _open.Length; i++)
+            {
+                var body = Body((CarColor)i);
+                _open[i] = Make(CarPixels(body, true), 96, 128);
+                _closed[i] = Make(CarPixels(body, false), 96, 128);
+            }
         }
 
         public static Color Body(CarColor color)
@@ -67,7 +79,7 @@ namespace CarMatch
             return px;
         }
 
-        static Color32[] CarPixels(Color body)
+        static Color32[] CarPixels(Color body, bool eyesOpen)
         {
             const int w = 96;
             const int h = 128;
@@ -76,6 +88,7 @@ namespace CarMatch
             var roof = C32(Color.Lerp(body, Color.white, 0.35f));
             var glass = new Color32(226, 242, 246, 255);
             var ink = new Color32(42, 46, 58, 255);
+            var white = new Color32(255, 255, 255, 255);
             var wheel = new Color32(38, 40, 48, 255);
             var hub = new Color32(214, 214, 220, 255);
             FillDisc(px, w, h, 48, 16, 28, new Color32(0, 0, 0, 50));
@@ -86,10 +99,20 @@ namespace CarMatch
             FillDisc(px, w, h, 68, 26, 12, wheel);
             FillDisc(px, w, h, 28, 26, 5, hub);
             FillDisc(px, w, h, 68, 26, 5, hub);
-            FillDisc(px, w, h, 36, 58, 7, new Color32(255, 255, 255, 255));
-            FillDisc(px, w, h, 60, 58, 7, new Color32(255, 255, 255, 255));
-            FillDisc(px, w, h, 37, 57, 3, ink);
-            FillDisc(px, w, h, 61, 57, 3, ink);
+            if (eyesOpen)
+            {
+                FillDisc(px, w, h, 36, 58, 7, white);
+                FillDisc(px, w, h, 60, 58, 7, white);
+                FillDisc(px, w, h, 37, 57, 3, ink);
+                FillDisc(px, w, h, 61, 57, 3, ink);
+            }
+            else
+            {
+                FillRound(px, w, h, 28, 54, 16, 7, 2, white);
+                FillRound(px, w, h, 52, 54, 16, 7, 2, white);
+                FillRound(px, w, h, 29, 56, 14, 3, 1, ink);
+                FillRound(px, w, h, 53, 56, 14, 3, 1, ink);
+            }
             FillDisc(px, w, h, 48, 46, 3, new Color32(255, 170, 170, 255));
             return px;
         }

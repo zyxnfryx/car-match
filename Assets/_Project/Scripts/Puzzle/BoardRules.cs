@@ -10,8 +10,9 @@ namespace CarMatch
         public bool Failed;
     }
 
-    // The only tap mutation. The view, the solver, and the tests all call Play
-    // so match, reveal, tunnel, and overflow stay in one place.
+    // The only tap mutation. The solver and the tests call Play immediately.
+    // The view waits until the drive finishes, then calls the same method,
+    // so the match still happens here and does not depend on time.
     public static class BoardRules
     {
         public static MoveResult Play(Board board, IList<Board> history, Tap tap)
