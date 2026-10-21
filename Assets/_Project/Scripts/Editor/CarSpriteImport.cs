@@ -4,26 +4,72 @@ using UnityEngine;
 
 namespace CarMatch.Editor
 {
-    // Dropping idle or heading PNGs into Art/Cars imports them as sprites
-    // and points the player-build catalog at them.
+    // Cars and the mascot import as sprites: centered pivot, no mips,
+    // uncompressed so the baked shadow stays clean.
     public sealed class CarSpriteImport : AssetPostprocessor
     {
-        const string Folder = "Assets/_Project/Art/Cars/";
+        const string Cars = "Assets/_Project/Art/Cars/";
+        const string Mascot = "Assets/_Project/Art/Mascot/";
 
         void OnPreprocessTexture()
         {
             var path = assetPath.Replace('\\', '/');
-            if (!path.StartsWith(Folder, System.StringComparison.Ordinal)) return;
+            if (!path.StartsWith(Cars, System.StringComparison.Ordinal) &&
+                !path.StartsWith(Mascot, System.StringComparison.Ordinal))
+                return;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.mipmapEnabled = false;
+            importer.streamingMipmaps = false;
             importer.alphaIsTransparency = true;
             importer.npotScale = TextureImporterNPOTScale.None;
             importer.sRGBTexture = true;
             importer.alphaSource = TextureImporterAlphaSource.FromInput;
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.crunchedCompression = false;
+            importer.spritePivot = new Vector2(0.5f, 0.5f);
+            importer.spritePixelsToUnits = 100f;
+
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            settings.spriteMode = (int)SpriteImportMode.Single;
+            settings.spriteMeshType = SpriteMeshType.FullRect;
+            settings.spriteAlignment = (int)SpriteAlignment.Center;
+            settings.spritePivot = new Vector2(0.5f, 0.5f);
+            settings.mipmapEnabled = false;
+            settings.alphaIsTransparency = true;
+            settings.sRGBTexture = true;
+            settings.npotScale = TextureImporterNPOTScale.None;
+            settings.filterMode = FilterMode.Bilinear;
+            settings.wrapMode = TextureWrapMode.Clamp;
+            importer.SetTextureSettings(settings);
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.mipmapEnabled = false;
+            importer.alphaIsTransparency = true;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.crunchedCompression = false;
+
+            Uncompressed(importer, "DefaultTexturePlatform", false);
+            Uncompressed(importer, "Standalone", true);
+            Uncompressed(importer, "iOS", true);
+            Uncompressed(importer, "Android", true);
+            Uncompressed(importer, "WebGL", true);
+        }
+
+        static void Uncompressed(TextureImporter importer, string platform, bool overridden)
+        {
+            var settings = importer.GetPlatformTextureSettings(platform);
+            settings.overridden = overridden;
+            settings.maxTextureSize = 2048;
+            settings.textureCompression = TextureImporterCompression.Uncompressed;
+            settings.crunchedCompression = false;
+            settings.format = TextureImporterFormat.RGBA32;
+            settings.compressionQuality = 100;
+            importer.SetPlatformTextureSettings(settings);
         }
 
         static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
@@ -40,7 +86,8 @@ namespace CarMatch.Editor
             {
                 if (string.IsNullOrEmpty(paths[i])) continue;
                 var path = paths[i].Replace('\\', '/');
-                if (path.StartsWith(Folder, System.StringComparison.Ordinal)) return true;
+                if (path.StartsWith(Cars, System.StringComparison.Ordinal)) return true;
+                if (path.StartsWith(Mascot, System.StringComparison.Ordinal)) return true;
             }
             return false;
         }
@@ -101,6 +148,24 @@ namespace CarMatch.Editor
                     set.Headings[index] = heading;
                     changed = true;
                 }
+            }
+            var idle = CarArt.LoadSprite(MascotArt.AssetPath("mascot_idle"));
+            var happy = CarArt.LoadSprite(MascotArt.AssetPath("mascot_happy"));
+            var cheer = CarArt.LoadSprite(MascotArt.AssetPath("mascot_cheer"));
+            if (set.MascotIdle != idle)
+            {
+                set.MascotIdle = idle;
+                changed = true;
+            }
+            if (set.MascotHappy != happy)
+            {
+                set.MascotHappy = happy;
+                changed = true;
+            }
+            if (set.MascotCheer != cheer)
+            {
+                set.MascotCheer = cheer;
+                changed = true;
             }
             if (!changed) return;
             EditorUtility.SetDirty(set);

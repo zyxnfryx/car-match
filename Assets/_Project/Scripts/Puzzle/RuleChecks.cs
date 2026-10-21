@@ -249,13 +249,17 @@ namespace CarMatch
             Expect(EyeState.IsOpen(continued, new Tap(TapKind.Lane, 6, 0)), "the restored mouth is open");
             Expect(!EyeState.IsOpen(continued, new Tap(TapKind.Lane, 6, 1)), "the car behind the restored mouth stays closed");
 
-            string[] names = { "coral", "amber", "lime", "teal", "violet", "rose", "sky", "gold" };
-            for (int i = 0; i < names.Length; i++)
+            string[] art = { "red", "yellow", "green", "teal", "purple", "red", "blue", "yellow" };
+            var distinct = new System.Collections.Generic.HashSet<string>();
+            for (int i = 0; i < art.Length; i++)
             {
                 var color = (CarColor)i;
-                Expect(EyeState.SpriteFile(color, true) == "car_" + names[i] + "_open.png", names[i] + " open file");
-                Expect(EyeState.SpriteFile(color, false) == "car_" + names[i] + "_closed.png", names[i] + " closed file");
+                distinct.Add(art[i]);
+                Expect(EyeState.Token(color) == art[i], color + " maps to " + art[i]);
+                Expect(EyeState.SpriteFile(color, true) == "car_" + art[i] + "_open.png", color + " open file");
+                Expect(EyeState.SpriteFile(color, false) == "car_" + art[i] + "_closed.png", color + " closed file");
             }
+            Expect(distinct.Count == 6, "the eight game colors share six painted sets");
         }
 
         public static void HeadingUsesTheNearestDirection()
@@ -283,15 +287,14 @@ namespace CarMatch
             Expect(FacingAt(-45f) == CarFacing.SE, "-45 degrees is southeast");
 
             string[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
-            string[] names = { "coral", "amber", "lime", "teal", "violet", "rose", "sky", "gold" };
             Expect(dirs.Length == EyeState.FacingCount, "eight headings");
-            for (int c = 0; c < names.Length; c++)
+            for (int c = 0; c < Palette.Count; c++)
             {
                 var color = (CarColor)c;
                 for (int d = 0; d < dirs.Length; d++)
                 {
                     var file = EyeState.SpriteFile(color, (CarFacing)d);
-                    Expect(file == "car_" + names[c] + "_open_" + dirs[d] + ".png", file);
+                    Expect(file == "car_" + EyeState.Token(color) + "_open_" + dirs[d] + ".png", file);
                 }
             }
         }

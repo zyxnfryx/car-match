@@ -164,7 +164,7 @@ namespace CarMatch
                 Destroy(_screen.GetChild(i).gameObject);
         }
 
-        void ShowHome()
+        void ShowHome(bool celebrate = false)
         {
             _phase = Phase.Home;
             _busy = false;
@@ -174,11 +174,12 @@ namespace CarMatch
             Arch(new Vector2(230f, 300f), new Vector2(150f, 260f), new Color(0.55f, 0.70f, 0.78f, 1f));
             Arch(new Vector2(0f, 180f), new Vector2(220f, 280f), new Color(0.96f, 0.90f, 0.80f, 1f));
             Hud(820f);
-            var mascot = Place(_screen, "Mascot", new Vector2(0f, 80f), new Vector2(460f, 560f));
+            var mascot = Place(_screen, "Mascot", new Vector2(0f, 120f), new Vector2(520f, 520f));
             var pic = mascot.gameObject.AddComponent<Image>();
-            pic.sprite = SpriteKit.Mascot;
+            pic.sprite = PaintedMascot(celebrate ? MascotArt.Happy : MascotArt.Idle);
             pic.preserveAspect = true;
             pic.raycastTarget = false;
+            if (celebrate) StartCoroutine(CheerHome(mascot, pic));
             Label(new Vector2(0f, -250f), new Vector2(800f, 90f), "Lot Loop", 72, Cream, TextAnchor.MiddleCenter);
             Label(new Vector2(0f, -330f), new Vector2(800f, 50f), "Clear the lane. Match three.", 32, new Color(1f, 0.95f, 0.88f, 1f), TextAnchor.MiddleCenter);
             int number = NextNumber();
@@ -721,13 +722,11 @@ namespace CarMatch
             _busy = false;
             ClearScreen();
             Backdrop();
-            var mascot = Place(_screen, "Mascot", new Vector2(0f, 220f), new Vector2(420f, 500f));
+            var mascot = Place(_screen, "Mascot", new Vector2(0f, 240f), new Vector2(480f, 480f));
             var pic = mascot.gameObject.AddComponent<Image>();
-            pic.sprite = SpriteKit.Mascot;
+            pic.sprite = PaintedMascot(MascotArt.Happy);
             pic.preserveAspect = true;
             pic.raycastTarget = false;
-            // The full mascot dance is stubbed in v1. A bounce stands in for it.
-            StartCoroutine(Bounce(mascot));
             string title = _level != null ? _level.Title + " is clear" : "Lot clear";
             Label(new Vector2(0f, -120f), new Vector2(900f, 80f), title, 48, Cream, TextAnchor.MiddleCenter);
             Label(new Vector2(0f, -210f), new Vector2(700f, 60f), "+" + Economy.Pay(true) + " coins", 40, Gold, TextAnchor.MiddleCenter);
@@ -739,21 +738,35 @@ namespace CarMatch
             MakeButton(new Vector2(0f, more ? -590f : -500f), new Vector2(420f, 110f), new Color(0.20f, 0.24f, 0.34f, 0.9f), "Home", 36, OnHome);
         }
 
-        IEnumerator Bounce(RectTransform rt)
+        static Sprite PaintedMascot(Sprite painted)
         {
+            return painted != null ? painted : SpriteKit.Mascot;
+        }
+
+        IEnumerator CheerHome(RectTransform rt, Image pic)
+        {
+            var happy = MascotArt.Happy;
+            var cheer = MascotArt.Cheer;
+            if (happy != null) pic.sprite = happy;
+            rt.localRotation = Quaternion.identity;
+            yield return new WaitForSecondsRealtime(0.5f);
+            if (cheer != null) pic.sprite = cheer;
             var origin = rt.anchoredPosition;
             float t = 0f;
-            while (t < 2.4f)
+            const float duration = 1.05f;
+            while (t < duration)
             {
                 t += Time.unscaledDeltaTime;
-                float hop = Mathf.Abs(Mathf.Sin(t * 7f)) * 26f;
+                float hop = Mathf.Abs(Mathf.Sin(t * 9f)) * 22f;
                 rt.anchoredPosition = origin + new Vector2(0f, hop);
-                float s = 1f + 0.04f * Mathf.Sin(t * 7f);
+                float s = 1f + 0.04f * Mathf.Sin(t * 9f);
                 rt.localScale = new Vector3(s, s, 1f);
+                rt.localRotation = Quaternion.identity;
                 yield return null;
             }
             rt.anchoredPosition = origin;
             rt.localScale = Vector3.one;
+            rt.localRotation = Quaternion.identity;
         }
 
         void OnNext()
@@ -833,8 +846,9 @@ namespace CarMatch
         void OnHome()
         {
             if (_busy || _driving) return;
+            bool celebrate = _phase == Phase.Win;
             if (_phase == Phase.Fail) AcceptFail();
-            ShowHome();
+            ShowHome(celebrate);
         }
 
         int NextNumber()

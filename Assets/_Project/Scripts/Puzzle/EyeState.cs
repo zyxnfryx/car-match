@@ -83,18 +83,26 @@ namespace CarMatch
             }
         }
 
+        // Six painted sets cover eight game colors. Closed eyes exist only
+        // on the south-facing idle file, which is all a blocked car needs.
         public static string Token(CarColor color)
         {
             switch (color)
             {
-                case CarColor.Coral: return "coral";
-                case CarColor.Amber: return "amber";
-                case CarColor.Lime: return "lime";
-                case CarColor.Teal: return "teal";
-                case CarColor.Violet: return "violet";
-                case CarColor.Rose: return "rose";
-                case CarColor.Sky: return "sky";
-                default: return "gold";
+                case CarColor.Coral:
+                case CarColor.Rose:
+                    return "red";
+                case CarColor.Amber:
+                case CarColor.Gold:
+                    return "yellow";
+                case CarColor.Lime:
+                    return "green";
+                case CarColor.Teal:
+                    return "teal";
+                case CarColor.Sky:
+                    return "blue";
+                default:
+                    return "purple";
             }
         }
     }

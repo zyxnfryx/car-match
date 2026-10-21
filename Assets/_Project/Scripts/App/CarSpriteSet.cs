@@ -10,6 +10,9 @@ namespace CarMatch
         public Sprite[] Open = new Sprite[Palette.Count];
         public Sprite[] Closed = new Sprite[Palette.Count];
         public Sprite[] Headings = new Sprite[Palette.Count * EyeState.FacingCount];
+        public Sprite MascotIdle;
+        public Sprite MascotHappy;
+        public Sprite MascotCheer;
 
         public Sprite HeadingSprite(CarColor color, CarFacing facing)
         {
