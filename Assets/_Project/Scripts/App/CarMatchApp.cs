@@ -47,6 +47,8 @@ namespace CarMatch
         Text _livesText;
         Button _retryButton;
         Button _playButton;
+        UiShake _shake;
+        readonly Dictionary<string, bool> _eyes = new Dictionary<string, bool>();
 
         static readonly Color Ink = new Color(0.15f, 0.17f, 0.22f, 1f);
         static readonly Color Cream = new Color(0.98f, 0.95f, 0.90f, 1f);
@@ -55,7 +57,7 @@ namespace CarMatch
         static readonly Color Slot = new Color(0.62f, 0.40f, 0.30f, 1f);
         static readonly Color Gold = new Color(0.96f, 0.78f, 0.28f, 1f);
 
-        const float DriveSeconds = 0.42f;
+        const float DriveSeconds = 0.62f;
         const float BarY = -620f;
         const float BarSlotWidth = 112f;
         const float BarGap = 10f;
@@ -153,6 +155,7 @@ namespace CarMatch
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
             _screen = screen.transform;
+            _shake = screen.AddComponent<UiShake>();
         }
 
         void ClearScreen()
@@ -171,7 +174,9 @@ namespace CarMatch
             _busy = false;
             ClearScreen();
             Backdrop();
+            Clouds();
             Hud(0f);
+            AudioManager.Music(AudioManager.HomeMusic);
             // Hierarchy: HUD (safe top) > title > mascot on its light pool > tagline > Play.
             var pool = Place(_screen, "MascotPool", new Vector2(0f, -40f), new Vector2(760f, 260f));
             var poolImage = pool.gameObject.AddComponent<Image>();
@@ -184,6 +189,13 @@ namespace CarMatch
             pic.preserveAspect = true;
             pic.raycastTarget = false;
             if (celebrate) StartCoroutine(CheerHome(mascot, pic));
+            else
+            {
+                mascot.gameObject.AddComponent<Bob>();
+                var blink = mascot.gameObject.AddComponent<Blinker>();
+                blink.Open = pic.sprite;
+                blink.Closed = UiArt.Get("mascot_blink");
+            }
             Logo(new Vector2(0f, 560f), new Vector2(940f, 398f));
             var tag = Label(new Vector2(0f, -250f), new Vector2(900f, 64f), "Clear the lane. Match three.", 44, Cream, TextAnchor.MiddleCenter);
             Outlined(tag, new Color(0.10f, 0.12f, 0.28f, 0.8f), 3f);
@@ -192,6 +204,14 @@ namespace CarMatch
             var play = MakeButton(new Vector2(0f, -470f), new Vector2(700f, 256f), Green, "Level " + number, 84, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null, "btn_green");
             _playButton = play;
             play.interactable = canPlay;
+            if (canPlay)
+            {
+                play.gameObject.AddComponent<Pulse>();
+                var mask = play.gameObject.AddComponent<Mask>();
+                mask.showMaskGraphic = true;
+                var shine = UiArt.Get("shine");
+                if (shine != null) play.gameObject.AddComponent<ShineSweep>().Init(shine, 640f, 150f);
+            }
         }
 
         void OnPlay()
@@ -211,6 +231,7 @@ namespace CarMatch
             _board = _level.Board.Clone();
             _seed = _board.Clone();
             _history.Clear();
+            _eyes.Clear();
             _settled = false;
             _failPaid = false;
             _lastMatch = false;
@@ -222,6 +243,7 @@ namespace CarMatch
         {
             _phase = Phase.Play;
             ClearScreen();
+            AudioManager.Music(AudioManager.GameMusic);
             Backdrop();
             var safe = HudPlay();
             string title = _level != null ? "Level " + _level.Number : "Level";
@@ -410,6 +432,7 @@ namespace CarMatch
             image.sprite = car.Hidden ? SpriteKit.Hidden : CarArt.For(car.Color, open);
             image.preserveAspect = true;
             image.color = open ? Color.white : new Color(0.62f, 0.62f, 0.66f, 1f);
+            AnimateEyes(rt, image, car, open, tap);
             if (queueCount > 1)
             {
                 var badge = Place(rt, "Count", new Vector2(size.x * 0.28f, size.y * 0.28f), new Vector2(48f, 40f));
@@ -420,7 +443,59 @@ namespace CarMatch
                 AddText(badge, queueCount.ToString(), 24, Ink, TextAnchor.MiddleCenter);
             }
             if (open) Hook(rt, tap);
-            else image.raycastTarget = false;
+            else BlockedHook(rt);
+        }
+
+        void BlockedHook(RectTransform rt)
+        {
+            var button = rt.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.None;
+            var piece = rt;
+            button.onClick.AddListener(delegate
+            {
+                if (_busy || _driving) return;
+                AudioManager.Play(Sfx.Blocked);
+                Haptics.Thud();
+                StartCoroutine(Wiggle(piece));
+            });
+        }
+
+        static IEnumerator Wiggle(RectTransform rt)
+        {
+            float t = 0f;
+            while (t < 0.32f && rt != null)
+            {
+                t += Time.unscaledDeltaTime;
+                rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * 50f) * 7f * (1f - t / 0.32f));
+                yield return null;
+            }
+            if (rt != null) rt.localRotation = Quaternion.identity;
+        }
+
+        // Eyes lift open (with an overshoot blink and a body bounce) when a car's lane clears,
+        // and close in reverse when it gets blocked again.
+        void AnimateEyes(RectTransform rt, Image image, Car car, bool open, Tap tap)
+        {
+            if (car.Hidden) return;
+            string key = (int)tap.Kind + ":" + tap.Index + ":" + tap.Cell + ":" + (int)car.Color;
+            bool before;
+            bool had = _eyes.TryGetValue(key, out before);
+            _eyes[key] = open;
+            if (!had || before == open) return;
+            var frames = new Sprite[5];
+            for (int f = 0; f < 5; f++) frames[f] = CarFrames.Eye(car.Color, f);
+            if (frames[0] == null) return;
+            var anim = rt.gameObject.AddComponent<EyeAnim>();
+            if (open)
+            {
+                anim.Frames = frames;
+                anim.Final = image.sprite;
+            }
+            else
+            {
+                anim.Frames = new[] { frames[4], frames[2], frames[1], frames[0] };
+                anim.Final = image.sprite;
+            }
         }
 
         void Hook(RectTransform rt, Tap tap)
@@ -528,6 +603,9 @@ namespace CarMatch
             var size = piece != null ? piece.sizeDelta : _metrics.Piece;
             HidePiece(piece);
             var flyer = SpawnFlyer(color, hidden, points[0], size);
+            AudioManager.CarTap();
+            AudioManager.Play(Sfx.DriveOut);
+            Haptics.Tap();
             LockInput();
             StartCoroutine(Drive(flyer, points, tap, color, hidden));
         }
@@ -605,13 +683,29 @@ namespace CarMatch
 
         IEnumerator Drive(RectTransform flyer, List<Vector2> points, Tap tap, CarColor color, bool hidden)
         {
+            // Round the lane corners so the car carves a curve instead of snapping at waypoints.
+            points = Smooth(points, 3);
             var startSize = flyer.sizeDelta;
             var endSize = new Vector2(BarSlotWidth - 8f, BarCarH);
             var image = flyer.GetComponent<Image>();
             Vector2 facing;
             Along(points, 0f, out facing);
-            Aim(flyer, image, color, hidden, facing);
+            float heading = CarFrames.HeadingAngle(facing);
+            float lean = 0f;
+            Steer(flyer, image, color, hidden, heading, 0f, 1f, 1f);
+            // Squash on start: the car crouches before it pulls out, and kicks up dust.
+            for (int k = 0; k < 3; k++) DustPuff(points[0] + new Vector2(Random.Range(-30f, 30f), -startSize.y * 0.3f), new Vector2(Random.Range(-60f, 60f), Random.Range(-20f, 30f)));
+            float crouch = 0f;
+            while (crouch < 0.08f)
+            {
+                crouch += Mathf.Min(Time.unscaledDeltaTime, 0.05f);
+                float q = Mathf.Sin(crouch / 0.08f * Mathf.PI);
+                flyer.localScale = new Vector3(1f + 0.10f * q, 1f - 0.12f * q, 1f);
+                yield return null;
+            }
             float elapsed = 0f;
+            float lineClock = 0f;
+            Vector2 last = flyer.anchoredPosition;
             while (elapsed < DriveSeconds)
             {
                 float dt = Time.unscaledDeltaTime;
@@ -619,18 +713,41 @@ namespace CarMatch
                 elapsed += dt;
                 float u = Mathf.Clamp01(elapsed / DriveSeconds);
                 float eased = u * u * (3f - 2f * u);
-                flyer.anchoredPosition = Along(points, eased, out facing);
+                var pos = Along(points, eased, out facing);
+                flyer.anchoredPosition = pos;
                 flyer.sizeDelta = Vector2.Lerp(startSize, endSize, eased);
-                Aim(flyer, image, color, hidden, facing);
+                // Heading eases toward the path tangent (no snapping); lean follows the turn rate.
+                float target = CarFrames.HeadingAngle(facing);
+                float delta = Mathf.DeltaAngle(heading, target);
+                float step = delta * Mathf.Clamp01(dt * 18f);
+                heading = Mathf.Repeat(heading + step, 360f);
+                lean = Mathf.Lerp(lean, Mathf.Clamp(-step / Mathf.Max(dt, 0.001f) * 0.02f, -9f, 9f), Mathf.Clamp01(dt * 12f));
+                float speed = (pos - last).magnitude / Mathf.Max(dt, 0.001f);
+                last = pos;
+                float stretch = Mathf.Clamp01(speed / 4000f) * 0.10f;
+                Steer(flyer, image, color, hidden, heading, lean, 1f - stretch * 0.5f, 1f + stretch);
+                lineClock += dt;
+                if (lineClock > 0.04f && speed > 900f)
+                {
+                    lineClock = 0f;
+                    SpeedLine(pos - facing.normalized * flyer.sizeDelta.y * 0.45f, facing);
+                }
                 yield return null;
             }
             flyer.anchoredPosition = points[points.Count - 1];
             flyer.sizeDelta = endSize;
-            Along(points, 1f, out facing);
-            Aim(flyer, image, color, hidden, facing);
+            Steer(flyer, image, color, hidden, 0f, 0f, 1f, 1f);
+            flyer.localScale = Vector3.one;
             var move = BoardRules.Play(_board, _history, tap);
             _driving = false;
             _lastMatch = move.Matched;
+            AudioManager.Play(Sfx.SlotArrive);
+            if (move.Matched)
+            {
+                AudioManager.Play(Sfx.MatchClear);
+                Haptics.Success();
+                if (_shake != null) _shake.Punch(0.22f, 9f, 0.6f);
+            }
             if (!move.Accepted)
             {
                 ShowPlay();
@@ -639,6 +756,79 @@ namespace CarMatch
             if (move.Won) EnterWin();
             else if (move.Failed) ShowFail(null);
             else ShowPlay();
+        }
+
+        // Chaikin corner cutting; keeps the first and last points fixed.
+        static List<Vector2> Smooth(List<Vector2> pts, int passes)
+        {
+            if (pts == null || pts.Count < 3) return pts;
+            var cur = pts;
+            for (int p = 0; p < passes; p++)
+            {
+                var next = new List<Vector2>(cur.Count * 2) { cur[0] };
+                for (int i = 0; i < cur.Count - 1; i++)
+                {
+                    var a = cur[i];
+                    var b = cur[i + 1];
+                    if (i > 0) next.Add(Vector2.Lerp(a, b, 0.25f));
+                    if (i < cur.Count - 2) next.Add(Vector2.Lerp(a, b, 0.75f));
+                }
+                next.Add(cur[cur.Count - 1]);
+                cur = next;
+            }
+            return cur;
+        }
+
+        // 16 painted headings; the leftover angle (at most 11.25 deg) plus the lean is applied as a
+        // small rotation so the turn reads continuous. Falls back to the 8-heading set, then the code car.
+        static void Steer(RectTransform rt, Image image, CarColor color, bool hidden, float heading, float lean, float sx, float sy)
+        {
+            if (rt == null) return;
+            rt.localScale = new Vector3(sx, sy, 1f);
+            if (hidden || image == null)
+            {
+                rt.localRotation = Quaternion.Euler(0f, 0f, lean);
+                return;
+            }
+            int index = Mathf.RoundToInt(heading / 22.5f) % 16;
+            var sprite = CarFrames.Heading(color, index);
+            if (sprite != null)
+            {
+                image.sprite = sprite;
+                float residual = Mathf.DeltaAngle(index * 22.5f, heading);
+                rt.localRotation = Quaternion.Euler(0f, 0f, residual + lean);
+                return;
+            }
+            float rad = heading * Mathf.Deg2Rad;
+            Aim(rt, image, color, hidden, new Vector2(Mathf.Sin(rad), -Mathf.Cos(rad)));
+        }
+
+        void DustPuff(Vector2 pos, Vector2 velocity)
+        {
+            var art = UiArt.Get("dust");
+            if (art == null) return;
+            var rt = Place(_screen, "Dust", pos, new Vector2(70f, 70f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = art;
+            img.color = new Color(1f, 1f, 1f, 0.7f);
+            img.raycastTarget = false;
+            var puff = rt.gameObject.AddComponent<Puff>();
+            puff.Velocity = velocity;
+        }
+
+        void SpeedLine(Vector2 pos, Vector2 dir)
+        {
+            var rt = Place(_screen, "SpeedLine", pos, new Vector2(6f, 46f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.color = new Color(1f, 1f, 1f, 0.55f);
+            img.raycastTarget = false;
+            rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f);
+            var puff = rt.gameObject.AddComponent<Puff>();
+            puff.Life = 0.22f;
+            puff.Grow = 0.6f;
+            puff.Velocity = -dir.normalized * 120f;
+            rt.SetAsFirstSibling();
+            rt.SetSiblingIndex(Mathf.Max(0, _screen.childCount - 2));
         }
 
         static Vector2 Along(List<Vector2> points, float t, out Vector2 facing)
@@ -714,6 +904,7 @@ namespace CarMatch
             Board restored;
             if (!BoosterKit.Undo(_history, out restored)) return;
             if (!Purse.TrySpend(Economy.UndoCost)) return;
+            AudioManager.Play(Sfx.BoosterUndo);
             _board = restored;
             _lastMatch = false;
             ShowPlay();
@@ -725,6 +916,7 @@ namespace CarMatch
             Board restored;
             if (!BoosterKit.SuperUndo(_history, out restored)) return;
             if (!Purse.TrySpend(Economy.SuperUndoCost)) return;
+            AudioManager.Play(Sfx.BoosterSuper);
             _board = restored;
             _lastMatch = false;
             ShowPlay();
@@ -746,6 +938,7 @@ namespace CarMatch
                 _board = back;
                 return;
             }
+            AudioManager.Play(Sfx.BoosterShuffle);
             _lastMatch = false;
             ShowPlay();
         }
@@ -766,6 +959,7 @@ namespace CarMatch
                 _board = back;
                 return;
             }
+            AudioManager.Play(Sfx.BoosterMagnet);
             _lastMatch = true;
             if (_board.Won) EnterWin();
             else ShowPlay();
@@ -965,6 +1159,24 @@ namespace CarMatch
             var fit = bg.gameObject.AddComponent<AspectRatioFitter>();
             fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
             fit.aspectRatio = painted.rect.width / painted.rect.height;
+        }
+
+        // Drifting cloud band over the sky with a little tilt parallax.
+        void Clouds()
+        {
+            var art = UiArt.Get("clouds");
+            if (art == null) return;
+            for (int i = 0; i < 2; i++)
+            {
+                var rt = Place(_screen, "Clouds", new Vector2(i == 0 ? 0f : -900f, i == 0 ? 700f : 420f), i == 0 ? new Vector2(2160f, 520f) : new Vector2(1620f, 390f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = art;
+                img.color = new Color(1f, 1f, 1f, i == 0 ? 0.85f : 0.6f);
+                img.raycastTarget = false;
+                var d = rt.gameObject.AddComponent<Drift>();
+                d.Speed = i == 0 ? 9f : 16f;
+                d.Parallax = i == 0 ? 8f : 16f;
+            }
         }
 
         static RectTransform Stretch(Transform parent, string name)
