@@ -10,6 +10,8 @@ namespace CarMatch
         public string Id;
         public string Title;
         public string Blurb;
+        // Every 10th level: a tougher spike with a red 'Super Hard' badge; pays Economy.SuperHardPay.
+        public bool SuperHard;
         public Board Board;
         public LevelHooks Hooks = new LevelHooks();
     }
@@ -39,6 +41,7 @@ namespace CarMatch
                     Id = Str(row, "id", "level-" + (i + 1)),
                     Title = Str(row, "title", "Level " + (i + 1)),
                     Blurb = Str(row, "blurb", ""),
+                    SuperHard = Str(row, "tier", "") == "superhard",
                     Board = Build(row, i + 1),
                     Hooks = LevelHooks.Read(row)
                 };
@@ -98,6 +101,8 @@ namespace CarMatch
             token = token == null ? "" : token.Trim();
             if (token.Length == 0 || token == "-")
                 return new Slot { Empty = true };
+            if (token.StartsWith("box:"))
+                return new Slot { Empty = false, Box = true, Car = ParseCar(token.Substring(4), number) };
             if (token.StartsWith("tunnel:"))
             {
                 var body = token.Substring("tunnel:".Length);

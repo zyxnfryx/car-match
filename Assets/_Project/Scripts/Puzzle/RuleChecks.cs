@@ -400,6 +400,9 @@ namespace CarMatch
             LevelsForGapCheck.Clear();
             foreach (var d in LevelJson.Parse(json)) LevelsForGapCheck.Add(d.Board);
             MagnetClosesLaneGaps();
+            SuperClearsASet();
+            MysteryBoxBreaksNextToAMatch();
+            SuperHardEveryTenth(json);
         }
 
         static Board Tiny(string lanes, string sides = null)
@@ -499,6 +502,16 @@ namespace CarMatch
                     }
                     else Ensure(BoardQuery.Key(mg) == key, tag + "failed magnet changed the board");
 
+                    var sp = board.Clone();
+                    CarColor sc; int sb;
+                    if (BoosterKit.Super(sp, null, out sc, out sb))
+                    {
+                        Ensure(BoardQuery.Total(sp) == BoardQuery.Total(board) - (MatchClear.Set - sb), tag + "super removed the wrong number of lot cars");
+                        int[] after = Totals(sp);
+                        for (int i = 0; i < after.Length; i++)
+                            Ensure(after[i] % MatchClear.Set == before[i] % MatchClear.Set, tag + "super broke a color set");
+                    }
+
                     if (history.Count > 0)
                     {
                         var hist = new List<Board>(history);
@@ -559,36 +572,61 @@ namespace CarMatch
             }
         }
 
-        // After a magnet pulls a car from the middle of a lane, the cars behind it slide up: no hole between cars.
+        // Car Match keeps parked cars where they are after a car leaves; the magnet does the same.
         public static void MagnetClosesLaneGaps()
         {
             var board = Tiny("[[\"teal\",\"coral\",\"amber\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
-            var moves = new List<int[]>();
-            Expect(BoosterKit.Magnet(board, null, moves), "magnet should find coral");
+            Expect(BoosterKit.Magnet(board), "magnet should find coral");
             var lane = board.Lanes[0].Cells;
             Expect(!lane[0].Empty && lane[0].Car.Color == CarColor.Teal, "front teal stays put");
-            Expect(!lane[1].Empty && lane[1].Car.Color == CarColor.Amber, "amber slid up into the hole");
-            Expect(!lane[2].Empty && lane[2].Car.Color == CarColor.Teal, "rear teal slid up");
-            Expect(lane.Count < 4 || lane[3].Empty, "the back cell is now free");
-            Expect(moves.Count == 2, "two cars moved");
-            foreach (var def in LevelsForGapCheck)
-            {
-                var b = def.Clone();
-                if (!BoosterKit.Magnet(b)) continue;
-                for (int l = 0; l < b.Lanes.Count; l++)
-                {
-                    var cells = b.Lanes[l].Cells;
-                    bool seenCar = false, seenHole = false;
-                    for (int c = 0; c < cells.Count; c++)
-                    {
-                        if (cells[c].Tunnel) { seenCar = false; seenHole = false; continue; }
-                        if (!cells[c].Empty) { Expect(!(seenCar && seenHole), "gap left mid-lane"); seenCar = true; }
-                        else if (seenCar) seenHole = true;
-                    }
-                }
-            }
+            Expect(lane[1].Empty, "the pulled coral leaves an empty bay, like a normal send");
+            Expect(!lane[2].Empty && lane[2].Car.Color == CarColor.Amber, "amber stays parked");
+            Expect(!lane[3].Empty && lane[3].Car.Color == CarColor.Teal, "rear teal stays parked");
+        }
+
+        // Super clears a set: uses matching bar cars first, then lot cars, and never refills the lot.
+        public static void SuperClearsASet()
+        {
+            var board = Tiny("[[\"coral\",\"teal\"],[\"amber\",\"teal\"],[\"teal\",\"amber\",\"amber\"]]");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0));
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 0));
+            int before = BoardQuery.Total(board);
+            var pulled = new List<int[]>();
+            CarColor color; int fromBar;
+            Expect(BoosterKit.Super(board, pulled, out color, out fromBar), "super applies");
+            Expect(color == CarColor.Amber || color == CarColor.Coral, "super picks a color waiting in the bar");
+            Expect(BoardQuery.Total(board) == before - (MatchClear.Set - fromBar), "super only removes cars");
+            Expect(MatchClear.Count(board.Bar, color) == 0, "the bar car of that color is used up");
+            var lone = Tiny("[[\"coral\",\"teal\"]]");
+            CarColor c2; int b2;
+            Expect(!BoosterKit.Super(lone, null, out c2, out b2), "no set possible, super refuses");
         }
 
         public static List<Board> LevelsForGapCheck = new List<Board>();
+
+        // A box blocks its lane until a car from a neighboring cell is cleared in a match; then its car shows.
+        public static void MysteryBoxBreaksNextToAMatch()
+        {
+            var board = Tiny("[[\"coral\",\"box:teal\",\"teal\"],[\"coral\",\"amber\"],[\"coral\",\"teal\"],[\"amber\",\"amber\"]]");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "a box can't be tapped");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(board.Lanes[0].Cells[1].Box, "one coral in the bar is not a clear");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 0));
+            var m = BoardRules.Play(board, null, new Tap(TapKind.Lane, 2, 0));
+            Expect(m.Matched, "three coral clear");
+            Expect(!board.Lanes[0].Cells[1].Box, "the box next to the cleared coral broke");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "the revealed teal can leave");
+            var far = Tiny("[[\"coral\"],[\"coral\"],[\"coral\"],[\"amber\",\"amber\",\"box:lime\"]]");
+            for (int i = 0; i < 3; i++) BoardRules.Play(far, null, new Tap(TapKind.Lane, i, 0));
+            Expect(far.Lanes[3].Cells[2].Box, "a box away from the match stays shut");
+            Expect(LotSolve.Search(Tiny("[[\"coral\",\"box:teal\",\"teal\"],[\"coral\",\"teal\"],[\"coral\"]]")).Outlook == LotSolve.Outlook.Winnable, "the solver opens boxes");
+        }
+
+        public static void SuperHardEveryTenth(string json)
+        {
+            foreach (var d in LevelJson.Parse(json))
+                Expect(d.SuperHard == (d.Number % 10 == 0), "level " + d.Number + " super hard flag");
+            Expect(Economy.WinPayFor(true) == 100 && Economy.WinPayFor(false) == 20, "super hard pays 100, others 20");
+        }
     }
 }

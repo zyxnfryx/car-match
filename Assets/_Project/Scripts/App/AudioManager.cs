@@ -19,7 +19,8 @@ namespace CarMatch
         Win,
         MascotCheer,
         Fail,
-        Coin
+        Coin,
+        BoxTear
     }
 
     // One pooled one-shot host + a music bed, after Flock Five's SfxHost/MixDesk (pool, duck),
@@ -59,7 +60,8 @@ namespace CarMatch
             { Sfx.Win, new Cue("level_win_fanfare", 0, 0.9f) },
             { Sfx.MascotCheer, new Cue("mascot_cheer", 0, 0.75f) },
             { Sfx.Fail, new Cue("level_fail", 0, 0.7f) },
-            { Sfx.Coin, new Cue("coin_gain", 3, 0.6f) }
+            { Sfx.Coin, new Cue("coin_gain", 3, 0.6f) },
+            { Sfx.BoxTear, new Cue("box_tear", 0, 0.8f) }
         };
 
         static float VariantTrim(string clip) { return 1f; }
@@ -129,6 +131,8 @@ namespace CarMatch
 
         public static void Play(Sfx sfx) { try { Live.PlayCue(sfx, 1f); } catch (System.Exception) { } }
         public static void Play(Sfx sfx, float volumeScale) { try { Live.PlayCue(sfx, volumeScale); } catch (System.Exception) { } }
+        // Same cue at a set pitch (e.g. the blocked thud a little lower).
+        public static void PlayPitched(Sfx sfx, float volumeScale, float pitch) { try { Live.PlayCue(sfx, volumeScale, pitch); } catch (System.Exception) { } }
 
         public const string HomeMusic = "music_home_loop";
         public const string GameMusic = "music_gameplay_loop";
@@ -188,7 +192,9 @@ namespace CarMatch
             }
         }
 
-        void PlayCue(Sfx sfx, float scale)
+        void PlayCue(Sfx sfx, float scale) { PlayCue(sfx, scale, -1f); }
+
+        void PlayCue(Sfx sfx, float scale, float pitch)
         {
             Cue cue;
             if (!Cues.TryGetValue(sfx, out cue)) return;
@@ -207,7 +213,7 @@ namespace CarMatch
             if (sfx == Sfx.Win || sfx == Sfx.Fail) Duck(clip.length + 0.4f);
             var src = _pool[_next];
             _next = (_next + 1) % _pool.Length;
-            src.pitch = Random.Range(0.97f, 1.03f);
+            src.pitch = pitch > 0f ? pitch : Random.Range(0.97f, 1.03f);
             src.PlayOneShot(clip, cue.Volume * VariantTrim(name) * scale);
         }
 

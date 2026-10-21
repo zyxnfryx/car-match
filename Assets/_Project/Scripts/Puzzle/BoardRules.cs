@@ -54,7 +54,17 @@ namespace CarMatch
                 side.Queue.RemoveAt(0);
             }
 
+            int origin = tap.Kind == TapKind.Lane ? tap.Index * 100 + tap.Cell : -1;
+            while (board.BarFrom.Count < board.Bar.Count) board.BarFrom.Add(-1);
+            int insertAt = MatchClear.InsertIndex(board.Bar, car.Color);
             var clear = MatchClear.Push(board.Bar, car.Color);
+            board.BarFrom.Insert(insertAt, origin);
+            if (clear.Matched && clear.ClearedFrom >= 0)
+            {
+                var from = board.BarFrom.GetRange(clear.ClearedFrom, MatchClear.Set);
+                board.BarFrom.RemoveRange(clear.ClearedFrom, MatchClear.Set);
+                MysteryBox.BreakNear(board, from, null);
+            }
             HiddenReveal.Sweep(board);
             bool won = BoardQuery.IsClear(board);
             bool failed = !won && clear.Overflow;

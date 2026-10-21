@@ -108,11 +108,27 @@ namespace CarMatch.Tests
         }
 
         [Test]
-        public void Boosters_MagnetClosesLaneGaps()
+        public void Boosters_MagnetLeavesParkedCarsInPlace()
         {
-            RuleChecks.LevelsForGapCheck.Clear();
-            foreach (var d in LevelJson.Parse(Json())) RuleChecks.LevelsForGapCheck.Add(d.Board);
             RuleChecks.MagnetClosesLaneGaps();
+        }
+
+        [Test]
+        public void MysteryBoxes_BreakNextToAMatch()
+        {
+            RuleChecks.MysteryBoxBreaksNextToAMatch();
+        }
+
+        [Test]
+        public void Levels_EveryTenthIsSuperHard()
+        {
+            RuleChecks.SuperHardEveryTenth(Json());
+        }
+
+        [Test]
+        public void Boosters_SuperClearsASet()
+        {
+            RuleChecks.SuperClearsASet();
         }
 
         [Test]

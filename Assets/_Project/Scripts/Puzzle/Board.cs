@@ -6,6 +6,9 @@ namespace CarMatch
     {
         public bool Empty = true;
         public bool Tunnel;
+        // Mystery box: a cardboard '?' box over a parked car. It blocks the lane and can't be tapped;
+        // it breaks (Box = false) when a car from a neighboring cell is cleared in the bar.
+        public bool Box;
         public Car Car;
         public List<Car> Queue;
 
@@ -17,6 +20,7 @@ namespace CarMatch
             {
                 Empty = Empty,
                 Tunnel = Tunnel,
+                Box = Box,
                 Car = Car
             };
             if (Queue != null)
@@ -62,6 +66,8 @@ namespace CarMatch
         public readonly List<Lane> Lanes = new List<Lane>();
         public readonly List<SideLot> Sides = new List<SideLot>();
         public readonly List<CarColor> Bar = new List<CarColor>();
+        // Parallel to Bar: where each bar car came from (lane * 100 + cell), or -1 for side lots and tunnels' queues.
+        public readonly List<int> BarFrom = new List<int>();
         public bool Won;
         public bool Failed;
 
@@ -73,6 +79,8 @@ namespace CarMatch
             for (int i = 0; i < Sides.Count; i++)
                 copy.Sides.Add(Sides[i].Clone());
             copy.Bar.AddRange(Bar);
+            copy.BarFrom.AddRange(BarFrom);
+            while (copy.BarFrom.Count < copy.Bar.Count) copy.BarFrom.Add(-1);
             return copy;
         }
     }

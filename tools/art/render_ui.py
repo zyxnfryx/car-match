@@ -43,11 +43,24 @@ def button(w,h,top,bot,lip,name,r=None):
     g=rrect(w-int(h*0.24),int(h*0.42),int(h*0.2)); gl=np.zeros((h,w),np.float32); y0=int(h*0.08); x0=int(h*0.12)
     gl[y0:y0+g.shape[0],x0:x0+g.shape[1]]=g*np.linspace(0.42,0.06,g.shape[0])[:,None]
     face[...,:3]=face[...,:3]*(1-gl[...,None])+gl[...,None]
-    full.alpha_composite(toimg(face),(0,0)); save(shadow(full,(0,8),9,0.5,22),name)
-button(700,190,(120,226,90),(38,160,64),(22,100,42),'btn_green')
-button(420,140,(110,170,250),(40,100,220),(24,62,150),'btn_blue')
-button(420,140,(255,190,80),(240,130,30),(170,80,20),'btn_orange')
-button(210,190,(110,170,250),(40,100,220),(24,62,150),'btn_booster',r=48)
+    full.alpha_composite(toimg(face),(0,0))
+    # Car Match style: thick dark-blue outer stroke around the whole pill, thick white stroke just inside the face.
+    a=np.asarray(full.split()[3],np.float32)/255
+    inner=ndimage.binary_erosion(a>0.5,iterations=max(5,int(h*0.045)))
+    outer=(a>0.5)&~inner
+    wi=ndimage.binary_erosion(m>0.5,iterations=max(5,int(h*0.045))+max(4,int(h*0.035)))
+    white=(m>0.5)&~wi&inner[:h,:]
+    px=np.asarray(full,np.float32)/255
+    px[outer]=[0.06,0.12,0.36,1.0]
+    wpad=np.zeros(a.shape,bool); wpad[:h,:]=white
+    px[wpad]=[1,1,1,1]
+    full=toimg(px)
+    save(shadow(full,(0,8),9,0.5,22),name)
+button(700,190,(110,240,70),(30,180,40),(16,110,30),'btn_green')
+button(420,140,(90,180,255),(20,100,240),(12,60,170),'btn_blue')
+button(420,140,(255,220,60),(255,150,0),(180,90,0),'btn_orange')
+button(420,140,(255,110,100),(230,30,40),(150,10,20),'btn_red')
+button(210,190,(90,180,255),(20,100,240),(12,60,170),'btn_booster',r=48)
 button(150,96,(70,84,120),(36,44,72),(18,22,40),'btn_navy',r=40)
 # ---------- top bar pill + plus badge ----------
 def pill():
@@ -113,7 +126,7 @@ def logo(text='Lot Loop',name='logo',W=980,Hh=380,size=210,top=(1.0,0.93,0.40),b
     out[...,:3]=out[...,:3]*(1-m[...,None])+face[...,:3]*m[...,None]
     im=toimg(out); save(shadow(im,(0,16),10,0.55,30),name)
 logo()
-logo('Lot Cleared!','title_win',W=1000,Hh=250,size=150,arc=0.05)
+logo('PERFECT!','title_win',W=1000,Hh=250,size=150,arc=0.05)
 # ---------- shine, glow, rays, confetti, dust, sparkle ----------
 s=Image.new('L',(160,400),0); d=ImageDraw.Draw(s); d.polygon([(60,0),(110,0),(100,400),(50,400)],fill=255); d.polygon([(10,0),(35,0),(25,400),(0,400)],fill=170)
 s=s.filter(ImageFilter.GaussianBlur(6)); w=Image.new('RGBA',s.size,(255,255,255,0)); w.putalpha(s); save(w,'shine')

@@ -23,7 +23,9 @@ namespace CarMatch
         // Rewarded-video coin bonus. Placeholder equal to one win's pay; Brandon to set the real number.
         public const int AdCoinReward = WinPay;
 
+        public const int SuperHardPay = 100;
         public static int Pay(bool won) => won ? WinPay : FailPay;
+        public static int WinPayFor(bool superHard) => superHard ? SuperHardPay : WinPay;
 
         public static Wallet NewWallet()
         {

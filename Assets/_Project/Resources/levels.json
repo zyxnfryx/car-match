@@ -158,23 +158,32 @@
   },
   {
    "id": "lot-010",
-   "title": "Cedar Block",
+   "title": "Orchard Bay",
    "blurb": "",
    "lanes": [
     [
      "teal",
+     "teal",
      "coral",
+     "teal",
+     "teal"
+    ],
+    [
+     "amber",
      "coral",
+     "amber",
      "coral",
      "amber"
     ],
     [
-     "amber",
+     "coral",
+     "coral",
      "teal",
      "teal",
-     "amber"
+     "coral"
     ]
-   ]
+   ],
+   "tier": "superhard"
   },
   {
    "id": "lot-011",
@@ -414,30 +423,42 @@
   },
   {
    "id": "lot-020",
-   "title": "River Block",
+   "title": "Meadow Block",
    "blurb": "",
    "lanes": [
     [
      "coral",
      "teal",
-     "coral"
+     "teal",
+     "amber"
     ],
     [
+     "coral",
+     "amber",
      "coral",
      "amber"
     ],
     [
+     "coral",
      "teal",
-     "amber"
+     "amber",
+     "coral"
+    ],
+    [
+     "amber",
+     "teal",
+     "teal"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 0,
+     "lane": 2,
      "at": 1,
      "cars": [
+      "amber",
       "teal",
-      "amber"
+      "coral"
      ]
     }
    ]
@@ -612,26 +633,26 @@
   },
   {
    "id": "lot-026",
-   "title": "Mystery Row",
-   "blurb": "A '?' car shows its color once the car in front leaves.",
+   "title": "Mystery Boxes",
+   "blurb": "Clear a match next to a box to break it open.",
    "lanes": [
     [
      "coral",
-     "coral",
-     "teal"
+     "teal",
+     "teal",
+     "box:amber"
     ],
     [
      "coral",
      "teal",
-     "?teal"
+     "coral"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
+     "lane": 1,
      "at": 1,
      "cars": [
-      "amber",
       "amber",
       "amber"
      ]
@@ -651,7 +672,7 @@
     ],
     [
      "coral",
-     "?amber",
+     "box:amber",
      "teal",
      "lime"
     ],
@@ -693,7 +714,7 @@
     ],
     [
      "coral",
-     "?lime",
+     "box:lime",
      "amber",
      "amber"
     ]
@@ -724,7 +745,7 @@
     [
      "coral",
      "amber",
-     "?amber",
+     "box:amber",
      "teal"
     ],
     [
@@ -748,24 +769,63 @@
   },
   {
    "id": "lot-030",
-   "title": "Maple Bay",
+   "title": "Pier Strip",
    "blurb": "",
    "lanes": [
     [
      "coral",
+     "coral",
+     "box:amber",
      "teal",
+     "teal"
+    ],
+    [
+     "teal",
+     "teal",
+     "lime",
+     "coral",
+     "teal"
+    ],
+    [
+     "lime",
+     "coral",
      "amber",
+     "amber"
+    ],
+    [
+     "coral",
+     "amber",
+     "teal",
      "lime"
+    ]
+   ],
+   "tier": "superhard",
+   "sides": [
+    {
+     "lane": 0,
+     "at": 0,
+     "cars": [
+      "amber",
+      "coral",
+      "amber"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-031",
+   "title": "Mystery Row",
+   "blurb": "A '?' car shows its color once the car in front leaves.",
+   "lanes": [
+    [
+     "coral",
+     "coral",
+     "box:amber"
     ],
     [
      "coral",
      "teal",
      "?teal"
-    ],
-    [
-     "amber",
-     "coral",
-     "amber"
     ]
    ],
    "sides": [
@@ -773,44 +833,9 @@
      "lane": 0,
      "at": 0,
      "cars": [
-      "lime",
-      "lime"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-031",
-   "title": "Maple Block",
-   "blurb": "",
-   "lanes": [
-    [
-     "lime",
-     "teal",
-     "lime",
-     "?amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber",
-     "amber"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 2,
-     "at": 0,
-     "cars": [
-      "lime",
-      "coral",
-      "coral"
+      "amber",
+      "teal",
+      "amber"
      ]
     }
    ]
@@ -839,7 +864,7 @@
      "coral",
      "?teal",
      "amber",
-     "teal",
+     "box:teal",
      "coral"
     ]
    ],
@@ -863,7 +888,7 @@
      "coral",
      "teal",
      "amber",
-     "teal",
+     "box:teal",
      "lime",
      "teal"
     ],
@@ -901,7 +926,7 @@
     [
      "coral",
      "teal",
-     "lime",
+     "box:lime",
      "amber",
      "lime"
     ],
@@ -951,7 +976,7 @@
     ],
     [
      "coral",
-     "amber",
+     "box:amber",
      "teal",
      "coral"
     ],
@@ -1021,7 +1046,7 @@
      "tunnel:coral,teal,coral",
      "teal",
      "amber",
-     "?lime"
+     "box:lime"
     ],
     [
      "lime",
@@ -1047,7 +1072,7 @@
    "lanes": [
     [
      "amber",
-     "?lime",
+     "box:lime",
      "amber",
      "teal"
     ],
@@ -1059,7 +1084,7 @@
     [
      "coral",
      "coral",
-     "lime"
+     "box:lime"
     ],
     [
      "teal",
@@ -1088,7 +1113,7 @@
     [
      "coral",
      "coral",
-     "?amber",
+     "box:amber",
      "lime"
     ],
     [
@@ -1098,7 +1123,7 @@
     ],
     [
      "teal",
-     "amber",
+     "box:amber",
      "coral"
     ],
     [
@@ -1121,34 +1146,48 @@
   },
   {
    "id": "lot-040",
-   "title": "River Deck",
+   "title": "Midtown Loop",
    "blurb": "",
    "lanes": [
     [
+     "coral",
+     "amber",
+     "amber",
+     "amber"
+    ],
+    [
      "teal",
+     "tunnel:lime,lime,amber",
+     "lime",
+     "teal",
+     "amber"
+    ],
+    [
+     "teal",
+     "coral",
+     "teal",
+     "box:coral"
+    ],
+    [
+     "coral",
+     "?lime",
+     "box:amber"
+    ],
+    [
+     "teal",
+     "lime",
      "coral"
-    ],
-    [
-     "tunnel:amber,amber",
-     "coral",
-     "?lime"
-    ],
-    [
-     "coral",
-     "?lime"
-    ],
-    [
-     "teal"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 0,
+     "lane": 4,
      "at": 1,
      "cars": [
+      "teal",
       "lime",
-      "amber",
-      "teal"
+      "coral"
      ]
     }
    ]
@@ -1162,7 +1201,7 @@
      "teal",
      "tunnel:teal,teal,coral,violet",
      "teal",
-     "violet",
+     "box:violet",
      "lime"
     ],
     [
@@ -1175,7 +1214,7 @@
      "coral",
      "?amber",
      "coral",
-     "amber"
+     "box:amber"
     ],
     [
      "coral",
@@ -1201,7 +1240,7 @@
    "lanes": [
     [
      "amber",
-     "teal",
+     "box:teal",
      "amber"
     ],
     [
@@ -1218,7 +1257,7 @@
      "tunnel:coral,teal,coral",
      "coral",
      "amber",
-     "lime"
+     "box:lime"
     ]
    ],
    "sides": [
@@ -1257,8 +1296,8 @@
     [
      "coral",
      "teal",
-     "amber",
-     "coral",
+     "box:amber",
+     "box:coral",
      "?violet"
     ],
     [
@@ -1308,9 +1347,9 @@
     ],
     [
      "coral",
-     "coral",
+     "box:coral",
      "lime",
-     "violet"
+     "box:violet"
     ],
     [
      "amber",
@@ -1347,12 +1386,12 @@
     [
      "coral",
      "?coral",
-     "amber",
+     "box:amber",
      "lime"
     ],
     [
      "coral",
-     "violet",
+     "box:violet",
      "amber",
      "coral"
     ],
@@ -1405,13 +1444,13 @@
     [
      "amber",
      "lime",
-     "?lime",
+     "box:lime",
      "violet"
     ],
     [
      "tunnel:amber,violet,teal,teal",
      "amber",
-     "teal",
+     "box:teal",
      "?coral",
      "teal"
     ]
@@ -1434,8 +1473,8 @@
    "lanes": [
     [
      "teal",
-     "lime",
-     "?teal",
+     "box:lime",
+     "box:teal",
      "violet",
      "amber"
     ],
@@ -1486,7 +1525,7 @@
     ],
     [
      "coral",
-     "teal",
+     "box:teal",
      "?lime",
      "violet"
     ],
@@ -1494,7 +1533,7 @@
      "teal",
      "amber",
      "coral",
-     "?lime"
+     "box:lime"
     ],
     [
      "tunnel:amber,violet,coral,lime",
@@ -1547,12 +1586,12 @@
      "tunnel:amber,coral,amber",
      "lime",
      "amber",
-     "amber",
+     "box:amber",
      "?teal"
     ],
     [
      "teal",
-     "?coral",
+     "box:coral",
      "lime",
      "teal"
     ]
@@ -1570,40 +1609,53 @@
   },
   {
    "id": "lot-050",
-   "title": "Midtown Block",
+   "title": "River Bay",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "teal",
+     "box:teal",
      "?violet",
-     "?violet"
-    ],
-    [
-     "tunnel:amber,violet",
-     "coral",
-     "?teal",
-     "amber"
-    ],
-    [
-     "coral",
      "lime",
      "lime"
     ],
     [
+     "coral",
+     "coral",
+     "coral",
+     "teal",
+     "teal"
+    ],
+    [
      "teal",
      "amber",
+     "violet",
+     "coral",
      "lime"
+    ],
+    [
+     "teal",
+     "tunnel:violet,amber,teal,violet",
+     "amber",
+     "lime",
+     "amber",
+     "?amber"
+    ],
+    [
+     "coral",
+     "box:lime",
+     "box:amber",
+     "violet"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 1,
-     "at": 1,
+     "lane": 3,
+     "at": 0,
      "cars": [
-      "coral",
-      "coral",
-      "coral"
+      "violet",
+      "lime"
      ]
     }
    ]
@@ -1616,7 +1668,7 @@
     [
      "teal",
      "amber",
-     "violet",
+     "box:violet",
      "teal"
     ],
     [
@@ -1628,7 +1680,7 @@
     ],
     [
      "coral",
-     "amber",
+     "box:amber",
      "teal",
      "?coral"
     ],
@@ -1636,7 +1688,7 @@
      "teal",
      "?amber",
      "coral",
-     "coral"
+     "box:coral"
     ]
    ],
    "sides": [
@@ -1666,7 +1718,7 @@
    "lanes": [
     [
      "coral",
-     "teal",
+     "box:teal",
      "amber",
      "coral",
      "?amber"
@@ -1684,11 +1736,11 @@
      "lime",
      "amber",
      "lime",
-     "coral"
+     "box:coral"
     ],
     [
      "teal",
-     "amber",
+     "box:amber",
      "?violet",
      "violet",
      "amber"
@@ -1714,19 +1766,19 @@
      "teal",
      "?violet",
      "lime",
-     "lime",
+     "box:lime",
      "?coral"
     ],
     [
      "teal",
      "coral",
      "amber",
-     "teal"
+     "box:teal"
     ],
     [
      "coral",
      "amber",
-     "violet",
+     "box:violet",
      "violet"
     ],
     [
@@ -1756,7 +1808,7 @@
    "lanes": [
     [
      "teal",
-     "teal",
+     "box:teal",
      "?coral",
      "violet"
     ],
@@ -1770,12 +1822,12 @@
     [
      "coral",
      "?amber",
-     "lime",
+     "box:lime",
      "coral"
     ],
     [
      "lime",
-     "amber",
+     "box:amber",
      "?lime"
     ]
    ],
@@ -1809,7 +1861,7 @@
      "coral",
      "teal",
      "amber",
-     "coral",
+     "box:coral",
      "lime"
     ],
     [
@@ -1818,7 +1870,7 @@
      "?teal",
      "lime",
      "violet",
-     "lime"
+     "box:lime"
     ],
     [
      "amber",
@@ -1829,7 +1881,7 @@
     ],
     [
      "teal",
-     "amber",
+     "box:amber",
      "violet",
      "coral",
      "?teal"
@@ -1854,15 +1906,15 @@
     [
      "teal",
      "?amber",
-     "coral",
+     "box:coral",
      "coral",
      "?teal"
     ],
     [
      "coral",
-     "amber",
+     "box:amber",
      "violet",
-     "?violet",
+     "box:violet",
      "coral"
     ],
     [
@@ -1902,14 +1954,14 @@
      "teal",
      "teal",
      "?violet",
-     "amber"
+     "box:amber"
     ],
     [
      "coral",
      "teal",
      "lime",
      "violet",
-     "?sky"
+     "box:sky"
     ],
     [
      "coral",
@@ -1923,7 +1975,7 @@
      "?coral",
      "amber",
      "lime",
-     "sky",
+     "box:sky",
      "?violet"
     ]
    ],
@@ -1969,9 +2021,9 @@
     ],
     [
      "tunnel:teal,amber,lime,teal",
-     "coral",
+     "box:coral",
      "amber",
-     "amber",
+     "box:amber",
      "coral"
     ],
     [
@@ -1982,7 +2034,7 @@
     ],
     [
      "sky",
-     "?lime",
+     "box:lime",
      "sky",
      "?coral"
     ]
@@ -2014,15 +2066,15 @@
     [
      "coral",
      "lime",
-     "?lime",
+     "box:lime",
      "sky",
-     "teal"
+     "box:teal"
     ],
     [
      "amber",
      "tunnel:lime,amber,teal,teal",
      "?coral",
-     "lime",
+     "box:lime",
      "?coral"
     ],
     [
@@ -2052,49 +2104,66 @@
   },
   {
    "id": "lot-060",
-   "title": "Lantern Strip",
+   "title": "Harbor Bay",
    "blurb": "",
    "lanes": [
     [
-     "coral",
-     "teal",
-     "lime"
-    ],
-    [
+     "tunnel:violet,amber,lime,sky",
+     "?lime",
      "teal",
      "amber",
-     "lime"
+     "coral",
+     "box:amber"
     ],
     [
-     "tunnel:sky,violet",
-     "?coral",
+     "coral",
+     "teal",
+     "violet",
+     "coral",
+     "sky"
+    ],
+    [
+     "coral",
+     "violet",
+     "teal",
+     "amber"
+    ],
+    [
+     "tunnel:coral,sky,lime,violet",
+     "box:lime",
+     "amber",
+     "?sky",
      "?lime"
     ],
     [
-     "amber",
-     "?amber"
+     "violet",
+     "coral",
+     "box:sky",
+     "teal"
     ],
     [
-     "tunnel:sky,violet",
-     "?teal",
-     "coral"
+     "coral",
+     "lime",
+     "teal",
+     "teal"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
      "lane": 0,
      "at": 1,
      "cars": [
+      "violet",
       "sky",
-      "coral",
-      "coral"
+      "amber"
      ]
     },
     {
      "lane": 4,
-     "at": 0,
+     "at": 1,
      "cars": [
-      "violet",
+      "coral",
       "coral"
      ]
     }
@@ -2124,12 +2193,12 @@
      "amber",
      "coral",
      "?violet",
-     "teal"
+     "box:teal"
     ],
     [
      "teal",
      "tunnel:coral,lime",
-     "amber",
+     "box:amber",
      "sky",
      "?amber"
     ],
@@ -2137,7 +2206,7 @@
      "teal",
      "lime",
      "violet",
-     "sky"
+     "box:sky"
     ]
    ],
    "sides": [
@@ -2161,15 +2230,15 @@
      "coral",
      "?coral",
      "?amber",
-     "sky",
+     "box:sky",
      "teal"
     ],
     [
      "amber",
      "tunnel:lime,coral",
      "teal",
-     "sky",
-     "lime",
+     "box:sky",
+     "box:lime",
      "?amber"
     ],
     [
@@ -2183,7 +2252,7 @@
      "tunnel:lime,amber",
      "amber",
      "lime",
-     "violet",
+     "box:violet",
      "coral",
      "coral"
     ],
@@ -2219,27 +2288,27 @@
     [
      "amber",
      "tunnel:sky,amber,teal,lime",
-     "amber",
+     "box:amber",
      "violet",
      "?coral"
     ],
     [
      "coral",
      "tunnel:lime,amber,coral,amber",
-     "coral",
+     "box:coral",
      "?lime",
      "teal"
     ],
     [
      "teal",
-     "violet",
+     "box:violet",
      "sky",
      "?amber"
     ],
     [
      "teal",
      "coral",
-     "teal",
+     "box:teal",
      "?violet"
     ]
    ],
@@ -2271,7 +2340,7 @@
     [
      "coral",
      "teal",
-     "violet",
+     "box:violet",
      "sky",
      "?sky"
     ],
@@ -2286,7 +2355,7 @@
     [
      "coral",
      "tunnel:lime,lime,amber,teal",
-     "violet",
+     "box:violet",
      "?lime",
      "coral",
      "lime"
@@ -2295,12 +2364,12 @@
      "amber",
      "sky",
      "amber",
-     "amber",
+     "box:amber",
      "teal"
     ],
     [
      "teal",
-     "lime",
+     "box:lime",
      "violet",
      "?coral"
     ]
@@ -2340,7 +2409,7 @@
     [
      "tunnel:lime,amber,teal",
      "?coral",
-     "violet",
+     "box:violet",
      "sky",
      "lime",
      "?amber"
@@ -2349,14 +2418,14 @@
      "coral",
      "teal",
      "lime",
-     "lime",
+     "box:lime",
      "teal"
     ],
     [
      "teal",
      "amber",
-     "violet",
-     "coral",
+     "box:violet",
+     "box:coral",
      "coral"
     ]
    ],
@@ -2380,7 +2449,7 @@
     [
      "coral",
      "coral",
-     "lime",
+     "box:lime",
      "sky",
      "?amber"
     ],
@@ -2393,9 +2462,9 @@
     [
      "amber",
      "tunnel:lime,coral,teal",
-     "amber",
+     "box:amber",
      "lime",
-     "sky"
+     "box:sky"
     ],
     [
      "teal",
@@ -2406,7 +2475,7 @@
     ],
     [
      "teal",
-     "?violet",
+     "box:violet",
      "?violet",
      "teal"
     ]
@@ -2456,22 +2525,22 @@
      "coral",
      "tunnel:amber,coral,violet",
      "?violet",
-     "coral",
+     "box:coral",
      "sky",
      "lime"
     ],
     [
      "amber",
      "amber",
-     "violet",
+     "box:violet",
      "teal",
      "?teal"
     ],
     [
      "lime",
      "lime",
-     "?violet",
-     "teal"
+     "box:violet",
+     "box:teal"
     ]
    ],
    "sides": [
@@ -2501,22 +2570,22 @@
     ],
     [
      "coral",
-     "amber",
+     "box:amber",
      "lime",
      "teal",
-     "coral"
+     "box:coral"
     ],
     [
      "coral",
      "?amber",
-     "amber",
+     "box:amber",
      "lime",
      "?teal"
     ],
     [
      "teal",
      "violet",
-     "?sky",
+     "box:sky",
      "?teal",
      "sky"
     ],
@@ -2555,22 +2624,22 @@
     [
      "tunnel:lime,violet",
      "?coral",
+     "box:sky",
      "sky",
-     "sky",
-     "?coral",
+     "box:coral",
      "?teal"
     ],
     [
      "tunnel:coral,violet",
      "coral",
-     "amber",
+     "box:amber",
      "violet",
      "sky",
      "teal"
     ],
     [
      "amber",
-     "amber",
+     "box:amber",
      "violet",
      "teal",
      "?amber"
@@ -2604,46 +2673,66 @@
   },
   {
    "id": "lot-070",
-   "title": "Park Square",
+   "title": "Sunny Loop",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:teal,coral",
-     "teal",
-     "teal",
+     "coral",
+     "?amber",
+     "coral",
+     "coral",
      "lime",
+     "lime"
+    ],
+    [
+     "coral",
+     "violet",
+     "box:coral",
+     "?sky",
+     "?amber",
+     "box:coral"
+    ],
+    [
+     "amber",
+     "violet",
+     "violet",
+     "?lime",
+     "teal",
+     "box:sky"
+    ],
+    [
+     "teal",
+     "tunnel:sky,coral,sky",
+     "amber",
+     "sky",
+     "amber",
+     "violet",
      "violet"
     ],
     [
-     "coral",
-     "?coral",
-     "?lime",
-     "sky"
-    ],
-    [
-     "tunnel:teal,sky,sky",
-     "coral",
-     "amber",
-     "?violet"
+     "tunnel:coral,teal,teal",
+     "box:teal",
+     "lime",
+     "lime",
+     "sky",
+     "amber"
     ],
     [
      "teal",
-     "?amber",
-     "coral"
-    ],
-    [
-     "amber",
      "lime",
-     "?violet"
+     "coral",
+     "teal",
+     "teal"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
      "lane": 3,
-     "at": 1,
+     "at": 0,
      "cars": [
-      "coral",
-      "teal"
+      "teal",
+      "violet"
      ]
     }
    ]
@@ -2657,7 +2746,7 @@
      "coral",
      "teal",
      "amber",
-     "teal",
+     "box:teal",
      "sky"
     ],
     [
@@ -2672,21 +2761,21 @@
      "amber",
      "?amber",
      "sky",
-     "sky",
+     "box:sky",
      "amber"
     ],
     [
      "tunnel:amber,amber",
      "teal",
      "?teal",
-     "violet",
+     "box:violet",
      "?coral",
      "coral"
     ],
     [
      "coral",
      "?lime",
-     "lime",
+     "box:lime",
      "teal",
      "lime"
     ]
@@ -2711,13 +2800,13 @@
      "amber",
      "tunnel:amber,coral",
      "coral",
-     "lime",
-     "coral",
+     "box:lime",
+     "box:coral",
      "?violet"
     ],
     [
      "coral",
-     "violet",
+     "box:violet",
      "violet",
      "?sky",
      "teal"
@@ -2725,7 +2814,7 @@
     [
      "coral",
      "?amber",
-     "teal",
+     "box:teal",
      "?sky",
      "amber"
     ],
@@ -2779,8 +2868,8 @@
     ],
     [
      "coral",
-     "amber",
-     "lime",
+     "box:amber",
+     "box:lime",
      "coral",
      "coral",
      "teal"
@@ -2788,7 +2877,7 @@
     [
      "coral",
      "?violet",
-     "amber",
+     "box:amber",
      "sky",
      "sky",
      "amber"
@@ -2800,7 +2889,7 @@
      "lime",
      "?rose",
      "?amber",
-     "violet"
+     "box:violet"
     ],
     [
      "tunnel:sky,amber",
@@ -2831,12 +2920,12 @@
    "lanes": [
     [
      "amber",
-     "teal",
+     "box:teal",
      "amber",
      "coral",
      "rose",
      "?amber",
-     "lime"
+     "box:lime"
     ],
     [
      "violet",
@@ -2858,16 +2947,16 @@
     ],
     [
      "coral",
-     "violet",
+     "box:violet",
      "rose",
      "?rose",
-     "coral",
+     "box:coral",
      "?teal"
     ],
     [
      "coral",
      "amber",
-     "lime",
+     "box:lime",
      "teal",
      "violet",
      "amber"
@@ -2902,9 +2991,9 @@
      "tunnel:violet,lime",
      "amber",
      "?lime",
-     "sky",
+     "box:sky",
      "rose",
-     "teal"
+     "box:teal"
     ],
     [
      "tunnel:lime,sky,amber",
@@ -2918,7 +3007,7 @@
     [
      "teal",
      "violet",
-     "violet",
+     "box:violet",
      "coral",
      "coral",
      "amber"
@@ -2927,8 +3016,8 @@
      "teal",
      "violet",
      "?coral",
-     "rose",
-     "teal"
+     "box:rose",
+     "box:teal"
     ]
    ],
    "sides": [
@@ -2963,7 +3052,7 @@
      "violet",
      "sky",
      "coral",
-     "lime",
+     "box:lime",
      "lime"
     ],
     [
@@ -2972,15 +3061,15 @@
      "amber",
      "?rose",
      "coral",
-     "?amber",
-     "teal"
+     "box:amber",
+     "box:teal"
     ],
     [
      "coral",
      "amber",
      "violet",
      "?rose",
-     "sky",
+     "box:sky",
      "teal"
     ],
     [
@@ -2994,7 +3083,7 @@
     ],
     [
      "teal",
-     "lime",
+     "box:lime",
      "violet",
      "sky",
      "amber",
@@ -3021,7 +3110,7 @@
     [
      "coral",
      "tunnel:lime,lime",
-     "lime",
+     "box:lime",
      "amber",
      "?sky",
      "?rose",
@@ -3040,23 +3129,23 @@
     [
      "amber",
      "teal",
-     "violet",
+     "box:violet",
      "sky",
      "amber",
      "amber"
     ],
     [
      "coral",
-     "lime",
+     "box:lime",
      "violet",
-     "teal",
+     "box:teal",
      "rose",
      "?amber"
     ],
     [
      "teal",
      "tunnel:violet,violet,violet",
-     "?teal",
+     "box:teal",
      "violet",
      "rose",
      "coral",
@@ -3081,10 +3170,10 @@
    "lanes": [
     [
      "tunnel:lime,violet,teal",
-     "?coral",
+     "box:coral",
      "teal",
      "amber",
-     "sky",
+     "box:sky",
      "coral",
      "?coral"
     ],
@@ -3094,7 +3183,7 @@
      "?lime",
      "sky",
      "coral",
-     "amber"
+     "box:amber"
     ],
     [
      "teal",
@@ -3110,14 +3199,14 @@
      "amber",
      "rose",
      "?rose",
-     "lime"
+     "box:lime"
     ],
     [
      "coral",
      "tunnel:sky,amber,violet,amber",
      "?sky",
      "violet",
-     "rose",
+     "box:rose",
      "lime",
      "violet"
     ]
@@ -3150,7 +3239,7 @@
     [
      "coral",
      "coral",
-     "lime",
+     "box:lime",
      "lime",
      "rose",
      "amber",
@@ -3162,8 +3251,8 @@
      "?amber",
      "?coral",
      "sky",
-     "teal",
-     "violet"
+     "box:teal",
+     "box:violet"
     ],
     [
      "tunnel:sky,sky,rose",
@@ -3173,7 +3262,7 @@
      "violet",
      "rose",
      "teal",
-     "?lime"
+     "box:lime"
     ],
     [
      "teal",
@@ -3182,7 +3271,7 @@
      "teal",
      "?amber",
      "coral",
-     "violet"
+     "box:violet"
     ],
     [
      "sky",
@@ -3208,56 +3297,73 @@
   },
   {
    "id": "lot-080",
-   "title": "Pier Court",
+   "title": "Midtown Drive",
    "blurb": "",
    "lanes": [
     [
-     "coral",
+     "teal",
+     "amber",
+     "sky",
+     "violet",
+     "violet",
+     "box:teal",
+     "sky"
+    ],
+    [
+     "lime",
+     "tunnel:amber,teal,coral",
+     "teal",
+     "sky",
+     "rose",
      "?teal",
-     "?rose",
+     "amber",
+     "amber"
+    ],
+    [
+     "tunnel:teal,teal",
+     "box:coral",
+     "box:violet",
+     "lime",
+     "rose",
+     "violet",
+     "?violet",
+     "sky"
+    ],
+    [
+     "teal",
+     "?lime",
+     "rose",
+     "coral",
+     "teal",
+     "coral",
      "amber"
     ],
     [
      "coral",
-     "tunnel:teal,violet",
-     "lime",
-     "violet",
-     "?rose"
+     "tunnel:lime,coral,sky,rose",
+     "box:amber",
+     "?amber",
+     "coral",
+     "?rose",
+     "violet"
     ],
     [
-     "tunnel:coral,teal,coral",
      "coral",
      "amber",
-     "?lime",
-     "sky"
-    ],
-    [
-     "teal",
-     "?violet",
-     "rose",
-     "?amber"
-    ],
-    [
-     "amber",
-     "amber",
      "sky",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:amber,teal",
      "lime",
-     "sky"
+     "lime",
+     "box:rose"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
      "lane": 3,
-     "at": 0,
+     "at": 1,
      "cars": [
-      "lime",
-      "lime",
-      "lime"
+      "amber",
+      "coral"
      ]
     }
    ]
@@ -3273,13 +3379,13 @@
      "amber",
      "sky",
      "violet",
-     "sky"
+     "box:sky"
     ],
     [
      "coral",
      "tunnel:violet,lime",
      "coral",
-     "violet",
+     "box:violet",
      "?rose",
      "lime"
     ],
@@ -3301,14 +3407,14 @@
      "coral",
      "lime",
      "coral",
-     "violet",
+     "box:violet",
      "teal"
     ],
     [
      "tunnel:amber,violet,sky,amber",
-     "teal",
+     "box:teal",
      "violet",
-     "sky",
+     "box:sky",
      "coral"
     ]
    ],
@@ -3341,7 +3447,7 @@
      "tunnel:lime,amber,teal,amber",
      "coral",
      "teal",
-     "amber",
+     "box:amber",
      "?sky",
      "?lime",
      "violet"
@@ -3349,7 +3455,7 @@
     [
      "coral",
      "?violet",
-     "violet",
+     "box:violet",
      "coral",
      "teal"
     ],
@@ -3364,7 +3470,7 @@
      "amber",
      "tunnel:violet,sky",
      "amber",
-     "sky",
+     "box:sky",
      "rose",
      "lime"
     ],
@@ -3374,13 +3480,13 @@
      "lime",
      "rose",
      "?coral",
-     "violet"
+     "box:violet"
     ],
     [
      "coral",
      "?lime",
      "?rose",
-     "sky",
+     "box:sky",
      "amber"
     ]
    ],
@@ -3405,7 +3511,7 @@
      "?teal",
      "violet",
      "?sky",
-     "teal",
+     "box:teal",
      "lime"
     ],
     [
@@ -3428,17 +3534,17 @@
     [
      "coral",
      "sky",
-     "amber",
+     "box:amber",
      "coral",
-     "amber",
-     "violet"
+     "box:amber",
+     "box:violet"
     ],
     [
      "violet",
      "tunnel:sky,rose",
      "coral",
      "?violet",
-     "rose",
+     "box:rose",
      "amber"
     ],
     [
@@ -3469,15 +3575,15 @@
     [
      "coral",
      "amber",
-     "sky",
+     "box:sky",
      "?violet",
      "?teal"
     ],
     [
      "coral",
      "tunnel:rose,violet",
-     "teal",
-     "sky",
+     "box:teal",
+     "box:sky",
      "teal",
      "rose"
     ],
@@ -3490,9 +3596,9 @@
     ],
     [
      "tunnel:amber,lime",
-     "amber",
+     "box:amber",
      "?lime",
-     "amber",
+     "box:amber",
      "sky",
      "?amber"
     ],
@@ -3539,8 +3645,8 @@
     [
      "amber",
      "tunnel:sky,rose",
-     "rose",
-     "lime",
+     "box:rose",
+     "box:lime",
      "violet",
      "rose",
      "lime"
@@ -3548,16 +3654,16 @@
     [
      "coral",
      "coral",
-     "sky",
+     "box:sky",
      "violet",
      "?teal",
-     "amber"
+     "box:amber"
     ],
     [
      "coral",
      "teal",
      "rose",
-     "violet",
+     "box:violet",
      "?teal",
      "lime"
     ],
@@ -3604,7 +3710,7 @@
     [
      "coral",
      "tunnel:sky,violet,violet,rose",
-     "teal",
+     "box:teal",
      "violet",
      "coral",
      "?amber"
@@ -3614,7 +3720,7 @@
      "?coral",
      "lime",
      "violet",
-     "teal",
+     "box:teal",
      "?teal"
     ],
     [
@@ -3622,7 +3728,7 @@
      "?amber",
      "sky",
      "violet",
-     "rose"
+     "box:rose"
     ],
     [
      "coral",
@@ -3641,9 +3747,9 @@
     ],
     [
      "lime",
-     "amber",
+     "box:amber",
      "sky",
-     "amber",
+     "box:amber",
      "?sky"
     ]
    ],
@@ -3669,7 +3775,7 @@
      "coral",
      "amber",
      "violet",
-     "rose",
+     "box:rose",
      "lime",
      "?lime"
     ],
@@ -3684,14 +3790,14 @@
      "tunnel:violet,teal",
      "?amber",
      "?sky",
-     "rose",
+     "box:rose",
      "violet",
      "coral"
     ],
     [
      "coral",
      "amber",
-     "rose",
+     "box:rose",
      "coral",
      "amber"
     ],
@@ -3699,13 +3805,13 @@
      "sky",
      "?lime",
      "violet",
-     "amber",
+     "box:amber",
      "?teal"
     ],
     [
      "tunnel:rose,lime",
      "teal",
-     "lime",
+     "box:lime",
      "sky",
      "teal",
      "amber"
@@ -3737,7 +3843,7 @@
    "lanes": [
     [
      "coral",
-     "amber",
+     "box:amber",
      "violet",
      "rose",
      "amber",
@@ -3747,8 +3853,8 @@
      "tunnel:rose,sky",
      "?coral",
      "teal",
-     "sky",
-     "rose",
+     "box:sky",
+     "box:rose",
      "lime",
      "teal"
     ],
@@ -3757,7 +3863,7 @@
      "amber",
      "?lime",
      "sky",
-     "coral"
+     "box:coral"
     ],
     [
      "teal",
@@ -3780,7 +3886,7 @@
      "lime",
      "rose",
      "teal",
-     "lime"
+     "box:lime"
     ]
    ],
    "sides": [
@@ -3804,7 +3910,7 @@
      "tunnel:coral,coral,rose,rose",
      "teal",
      "amber",
-     "violet",
+     "box:violet",
      "sky",
      "rose",
      "teal",
@@ -3815,7 +3921,7 @@
      "tunnel:gold,sky,sky",
      "coral",
      "violet",
-     "rose",
+     "box:rose",
      "amber",
      "amber",
      "?violet"
@@ -3823,10 +3929,10 @@
     [
      "lime",
      "?amber",
-     "violet",
-     "gold",
+     "box:violet",
+     "box:gold",
      "coral",
-     "amber",
+     "box:amber",
      "lime"
     ],
     [
@@ -3869,60 +3975,87 @@
   },
   {
    "id": "lot-090",
-   "title": "Market Row",
+   "title": "Corner Drive",
    "blurb": "",
    "lanes": [
     [
-     "coral",
+     "teal",
      "amber",
+     "sky",
+     "rose",
+     "amber",
+     "gold",
+     "?rose",
+     "?rose"
+    ],
+    [
+     "coral",
+     "teal",
+     "violet",
+     "coral",
+     "coral",
+     "teal",
      "violet",
      "rose"
     ],
     [
      "coral",
-     "amber",
+     "?amber",
      "violet",
+     "?rose",
+     "amber",
+     "teal",
+     "lime",
+     "gold"
+    ],
+    [
+     "tunnel:coral,amber,lime",
+     "teal",
+     "violet",
+     "lime",
+     "gold",
+     "coral",
+     "?lime",
+     "gold",
      "sky"
     ],
     [
-     "coral",
-     "tunnel:teal,teal,teal",
+     "tunnel:teal,coral",
      "amber",
-     "?violet",
-     "rose"
-    ],
-    [
-     "teal",
-     "teal",
-     "?lime",
-     "rose"
-    ],
-    [
-     "tunnel:lime,lime,amber,amber",
-     "?teal",
-     "?lime",
+     "box:lime",
      "gold",
-     "?gold"
+     "sky",
+     "teal",
+     "box:violet",
+     "box:lime",
+     "box:sky"
     ],
     [
+     "coral",
+     "tunnel:sky,coral,teal,teal",
      "lime",
-     "tunnel:coral,coral,coral,gold",
      "sky",
-     "?sky"
+     "amber",
+     "rose",
+     "?violet",
+     "gold",
+     "box:lime"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 3,
-     "at": 0,
+     "lane": 2,
+     "at": 1,
      "cars": [
       "amber",
-      "violet"
+      "violet",
+      "amber"
      ]
     },
     {
-     "lane": 3,
-     "at": 1,
+     "lane": 5,
+     "at": 0,
      "cars": [
       "violet",
       "violet",
@@ -3950,7 +4083,7 @@
      "lime",
      "tunnel:coral,gold,gold,rose",
      "amber",
-     "violet",
+     "box:violet",
      "rose",
      "coral",
      "lime",
@@ -3958,7 +4091,7 @@
     ],
     [
      "teal",
-     "coral",
+     "box:coral",
      "sky",
      "rose",
      "violet",
@@ -3969,14 +4102,14 @@
      "tunnel:rose,coral",
      "?lime",
      "amber",
-     "violet",
+     "box:violet",
      "?sky",
-     "amber",
+     "box:amber",
      "lime"
     ],
     [
      "coral",
-     "teal",
+     "box:teal",
      "sky",
      "gold",
      "teal",
@@ -4012,7 +4145,7 @@
      "amber",
      "violet",
      "rose",
-     "coral",
+     "box:coral",
      "coral",
      "?violet"
     ],
@@ -4040,7 +4173,7 @@
      "teal",
      "tunnel:coral,rose,sky",
      "?lime",
-     "lime",
+     "box:lime",
      "rose",
      "teal",
      "amber",
@@ -4057,10 +4190,10 @@
     [
      "teal",
      "coral",
-     "gold",
-     "gold",
+     "box:gold",
+     "box:gold",
      "teal",
-     "violet"
+     "box:violet"
     ]
    ],
    "sides": [
@@ -4105,22 +4238,22 @@
      "lime",
      "violet",
      "?sky",
-     "coral",
+     "box:coral",
      "amber"
     ],
     [
      "teal",
-     "teal",
+     "box:teal",
      "amber",
      "gold",
      "teal",
-     "lime"
+     "box:lime"
     ],
     [
      "tunnel:gold,rose",
      "?amber",
      "?lime",
-     "rose",
+     "box:rose",
      "rose",
      "teal",
      "lime"
@@ -4128,7 +4261,7 @@
     [
      "coral",
      "amber",
-     "sky",
+     "box:sky",
      "gold",
      "amber",
      "?sky"
@@ -4165,13 +4298,13 @@
      "coral",
      "violet",
      "?sky",
-     "amber",
+     "box:amber",
      "?teal",
      "?violet"
     ],
     [
      "lime",
-     "lime",
+     "box:lime",
      "violet",
      "sky",
      "?teal",
@@ -4184,7 +4317,7 @@
      "violet",
      "?gold",
      "coral",
-     "lime",
+     "box:lime",
      "lime"
     ],
     [
@@ -4208,8 +4341,8 @@
     ],
     [
      "tunnel:coral,gold",
-     "coral",
-     "amber",
+     "box:coral",
+     "box:amber",
      "rose",
      "rose",
      "coral",
@@ -4235,18 +4368,18 @@
     [
      "amber",
      "amber",
-     "violet",
+     "box:violet",
      "?rose",
      "coral",
      "teal",
-     "sky"
+     "box:sky"
     ],
     [
      "tunnel:teal,sky,violet,rose",
      "coral",
      "teal",
      "violet",
-     "rose",
+     "box:rose",
      "coral",
      "?lime",
      "rose"
@@ -4256,7 +4389,7 @@
      "tunnel:violet,sky",
      "amber",
      "lime",
-     "rose",
+     "box:rose",
      "coral",
      "lime",
      "rose"
@@ -4272,7 +4405,7 @@
     ],
     [
      "teal",
-     "lime",
+     "box:lime",
      "sky",
      "?gold",
      "amber",
@@ -4309,8 +4442,8 @@
      "teal",
      "violet",
      "rose",
-     "coral",
-     "amber",
+     "box:coral",
+     "box:amber",
      "violet"
     ],
     [
@@ -4324,7 +4457,7 @@
     ],
     [
      "tunnel:gold,rose",
-     "lime",
+     "box:lime",
      "?amber",
      "violet",
      "sky",
@@ -4338,7 +4471,7 @@
      "sky",
      "?gold",
      "lime",
-     "teal"
+     "box:teal"
     ],
     [
      "teal",
@@ -4354,7 +4487,7 @@
      "tunnel:gold,violet",
      "?lime",
      "lime",
-     "gold",
+     "box:gold",
      "teal",
      "?lime"
     ]
@@ -4399,12 +4532,12 @@
      "violet",
      "gold",
      "coral",
-     "coral",
+     "box:coral",
      "sky"
     ],
     [
      "tunnel:rose,violet,rose",
-     "coral",
+     "box:coral",
      "teal",
      "violet",
      "coral",
@@ -4423,7 +4556,7 @@
     ],
     [
      "tunnel:coral,sky",
-     "amber",
+     "box:amber",
      "?lime",
      "violet",
      "?rose",
@@ -4435,8 +4568,8 @@
      "teal",
      "amber",
      "sky",
-     "gold",
-     "amber",
+     "box:gold",
+     "box:amber",
      "violet"
     ]
    ],
@@ -4471,7 +4604,7 @@
      "tunnel:gold,coral,rose",
      "amber",
      "amber",
-     "coral",
+     "box:coral",
      "sky",
      "amber"
     ],
@@ -4480,8 +4613,8 @@
      "tunnel:rose,sky,coral,sky",
      "violet",
      "sky",
-     "coral",
-     "amber",
+     "box:coral",
+     "box:amber",
      "violet"
     ],
     [
@@ -4494,9 +4627,9 @@
     ],
     [
      "coral",
-     "lime",
+     "box:lime",
      "violet",
-     "gold",
+     "box:gold",
      "teal",
      "?violet"
     ],
@@ -4533,7 +4666,7 @@
      "lime",
      "rose",
      "coral",
-     "amber",
+     "box:amber",
      "violet"
     ],
     [
@@ -4543,11 +4676,11 @@
      "violet",
      "?coral",
      "amber",
-     "rose"
+     "box:rose"
     ],
     [
      "tunnel:rose,violet",
-     "coral",
+     "box:coral",
      "teal",
      "gold",
      "?rose",
@@ -4559,10 +4692,10 @@
      "teal",
      "tunnel:gold,gold,sky",
      "violet",
-     "sky",
+     "box:sky",
      "gold",
      "lime",
-     "gold"
+     "box:gold"
     ],
     [
      "teal",
@@ -4605,60 +4738,85 @@
   },
   {
    "id": "lot-100",
-   "title": "Garden Court",
+   "title": "Library Circle",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:sky,violet,violet",
-     "coral",
-     "?amber",
-     "violet",
-     "rose",
-     "?coral",
-     "coral"
-    ],
-    [
-     "teal",
      "amber",
-     "?violet",
-     "rose",
+     "tunnel:amber,teal,teal,sky",
+     "amber",
+     "coral",
+     "coral",
+     "coral",
+     "amber",
+     "amber",
+     "?rose",
+     "coral",
      "amber"
     ],
     [
      "coral",
-     "tunnel:amber,amber",
-     "lime",
-     "sky",
-     "sky",
-     "teal"
-    ],
-    [
-     "teal",
-     "lime",
-     "sky",
-     "gold",
-     "?teal"
-    ],
-    [
-     "teal",
-     "?violet",
+     "tunnel:violet,violet,sky",
+     "coral",
      "rose",
-     "gold",
-     "coral"
+     "?sky",
+     "rose",
+     "violet",
+     "lime",
+     "sky",
+     "amber"
     ],
     [
+     "lime",
+     "violet",
+     "sky",
+     "sky",
+     "coral",
+     "lime",
+     "box:rose",
+     "coral",
+     "lime"
+    ],
+    [
+     "tunnel:sky,lime",
+     "teal",
      "amber",
-     "tunnel:violet,sky,lime,lime",
-     "?coral",
+     "box:gold",
      "lime",
      "gold",
+     "amber",
+     "?sky",
+     "gold",
      "teal"
+    ],
+    [
+     "teal",
+     "box:teal",
+     "box:violet",
+     "rose",
+     "?teal",
+     "violet",
+     "?lime",
+     "gold",
+     "violet"
+    ],
+    [
+     "lime",
+     "teal",
+     "violet",
+     "?gold",
+     "teal",
+     "violet",
+     "gold",
+     "coral",
+     "box:rose"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 2,
-     "at": 1,
+     "lane": 0,
+     "at": 0,
      "cars": [
       "lime",
       "sky"
