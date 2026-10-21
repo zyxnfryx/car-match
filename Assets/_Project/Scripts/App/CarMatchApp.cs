@@ -46,6 +46,7 @@ namespace CarMatch
         Text _coinText;
         Text _livesText;
         Button _retryButton;
+        Button _playButton;
 
         static readonly Color Ink = new Color(0.15f, 0.17f, 0.22f, 1f);
         static readonly Color Cream = new Color(0.98f, 0.95f, 0.90f, 1f);
@@ -183,13 +184,13 @@ namespace CarMatch
             pic.preserveAspect = true;
             pic.raycastTarget = false;
             if (celebrate) StartCoroutine(CheerHome(mascot, pic));
-            var title = Label(new Vector2(0f, 560f), new Vector2(980f, 200f), "Lot Loop", 150, Cream, TextAnchor.MiddleCenter);
-            Outlined(title, new Color(0.35f, 0.12f, 0.10f, 1f), 6f);
+            Logo(new Vector2(0f, 560f), new Vector2(940f, 398f));
             var tag = Label(new Vector2(0f, -250f), new Vector2(900f, 64f), "Clear the lane. Match three.", 44, Cream, TextAnchor.MiddleCenter);
             Outlined(tag, new Color(0.10f, 0.12f, 0.28f, 0.8f), 3f);
             int number = NextNumber();
             bool canPlay = _levels.Count > 0 && Purse.Wallet.Lives > 0;
-            var play = MakeButton(new Vector2(0f, -470f), new Vector2(680f, 184f), Green, "Level " + number, 64, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null);
+            var play = MakeButton(new Vector2(0f, -470f), new Vector2(700f, 256f), Green, "Level " + number, 84, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null, "btn_green");
+            _playButton = play;
             play.interactable = canPlay;
         }
 
@@ -222,14 +223,14 @@ namespace CarMatch
             _phase = Phase.Play;
             ClearScreen();
             Backdrop();
-            Hud(860f);
-            var home = MakeButton(new Vector2(-430f, 860f), new Vector2(150f, 72f), new Color(0.20f, 0.24f, 0.34f, 0.85f), "Home", 28, OnHome);
-            home.interactable = !_busy && !_driving;
+            var safe = HudPlay();
             string title = _level != null ? "Level " + _level.Number : "Level";
-            Label(new Vector2(0f, 760f), new Vector2(700f, 56f), title, 40, Cream, TextAnchor.MiddleCenter);
+            var t = Label(new Vector2(0f, 770f), new Vector2(700f, 70f), title, 54, Cream, TextAnchor.MiddleCenter);
+            Outlined(t, new Color(0.10f, 0.12f, 0.28f, 0.9f), 3f);
             string blurb = _level != null && !string.IsNullOrEmpty(_level.Blurb) ? _level.Blurb : "";
-            if (_lastMatch) blurb = "Matched.";
-            Label(new Vector2(0f, 700f), new Vector2(900f, 44f), blurb, 26, new Color(1f, 0.94f, 0.86f, 1f), TextAnchor.MiddleCenter);
+            if (_lastMatch) blurb = "Matched!";
+            var b = Label(new Vector2(0f, 712f), new Vector2(900f, 44f), blurb, 30, new Color(1f, 0.96f, 0.88f, 1f), TextAnchor.MiddleCenter);
+            Outlined(b, new Color(0.10f, 0.12f, 0.28f, 0.7f), 2f);
             DrawBoard();
             DrawBar();
             DrawBoosters();
@@ -245,17 +246,18 @@ namespace CarMatch
                 if (_board.Lanes[i].Cells.Count > depth)
                     depth = _board.Lanes[i].Cells.Count;
             bool sides = _board.Sides.Count > 0;
-            float gutter = sides ? 150f : 24f;
-            float gap = 16f;
-            float availW = 1000f - gutter * 2f;
+            // Tight packing: thin painted lines between lanes instead of wide gaps.
+            float gutter = sides ? 130f : 12f;
+            float gap = 8f;
+            float availW = 1064f - gutter * 2f;
             float cellW = (availW - gap * (lanes - 1)) / lanes;
-            if (cellW > 168f) cellW = 168f;
-            float cellH = cellW * 1.18f;
-            float availH = 980f;
+            if (cellW > 196f) cellW = 196f;
+            float cellH = cellW * 1.04f;
+            float availH = 1000f;
             if (cellH * depth > availH) cellH = availH / depth;
             float boardW = lanes * cellW + (lanes - 1) * gap;
             float left = -boardW * 0.5f + cellW * 0.5f;
-            float baseY = -360f + cellH * 0.5f;
+            float baseY = -370f + cellH * 0.5f;
             _metrics = new LotMetrics
             {
                 Lanes = lanes,
@@ -264,15 +266,9 @@ namespace CarMatch
                 Gap = gap,
                 Left = left,
                 BaseY = baseY,
-                Piece = new Vector2(cellW - 8f, cellH - 10f)
+                Piece = new Vector2(cellW + 6f, cellH + 6f)
             };
-
-            var road = Place(_screen, "Road", new Vector2(0f, baseY + (depth - 1) * cellH * 0.5f), new Vector2(boardW + gutter * 1.1f, depth * cellH + 36f));
-            var roadImage = road.gameObject.AddComponent<Image>();
-            roadImage.sprite = SpriteKit.Round;
-            roadImage.type = Image.Type.Sliced;
-            roadImage.color = new Color(0.93f, 0.84f, 0.70f, 1f);
-            roadImage.raycastTarget = false;
+            DrawLot(lanes, depth, boardW, gutter);
 
             var piece = _metrics.Piece;
             for (int lane = 0; lane < lanes; lane++)
@@ -294,6 +290,54 @@ namespace CarMatch
                 var tap = new Tap(TapKind.Side, s, side.Cell);
                 DrawCar(SideAnchor(side), piece, side.Queue[0], EyeState.IsOpen(_board, tap), tap, side.Queue.Count);
             }
+        }
+
+        // The playfield as a real lot: asphalt across the full width, painted lane lines, stop bars
+        // at each lane mouth, and an exit road along the bottom that every car drives out on.
+        void DrawLot(int lanes, int depth, float boardW, float gutter)
+        {
+            float top = _metrics.BaseY + (depth - 0.5f) * _metrics.CellH + 40f;
+            float mouth = _metrics.BaseY - _metrics.CellH * 0.5f;
+            float roadH = _metrics.CellH * 0.9f;
+            float bottom = BarY + 60f;
+            var asphalt = UiArt.Get("asphalt");
+            var lot = Place(_screen, "Lot", new Vector2(0f, (top + bottom) * 0.5f), new Vector2(1400f, top - bottom));
+            var lotImage = lot.gameObject.AddComponent<Image>();
+            lotImage.raycastTarget = false;
+            if (asphalt != null)
+            {
+                lotImage.sprite = asphalt;
+                lotImage.type = Image.Type.Tiled;
+            }
+            else lotImage.color = new Color(0.30f, 0.31f, 0.34f, 1f);
+            // Curb along the top of the lot.
+            Bar("Curb", new Vector2(0f, top + 8f), new Vector2(1400f, 18f), new Color(0.86f, 0.84f, 0.78f, 1f));
+            Bar("CurbShade", new Vector2(0f, top - 4f), new Vector2(1400f, 8f), new Color(0.55f, 0.54f, 0.50f, 1f));
+            var line = new Color(0.97f, 0.96f, 0.90f, 0.92f);
+            float h = depth * _metrics.CellH;
+            float cy = _metrics.BaseY + (depth - 1) * _metrics.CellH * 0.5f;
+            for (int i = 0; i <= lanes; i++)
+            {
+                float x = _metrics.Left - _metrics.CellW * 0.5f - _metrics.Gap * 0.5f + i * (_metrics.CellW + _metrics.Gap);
+                Bar("LaneLine", new Vector2(x, cy + 10f), new Vector2(8f, h + 20f), line);
+            }
+            for (int i = 0; i < lanes; i++)
+            {
+                var a = LaneAnchor(i, 0);
+                Bar("StopBar", new Vector2(a.x, mouth - 4f), new Vector2(_metrics.CellW - 20f, 10f), new Color(0.98f, 0.82f, 0.22f, 0.95f));
+            }
+            // Exit road: dashed centre line running to the bar.
+            float roadY = mouth - roadH * 0.5f - 10f;
+            for (float x = -520f; x < 540f; x += 110f)
+                Bar("Dash", new Vector2(x, roadY - roadH * 0.32f), new Vector2(60f, 8f), new Color(0.98f, 0.82f, 0.22f, 0.8f));
+        }
+
+        void Bar(string name, Vector2 pos, Vector2 size, Color color)
+        {
+            var rt = Place(_screen, name, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.color = color;
+            img.raycastTarget = false;
         }
 
         Vector2 LaneAnchor(int lane, int cell)
@@ -353,11 +397,12 @@ namespace CarMatch
         {
             if (open)
             {
-                var ring = Place(_screen, "Ring", pos, size + new Vector2(14f, 14f));
+                var ring = Place(_screen, "Ring", pos + new Vector2(0f, -size.y * 0.06f), size * 1.15f);
                 var ringImage = ring.gameObject.AddComponent<Image>();
-                ringImage.sprite = SpriteKit.Round;
-                ringImage.type = Image.Type.Sliced;
-                ringImage.color = Gold;
+                var glow = UiArt.Get("glow");
+                ringImage.sprite = glow != null ? glow : SpriteKit.Round;
+                if (glow == null) ringImage.type = Image.Type.Sliced;
+                ringImage.color = glow != null ? new Color(1f, 0.86f, 0.35f, 0.75f) : Gold;
                 ringImage.raycastTarget = false;
             }
             var rt = Place(_screen, "Car", pos, size);
@@ -389,16 +434,25 @@ namespace CarMatch
 
         void DrawBar()
         {
-            var tray = Place(_screen, "Bar", new Vector2(0f, BarY), new Vector2(980f, 130f));
+            var trayArt = UiArt.Get("tray");
+            var tray = Place(_screen, "Bar", new Vector2(0f, BarY - 6f), trayArt != null ? new Vector2(1060f, 210f) : new Vector2(980f, 130f));
             var trayImage = tray.gameObject.AddComponent<Image>();
-            trayImage.sprite = SpriteKit.Round;
-            trayImage.type = Image.Type.Sliced;
-            trayImage.color = Wood;
+            trayImage.sprite = trayArt != null ? trayArt : SpriteKit.Round;
+            trayImage.type = trayArt != null ? Image.Type.Simple : Image.Type.Sliced;
+            trayImage.color = trayArt != null ? Color.white : Wood;
             trayImage.raycastTarget = false;
+            var slotArt = UiArt.Get("slot");
             for (int i = 0; i < MatchClear.BarCap; i++)
             {
                 var center = BarSlotCenter(i);
-                var cell = Place(tray, "Slot", new Vector2(center.x, 0f), new Vector2(BarSlotWidth - 8f, BarCarH));
+                var cell = Place(tray, "Slot", new Vector2(center.x, trayArt != null ? 6f : 0f), new Vector2(BarSlotWidth - 8f, BarCarH));
+                if (slotArt != null)
+                {
+                    var well = cell.gameObject.AddComponent<Image>();
+                    well.sprite = slotArt;
+                    well.raycastTarget = false;
+                    cell = Place(cell, "Car", Vector2.zero, new Vector2(BarSlotWidth + 4f, BarCarH + 8f));
+                }
                 var image = cell.gameObject.AddComponent<Image>();
                 image.raycastTarget = false;
                 if (_board != null && i < _board.Bar.Count)
@@ -418,7 +472,7 @@ namespace CarMatch
 
         void DrawBoosters()
         {
-            float y = -810f;
+            float y = -820f;
             Booster("Undo", Economy.UndoCost, -390f, y, _history.Count > 0, OnUndo);
             Booster("Shuffle", Economy.ShuffleCost, -130f, y, _board != null && BoardQuery.Total(_board) >= 2, OnShuffle);
             Booster("Super", Economy.SuperUndoCost, 130f, y, _history.Count > 0, OnSuper);
@@ -428,10 +482,23 @@ namespace CarMatch
         void Booster(string name, int cost, float x, float y, bool legal, UnityEngine.Events.UnityAction action)
         {
             bool afford = Economy.CanAfford(Purse.Wallet, cost);
-            var button = MakeButton(new Vector2(x, y), new Vector2(230f, 130f), new Color(0.22f, 0.45f, 0.82f, 1f), name, 32, action);
+            var button = MakeButton(new Vector2(x, y), new Vector2(220f, 200f), new Color(0.22f, 0.45f, 0.82f, 1f), name, 40, action, "btn_booster");
             button.interactable = legal && afford && !_busy && !_driving && _board != null && !_board.Won && !_board.Failed;
-            var costLabel = Label(new Vector2(x, y - 88f), new Vector2(220f, 36f), cost.ToString(), 26, Gold, TextAnchor.MiddleCenter);
-            costLabel.raycastTarget = false;
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null) label.rectTransform.offsetMin = new Vector2(0f, 90f);
+            // Cost chip: coin icon + price in a small pill on the button face.
+            var chip = Place(button.transform, "Cost", new Vector2(0f, -10f), new Vector2(150f, 56f));
+            var chipImage = chip.gameObject.AddComponent<Image>();
+            chipImage.sprite = UiArt.Get("pill") ?? SpriteKit.Round;
+            chipImage.raycastTarget = false;
+            var coin = Place(chip, "Coin", new Vector2(-48f, 2f), new Vector2(46f, 46f));
+            var coinImage = coin.gameObject.AddComponent<Image>();
+            coinImage.sprite = UiArt.Get("icon_coin") ?? SpriteKit.Coin;
+            coinImage.preserveAspect = true;
+            coinImage.raycastTarget = false;
+            var costLabel = AddText(chip, cost.ToString(), 30, afford ? Cream : new Color(1f, 0.55f, 0.5f, 1f), TextAnchor.MiddleCenter);
+            costLabel.rectTransform.offsetMin = new Vector2(30f, 0f);
+            costLabel.font = ChunkyFont();
         }
 
         bool CanMagnet()
@@ -940,32 +1007,92 @@ namespace CarMatch
             image.raycastTarget = false;
         }
 
-        void Hud(float y)
+        RectTransform Hud(float y)
         {
             var safe = SafeLayer();
-            Pill(safe, new Vector2(-250f, -70f), SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
-            Pill(safe, new Vector2(250f, -70f), SpriteKit.Heart, LivesLine(), false);
+            Pill(safe, new Vector2(-250f, -70f), new Vector2(340f, 96f), UiArt.Get("icon_coin") ?? SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
+            Pill(safe, new Vector2(250f, -70f), new Vector2(340f, 96f), UiArt.Get("icon_heart") ?? SpriteKit.Heart, LivesLine(), false);
+            return safe;
         }
 
-        void Pill(RectTransform parent, Vector2 pos, Sprite icon, string value, bool coins)
+        // Play HUD: Home in its own pill on the left, then coins and lives.
+        RectTransform HudPlay()
         {
-            var rt = Place(parent, coins ? "Coins" : "Lives", pos, new Vector2(340f, 88f));
+            var safe = SafeLayer();
+            var home = MakeButton(new Vector2(-400f, -70f), new Vector2(200f, 100f), new Color(0.20f, 0.24f, 0.34f, 1f), "Home", 38, OnHome, "pill", safe);
+            ((RectTransform)home.transform).anchorMin = ((RectTransform)home.transform).anchorMax = new Vector2(0.5f, 1f);
+            ((RectTransform)home.transform).anchoredPosition = new Vector2(-400f, -70f);
+            home.interactable = !_busy && !_driving;
+            Pill(safe, new Vector2(-40f, -70f), new Vector2(290f, 96f), UiArt.Get("icon_coin") ?? SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
+            Pill(safe, new Vector2(320f, -70f), new Vector2(290f, 96f), UiArt.Get("icon_heart") ?? SpriteKit.Heart, LivesLine(), false);
+            return safe;
+        }
+
+        void Logo(Vector2 pos, Vector2 size)
+        {
+            var art = UiArt.Get("logo");
+            if (art == null)
+            {
+                var title = Label(pos, new Vector2(980f, 200f), "Lot Loop", 150, Cream, TextAnchor.MiddleCenter);
+                Outlined(title, new Color(0.35f, 0.12f, 0.10f, 1f), 6f);
+                return;
+            }
+            var rt = Place(_screen, "Logo", pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = art;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+        }
+
+        void Pill(RectTransform parent, Vector2 pos, Vector2 size, Sprite icon, string value, bool coins)
+        {
+            var rt = Place(parent, coins ? "Coins" : "Lives", pos, size);
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 1f);
+            rt.anchoredPosition = pos;
             var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = SpriteKit.Round;
-            image.type = Image.Type.Sliced;
-            image.color = new Color(0.12f, 0.14f, 0.20f, 0.78f);
+            var pill = UiArt.Get("pill");
+            if (pill != null)
+            {
+                // The painted pill carries its own shadow padding (16px each side at 360x96).
+                image.sprite = pill;
+                rt.sizeDelta = size * new Vector2(392f / 360f, 128f / 96f);
+            }
+            else
+            {
+                image.sprite = SpriteKit.Round;
+                image.type = Image.Type.Sliced;
+                image.color = new Color(0.12f, 0.14f, 0.20f, 0.78f);
+            }
             image.raycastTarget = false;
-            var mark = Place(rt, "Icon", new Vector2(-110f, 0f), new Vector2(56f, 56f));
+            var mark = Place(rt, "Icon", new Vector2(-size.x * 0.5f + 20f, 2f), new Vector2(92f, 92f));
             var markImage = mark.gameObject.AddComponent<Image>();
             markImage.sprite = icon;
             markImage.preserveAspect = true;
             markImage.raycastTarget = false;
-            var text = AddText(rt, value, 32, Cream, TextAnchor.MiddleCenter);
+            var text = AddText(rt, value, 40, Cream, TextAnchor.MiddleCenter);
             text.rectTransform.offsetMin = new Vector2(70f, 0f);
-            text.rectTransform.offsetMax = new Vector2(-16f, 0f);
+            text.rectTransform.offsetMax = new Vector2(-60f, 0f);
+            Outlined(text, new Color(0.05f, 0.06f, 0.15f, 0.9f), 2f);
+            // '+' affordance: coins open the (future) shop, hearts the refill. Today it just answers the tap.
+            var plusArt = UiArt.Get("plus");
+            if (plusArt != null)
+            {
+                var plus = Place(rt, "Plus", new Vector2(size.x * 0.5f - 22f, 0f), new Vector2(76f, 76f));
+                var plusImage = plus.gameObject.AddComponent<Image>();
+                plusImage.sprite = plusArt;
+                plusImage.preserveAspect = true;
+                var plusButton = plus.gameObject.AddComponent<Button>();
+                plusButton.transition = Selectable.Transition.None;
+                plus.gameObject.AddComponent<PressSquash>().Sink = 3f;
+                plusButton.onClick.AddListener(OnPlus);
+            }
             if (coins) _coinText = text;
             else _livesText = text;
+        }
+
+        void OnPlus()
+        {
+            AudioManager.Play(Sfx.Click);
         }
 
         Text Label(Vector2 pos, Vector2 size, string value, int fontSize, Color color, TextAnchor anchor)
@@ -974,30 +1101,84 @@ namespace CarMatch
             return AddText(rt, value, fontSize, color, anchor);
         }
 
-        Button MakeButton(Vector2 pos, Vector2 size, Color color, string value, int fontSize, UnityEngine.Events.UnityAction action)
+        Button MakeButton(Vector2 pos, Vector2 size, Color color, string value, int fontSize, UnityEngine.Events.UnityAction action, string style = null, RectTransform parent = null)
         {
-            var shadow = Place(_screen, "Shadow", pos + new Vector2(0f, -8f), size);
-            var shadowImage = shadow.gameObject.AddComponent<Image>();
-            shadowImage.sprite = SpriteKit.Round;
-            shadowImage.type = Image.Type.Sliced;
-            shadowImage.color = new Color(0f, 0f, 0f, 0.25f);
-            shadowImage.raycastTarget = false;
-            var rt = Place(_screen, "Button", pos, size);
+            if (style == null) style = StyleFor(color);
+            var art = UiArt.Get(style);
+            var host = parent != null ? (Transform)parent : _screen;
+            if (art == null)
+            {
+                var shadow = Place(host, "Shadow", pos + new Vector2(0f, -8f), size);
+                var shadowImage = shadow.gameObject.AddComponent<Image>();
+                shadowImage.sprite = SpriteKit.Round;
+                shadowImage.type = Image.Type.Sliced;
+                shadowImage.color = new Color(0f, 0f, 0f, 0.25f);
+                shadowImage.raycastTarget = false;
+            }
+            var rt = Place(host, "Button", pos, size);
             var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = SpriteKit.Round;
-            image.type = Image.Type.Sliced;
-            image.color = color;
+            if (art != null)
+            {
+                image.sprite = art;
+                image.type = Image.Type.Sliced;
+                image.color = Color.white;
+            }
+            else
+            {
+                image.sprite = SpriteKit.Round;
+                image.type = Image.Type.Sliced;
+                image.color = color;
+            }
             var button = rt.gameObject.AddComponent<Button>();
             button.targetGraphic = image;
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(0.94f, 0.94f, 0.94f, 1f);
-            colors.pressedColor = new Color(0.78f, 0.78f, 0.78f, 1f);
-            colors.disabledColor = new Color(0.55f, 0.55f, 0.55f, 0.85f);
+            colors.highlightedColor = Color.white;
+            colors.pressedColor = new Color(0.90f, 0.90f, 0.90f, 1f);
+            colors.disabledColor = new Color(0.60f, 0.60f, 0.62f, 0.9f);
             button.colors = colors;
-            AddText(rt, value, fontSize, Color.white, TextAnchor.MiddleCenter);
+            var label = AddText(rt, value, fontSize, Color.white, TextAnchor.MiddleCenter);
+            label.font = ChunkyFont();
+            if (art != null)
+            {
+                // The face sits above the baked lip and shadow; centre the label on the face.
+                label.rectTransform.offsetMin = new Vector2(0f, size.y * 0.20f);
+                label.rectTransform.offsetMax = new Vector2(0f, -size.y * 0.06f);
+            }
+            Outlined(label, LabelInk(style), Mathf.Max(2f, fontSize / 18f));
+            rt.gameObject.AddComponent<PressSquash>().Sink = size.y * 0.05f;
+            button.onClick.AddListener(delegate { AudioManager.Play(Sfx.Click); });
             if (action != null) button.onClick.AddListener(action);
             return button;
+        }
+
+        static string StyleFor(Color color)
+        {
+            if (color.g > color.r && color.g > color.b) return "btn_green";
+            if (color.b > 0.6f && color.b > color.r) return "btn_blue";
+            return "btn_navy";
+        }
+
+        static Color LabelInk(string style)
+        {
+            switch (style)
+            {
+                case "btn_green": return new Color(0.06f, 0.32f, 0.12f, 1f);
+                case "btn_blue":
+                case "btn_booster": return new Color(0.07f, 0.18f, 0.45f, 1f);
+                case "btn_orange": return new Color(0.50f, 0.22f, 0.04f, 1f);
+                default: return new Color(0.04f, 0.05f, 0.12f, 1f);
+            }
+        }
+
+        Font _chunky;
+
+        Font ChunkyFont()
+        {
+            if (_chunky != null) return _chunky;
+            _chunky = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (_chunky == null) _chunky = UiFont();
+            return _chunky;
         }
 
         static RectTransform Place(Transform parent, string name, Vector2 pos, Vector2 size)

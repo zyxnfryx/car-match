@@ -47,6 +47,14 @@ namespace CarMatch.Editor
             importer.crunchedCompression = false;
             importer.spritePivot = new Vector2(0.5f, 0.5f);
             importer.spritePixelsToUnits = 100f;
+            // 3D buttons and pills slice: keep the rounded ends and bevel, stretch the middle.
+            var file = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (path.StartsWith(Extra[0], System.StringComparison.Ordinal) &&
+                (file.StartsWith("btn_", System.StringComparison.Ordinal) || file == "pill"))
+            {
+                float b = file == "btn_booster" ? 70f : file == "pill" ? 56f : file == "btn_navy" ? 60f : 96f;
+                importer.spriteBorder = new Vector4(b, b * 0.8f, b, b * 0.8f);
+            }
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
