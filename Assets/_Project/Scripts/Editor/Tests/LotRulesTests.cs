@@ -108,6 +108,14 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_MagnetClosesLaneGaps()
+        {
+            RuleChecks.LevelsForGapCheck.Clear();
+            foreach (var d in LevelJson.Parse(Json())) RuleChecks.LevelsForGapCheck.Add(d.Board);
+            RuleChecks.MagnetClosesLaneGaps();
+        }
+
+        [Test]
         public void Eyes_OpenOnlyWhenTheExitIsClear()
         {
             RuleChecks.OpenEyesOnlyOnAClearExit();

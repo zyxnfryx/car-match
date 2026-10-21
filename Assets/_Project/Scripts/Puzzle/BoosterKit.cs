@@ -54,6 +54,12 @@ namespace CarMatch
         // and do not take holding-bar slots. Fronts go first.
         public static bool Magnet(Board board)
         {
+            return Magnet(board, null, null);
+        }
+
+        // pulled: (lane, cell) of lane cars the magnet took; moves: (lane, from, to) of cars that slid up to close gaps.
+        public static bool Magnet(Board board, List<int[]> pulled, List<int[]> moves)
+        {
             if (board == null || board.Won || board.Failed) return false;
             var hist = BoardQuery.Histogram(board);
             int best = 2;
@@ -82,16 +88,49 @@ namespace CarMatch
                     }
                     if (slot.Empty || slot.Car.Color != color) continue;
                     slot.Empty = true;
+                    if (pulled != null) pulled.Add(new[] { l, c });
                     need--;
                 }
             }
             for (int s = 0; s < board.Sides.Count && need > 0; s++)
                 need -= PullQueue(board.Sides[s].Queue, color, need);
             if (need != 0) return false;
+            CloseGaps(board, moves);
             HiddenReveal.Sweep(board);
             if (BoardQuery.IsClear(board))
                 board.Won = true;
             return true;
+        }
+
+        // Closes holes between parked cars in a lane: cars behind a hole slide toward the exit until they
+        // touch the car ahead. Leading empty cells (normal after cars leave) stay; tunnels never move.
+        public static void CloseGaps(Board board, List<int[]> moves)
+        {
+            for (int l = 0; l < board.Lanes.Count; l++)
+            {
+                var cells = board.Lanes[l].Cells;
+                int c = 0;
+                while (c < cells.Count)
+                {
+                    int segEnd = c;
+                    while (segEnd < cells.Count && !cells[segEnd].Tunnel) segEnd++;
+                    int first = c;
+                    while (first < segEnd && cells[first].Empty) first++;
+                    int write = first;
+                    for (int read = first; read < segEnd; read++)
+                    {
+                        if (cells[read].Empty) continue;
+                        if (read != write)
+                        {
+                            cells[write] = cells[read];
+                            cells[read] = new Slot { Empty = true };
+                            if (moves != null) moves.Add(new[] { l, read, write });
+                        }
+                        write++;
+                    }
+                    c = segEnd + 1;
+                }
+            }
         }
 
         struct Paint

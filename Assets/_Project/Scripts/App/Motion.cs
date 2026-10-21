@@ -156,6 +156,28 @@ namespace CarMatch
         }
     }
 
+    // Plays a sprite sheet once over 'life' seconds (FX hook for Character Creator's sheets).
+    public sealed class Flipbook : MonoBehaviour
+    {
+        Sprite[] _frames; float _fps = 20f; bool _loop; bool _destroyAtEnd; float _t; Image _img;
+        public void Init(Sprite[] frames, float life) { Play(frames, frames.Length / Mathf.Max(0.05f, life), false); _destroyAtEnd = false; }
+        // One-shot sheets destroy their object after the last frame; looping sheets run until removed.
+        public void Play(Sprite[] frames, float fps, bool loop) { _frames = frames; _fps = Mathf.Max(1f, fps); _loop = loop; _destroyAtEnd = !loop; _img = GetComponent<Image>(); }
+        void Update()
+        {
+            if (_frames == null || _img == null) return;
+            _t += Time.unscaledDeltaTime;
+            int i = (int)(_t * _fps);
+            if (i >= _frames.Length)
+            {
+                if (_loop) i %= _frames.Length;
+                else if (_destroyAtEnd) { Destroy(gameObject); return; }
+                else i = _frames.Length - 1;
+            }
+            _img.sprite = _frames[i];
+        }
+    }
+
     // Port of Flock Five's CamShake punch for a uGUI root (the screen rect, not a camera).
     public sealed class UiShake : MonoBehaviour
     {
