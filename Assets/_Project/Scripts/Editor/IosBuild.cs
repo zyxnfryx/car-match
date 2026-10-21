@@ -18,6 +18,10 @@ public static class IosBuild
         PlayerSettings.iOS.appleEnableAutomaticSigning = true;
         PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPhoneOnly;
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
+        AssetDatabase.Refresh();
+        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Art/AppIcon.png");
+        if (icon == null) throw new Exception("missing Assets/_Project/Art/AppIcon.png");
+        PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);
         var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
         var r = BuildPipeline.BuildPlayer(new BuildPlayerOptions
         {
