@@ -30,13 +30,27 @@ namespace CarMatch
             return true;
         }
 
-        public static bool Shuffle(Board board, System.Random rng)
+        // True only if a shuffle can produce a different board: at least two cars of
+        // two different colors. With one color left (or one car) the HUD greys the
+        // button and nothing is charged.
+        public static bool CanShuffle(Board board)
         {
-            if (board == null || board.Won || board.Failed || rng == null) return false;
+            if (board == null || board.Won || board.Failed) return false;
             var paints = new List<Paint>(32);
             var colors = new List<CarColor>(32);
             Gather(board, paints, colors);
-            if (colors.Count < 2) return false;
+            for (int i = 1; i < colors.Count; i++)
+                if (colors[i] != colors[0]) return true;
+            return false;
+        }
+
+        public static bool Shuffle(Board board, System.Random rng)
+        {
+            if (rng == null || !CanShuffle(board)) return false;
+            var paints = new List<Paint>(32);
+            var colors = new List<CarColor>(32);
+            Gather(board, paints, colors);
+            var original = colors.ToArray();
             for (int i = colors.Count - 1; i > 0; i--)
             {
                 int j = rng.Next(i + 1);
@@ -44,6 +58,13 @@ namespace CarMatch
                 colors[i] = colors[j];
                 colors[j] = tmp;
             }
+            // Never spend a shuffle on an identical layout: if the deal came out the same,
+            // swap the first car with the first one of a different color.
+            bool same = true;
+            for (int i = 0; i < colors.Count && same; i++) same = colors[i] == original[i];
+            if (same)
+                for (int j = 1; j < colors.Count; j++)
+                    if (colors[j] != colors[0]) { var tmp = colors[0]; colors[0] = colors[j]; colors[j] = tmp; break; }
             for (int i = 0; i < paints.Count; i++)
                 PaintColor(board, paints[i], colors[i]);
             HiddenReveal.Sweep(board);

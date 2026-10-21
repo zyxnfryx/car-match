@@ -84,6 +84,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_ShuffleRefusesWhenNothingCanChange()
+        {
+            RuleChecks.ShuffleRefusesWhenNothingCanChange();
+        }
+
+        [Test]
         public void Boosters_MagnetPullsASetOfThree()
         {
             RuleChecks.MagnetPullsASetOfThree();

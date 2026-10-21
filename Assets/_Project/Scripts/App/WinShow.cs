@@ -186,6 +186,19 @@ namespace CarMatch
         }
 
         static bool _skip;
+        public const float FinaleParkMaxSec = 1.0f, FinaleHonkSec = 0.55f, FinaleClearSec = 0.15f;
+
+        // Sets the finale skip flag on any pointer/touch press while the catcher exists.
+        class SkipOnPress : MonoBehaviour
+        {
+            void Update()
+            {
+                var p = UnityEngine.InputSystem.Pointer.current;
+                if (p != null && p.press.wasPressedThisFrame) _skip = true;
+                var ts = UnityEngine.InputSystem.Touchscreen.current;
+                if (ts != null && ts.primaryTouch.press.wasPressedThisFrame) _skip = true;
+            }
+        }
 
         static IEnumerator CarFinale(Transform screen)
         {
@@ -194,6 +207,8 @@ namespace CarMatch
             var catcher = Img(screen, "SkipFinale", null, Vector2.zero, new Vector2(4000f, 4000f), new Color(0f, 0f, 0f, 0.001f));
             catcher.GetComponent<Image>().raycastTarget = true;
             catcher.gameObject.AddComponent<Button>().onClick.AddListener(() => _skip = true);
+            // Also skip on the press itself (not just a full click), anywhere on screen.
+            catcher.gameObject.AddComponent<SkipOnPress>();
             // Fit the letters and the drive-in lanes inside the visible canvas (390x844 and taller included).
             float halfW = 490f;
             var srt = screen as RectTransform;
@@ -230,9 +245,11 @@ namespace CarMatch
                 }
             }
             catcher.SetAsLastSibling();
-            // 1) Drive in and park (~1.0 s, staggered).
+            // Whole formation is capped at ~2 s: park <= 1.0 s, honk 0.55 s, clear 0.15 s.
+            // 1) Drive in and park (<= 1.0 s, staggered).
             float t = 0f;
-            const float drive = 0.45f, stagger = 0.012f;
+            const float drive = 0.4f;
+            float stagger = cars.Count > 1 ? Mathf.Min(0.012f, 0.6f / cars.Count) : 0f;
             float parkEnd = drive + stagger * cars.Count;
             while (t < parkEnd && !_skip)
             {
@@ -265,10 +282,10 @@ namespace CarMatch
                 Haptics.Thud();
 #endif
                 t = 0f;
-                while (t < 0.6f && !_skip)
+                while (t < FinaleHonkSec && !_skip)
                 {
                     t += Time.unscaledDeltaTime;
-                    float u = t / 0.6f;
+                    float u = Mathf.Clamp01(t / FinaleHonkSec);
                     float hop = Mathf.Abs(Mathf.Sin(u * Mathf.PI * 2f)) * 18f * (1f - u);
                     float sq = 1f + 0.12f * Mathf.Sin(u * Mathf.PI * 4f) * (1f - u);
                     for (int i = 0; i < cars.Count; i++)
@@ -281,10 +298,10 @@ namespace CarMatch
             }
             // 3) Clear the stage quickly so the fanfare, banner and coins own the screen.
             t = 0f;
-            while (t < 0.2f)
+            while (t < FinaleClearSec)
             {
                 t += Time.unscaledDeltaTime;
-                float u = Mathf.Clamp01(t / 0.2f);
+                float u = Mathf.Clamp01(t / FinaleClearSec);
                 for (int i = 0; i < cars.Count; i++)
                 {
                     cars[i].localScale = Vector3.one * (1f - u);
