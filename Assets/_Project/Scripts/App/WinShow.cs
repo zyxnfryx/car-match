@@ -100,6 +100,7 @@ namespace CarMatch
             plate.GetComponent<Image>().preserveAspect = false;
             Img(plate, "Coin", UiArt.Get("icon_coin") ?? SpriteKit.Coin, new Vector2(-130f, 4f), new Vector2(110f, 110f), Color.white);
             var plus = Txt(plate, "+0", s.Font, 96, new Vector2(40f, 6f), new Vector2(300f, 120f), new Color(1f, 0.88f, 0.32f), new Color(0.35f, 0.18f, 0.02f));
+            plate.gameObject.SetActive(false); // shown when the coin count-up starts (no '+0' during confetti)
             Button next = null;
             if (s.More)
             {
@@ -140,6 +141,8 @@ namespace CarMatch
             int n = Mathf.Clamp(s.Pay, 1, CoinFlyMax);
             int shown = 0;
             int landed = 0;
+            plus.transform.parent.gameObject.SetActive(true);
+            host.StartCoroutine(Pop((RectTransform)plus.transform.parent, 0f, 0.25f));
             for (int i = 0; i < n; i++)
             {
                 int worth = s.Pay / n + (i < s.Pay % n ? 1 : 0);
