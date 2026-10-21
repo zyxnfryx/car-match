@@ -174,7 +174,7 @@ namespace CarMatch
             _phase = Phase.Home;
             _busy = false;
             ClearScreen();
-            Backdrop();
+            Backdrop(true);
             Clouds();
             Hud(0f);
             AudioManager.Music(AudioManager.HomeMusic);
@@ -269,7 +269,7 @@ namespace CarMatch
             float gap = 8f;
             float availW = 1064f - gutter * 2f;
             float cellW = (availW - gap * (lanes - 1)) / lanes;
-            if (cellW > 300f) cellW = 300f;
+            if (cellW > 420f) cellW = 420f;
             float availH = 1000f;
             // Fill the width: cars grow until the deepest lane would overflow the lot height.
             if (cellW * 1.04f * depth > availH) cellW = Mathf.Max(availH / (1.04f * depth), Mathf.Min(cellW, 150f));
@@ -706,11 +706,16 @@ namespace CarMatch
                 cell = tap.Cell;
                 points.Add(LaneAnchor(lane, cell));
             }
-            for (int c = cell - 1; c >= 0; c--)
-                points.Add(LaneAnchor(lane, c));
             var mouth = LaneAnchor(lane, 0);
             var slotPos = BarSlotCenter(slotIndex);
-            var exit = new Vector2(mouth.x, mouth.y - _metrics.CellH);
+            // Gentle S-curve out of the lane: a small swing away from the slot side, then a lean toward it,
+            // so the car rolls through the in-between headings instead of driving dead straight.
+            var start = points[points.Count - 1];
+            float side = Mathf.Sign(slotPos.x - mouth.x);
+            if (Mathf.Abs(slotPos.x - mouth.x) < 1f) side = lane % 2 == 0 ? 1f : -1f;
+            float swing = _metrics.CellW * 0.14f;
+            var exit = new Vector2(mouth.x + side * swing * 1.8f, mouth.y - _metrics.CellH);
+            points.Add(new Vector2(mouth.x - side * swing, Mathf.Lerp(start.y, exit.y, 0.45f)));
             points.Add(exit);
             // Real turn on the exit road: pull out, swing toward the slot, then nose into the bar.
             float roadY = Mathf.Lerp(exit.y, slotPos.y, 0.45f);
@@ -1026,6 +1031,8 @@ namespace CarMatch
             _history.Add(_board.Clone());
             if (!BoosterKit.Magnet(_board))
             {
+                // Magnet can pull some cars before it gives up; put the untouched snapshot back.
+                _board = _history[_history.Count - 1];
                 _history.RemoveAt(_history.Count - 1);
                 return;
             }
@@ -1220,7 +1227,7 @@ namespace CarMatch
             return (seconds / 60) + ":" + (seconds % 60).ToString("00");
         }
 
-        void Backdrop()
+        void Backdrop(bool home = false)
         {
             var rt = Place(_screen, "Sky", Vector2.zero, new Vector2(1080f, 1920f));
             var image = rt.gameObject.AddComponent<Image>();
@@ -1231,6 +1238,8 @@ namespace CarMatch
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
             rt.sizeDelta = Vector2.zero;
+            // The painted home backdrop has parked cars in it; only the home screen shows it.
+            if (!home) return;
             var painted = UiArt.Get("home_bg");
             if (painted == null) return;
             var bg = Place(_screen, "Backdrop", Vector2.zero, new Vector2(1080f, 2340f));

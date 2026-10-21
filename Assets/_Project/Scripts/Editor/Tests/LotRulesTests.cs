@@ -90,6 +90,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_ShuffleSuperMagnetOnEveryLevel()
+        {
+            RuleChecks.BoostersOnEveryLevel(Json());
+        }
+
+        [Test]
         public void Eyes_OpenOnlyWhenTheExitIsClear()
         {
             RuleChecks.OpenEyesOnlyOnAClearExit();

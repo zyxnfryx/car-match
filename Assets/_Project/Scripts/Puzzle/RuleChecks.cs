@@ -394,6 +394,7 @@ namespace CarMatch
             WinAndFailPayTheSame();
             LivesSpendAndRegen();
             AllLevelsSolvable(json);
+            BoostersOnEveryLevel(json);
         }
 
         static Board Tiny(string lanes, string sides = null)
@@ -444,6 +445,76 @@ namespace CarMatch
         }
 
         static void Expect(bool ok, string message)
+        {
+            if (!ok) throw new System.InvalidOperationException(message);
+        }
+
+        // Shuffle, Super Undo and Magnet on every level, at the start and after a few moves:
+        // color totals (board + bar) stay whole sets, Super puts cars back, a failed booster leaves the board untouched.
+        public static void BoostersOnEveryLevel(string json)
+        {
+            var rng = new System.Random(7);
+            var defs = LevelJson.Parse(json);
+            var taps = new List<Tap>(16);
+            foreach (var def in defs)
+            {
+                for (int moves = 0; moves <= 4; moves += 2)
+                {
+                    var board = def.Board.Clone();
+                    var history = new List<Board>();
+                    for (int m = 0; m < moves && !board.Won && !board.Failed; m++)
+                    {
+                        taps.Clear();
+                        ExitPath.Collect(board, taps);
+                        if (taps.Count == 0) break;
+                        BoardRules.Play(board, history, taps[rng.Next(taps.Count)]);
+                    }
+                    if (board.Won || board.Failed) continue;
+                    string tag = "level " + def.Number + " after " + moves + ": ";
+                    int[] before = Totals(board);
+
+                    var sh = board.Clone();
+                    if (BoosterKit.Shuffle(sh, rng))
+                    {
+                        int[] after = Totals(sh);
+                        for (int i = 0; i < after.Length; i++)
+                            Ensure(after[i] == before[i], tag + "shuffle changed color counts");
+                        Ensure(BoardQuery.Total(sh) == BoardQuery.Total(board), tag + "shuffle changed car count");
+                    }
+
+                    var mg = board.Clone();
+                    string key = BoardQuery.Key(mg);
+                    if (BoosterKit.Magnet(mg))
+                    {
+                        Ensure(BoardQuery.Total(mg) == BoardQuery.Total(board) - MatchClear.Set, tag + "magnet did not pull exactly three");
+                        int[] after = Totals(mg);
+                        for (int i = 0; i < after.Length; i++)
+                            Ensure(after[i] % MatchClear.Set == before[i] % MatchClear.Set, tag + "magnet broke a color set");
+                        Ensure(!mg.Won || (BoardQuery.IsClear(mg) && mg.Bar.Count == 0), tag + "magnet won with cars left");
+                    }
+                    else Ensure(BoardQuery.Key(mg) == key, tag + "failed magnet changed the board");
+
+                    if (history.Count > 0)
+                    {
+                        var hist = new List<Board>(history);
+                        Board restored;
+                        Ensure(BoosterKit.SuperUndo(hist, out restored), tag + "super refused");
+                        int back = System.Math.Min(3, history.Count);
+                        Ensure(hist.Count == history.Count - back, tag + "super dropped the wrong number of snapshots");
+                        Ensure(BoardQuery.Total(restored) >= BoardQuery.Total(board), tag + "super did not return cars");
+                    }
+                }
+            }
+        }
+
+        static int[] Totals(Board board)
+        {
+            var n = BoardQuery.Histogram(board);
+            for (int i = 0; i < board.Bar.Count; i++) n[(int)board.Bar[i]]++;
+            return n;
+        }
+
+        static void Ensure(bool ok, string message)
         {
             if (!ok) throw new System.InvalidOperationException(message);
         }
