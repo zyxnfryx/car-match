@@ -184,6 +184,40 @@ namespace CarMatch
             Expect(!board.Failed && !board.Won, "shuffle does not finish the lot");
         }
 
+        // A shuffle that cannot change anything is unavailable: the button greys out,
+        // Shuffle() refuses, and neither coins nor the free use are spent.
+        public static void ShuffleRefusesWhenNothingCanChange()
+        {
+            var mono = Tiny("[[\"coral\",\"coral\"],[\"?coral\",\"coral\"]]");
+            string key = BoardQuery.Key(mono);
+            Expect(!BoosterKit.CanShuffle(mono), "one color left cannot be shuffled");
+            Expect(!BoosterKit.Shuffle(mono, new System.Random(1)), "shuffle refuses a one-color lot");
+            Expect(BoardQuery.Key(mono) == key, "a refused shuffle leaves the lot untouched");
+            var single = Tiny("[[\"teal\"]]");
+            Expect(!BoosterKit.CanShuffle(single), "one car cannot be shuffled");
+            Expect(!BoosterKit.CanShuffle(null), "no board, no shuffle");
+
+            var flags = new MemoryFlags();
+            Expect(FreeBoosters.IsFree(flags, "Shuffle"), "shuffle starts with a free use");
+            int purse = 1000;
+            System.Func<int, bool> spend = c => { if (purse < c) return false; purse -= c; return true; };
+            // The HUD only pays after a shuffle applied, mirroring CarMatchApp.OnShuffle.
+            if (BoosterKit.CanShuffle(mono) && BoosterKit.Shuffle(mono, new System.Random(1)))
+                FreeBoosters.Pay(flags, "Shuffle", Economy.ShuffleCost, spend);
+            Expect(FreeBoosters.IsFree(flags, "Shuffle"), "the free use is kept");
+            Expect(purse == 1000, "no coins charged");
+
+            // Two colors: every shuffle actually changes the layout (never a wasted deal).
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var two = Tiny("[[\"coral\",\"teal\"]]");
+                string k2 = BoardQuery.Key(two);
+                Expect(BoosterKit.CanShuffle(two), "two colors can shuffle");
+                Expect(BoosterKit.Shuffle(two, new System.Random(seed)), "shuffle applies");
+                Expect(BoardQuery.Key(two) != k2, "seed " + seed + ": shuffle changed the layout");
+            }
+        }
+
         public static void MagnetPullsASetOfThree()
         {
             var board = Tiny("[[\"coral\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
@@ -388,6 +422,7 @@ namespace CarMatch
             SuperUndoReturnsThreeCars();
             ContinueUndoesAFullBar();
             ShuffleKeepsColorCounts();
+            ShuffleRefusesWhenNothingCanChange();
             MagnetPullsASetOfThree();
             OpenEyesOnlyOnAClearExit();
             HeadingUsesTheNearestDirection();

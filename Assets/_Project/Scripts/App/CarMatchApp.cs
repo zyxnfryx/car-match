@@ -820,7 +820,7 @@ namespace CarMatch
         {
             float y = -820f;
             Booster("Undo", Economy.UndoCost, -390f, y, _history.Count > 0, OnUndo);
-            Booster("Shuffle", Economy.ShuffleCost, -130f, y, _board != null && BoardQuery.Total(_board) >= 2, OnShuffle);
+            Booster("Shuffle", Economy.ShuffleCost, -130f, y, BoosterKit.CanShuffle(_board), OnShuffle);
             Booster("Super", Economy.SuperUndoCost, 130f, y, CanSuper(), OnSuper);
             Booster("Magnet", Economy.MagnetCost, 390f, y, CanMagnet(), OnMagnet);
         }
@@ -862,6 +862,8 @@ namespace CarMatch
                 costLabel.color = Color.white;
                 costLabel.rectTransform.offsetMin = Vector2.zero;
             }
+            // Illegal boosters (e.g. Shuffle with one color left) read as clearly greyed out.
+            if (!legal) button.gameObject.AddComponent<CanvasGroup>().alpha = 0.45f;
         }
 
         bool CanMagnet()
@@ -1296,6 +1298,8 @@ namespace CarMatch
 
         void OnShuffle()
         {
+            // Nothing to rearrange: no charge, free use kept.
+            if (!BoosterKit.CanShuffle(_board)) return;
             if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Shuffle") ? 0 : Economy.ShuffleCost)) return;
             var before = _board.Clone();
             _history.Add(_board.Clone());
@@ -1494,11 +1498,21 @@ namespace CarMatch
             _busy = false;
         }
 
-        // Shuffle: every car flips with a stagger; the color swaps at the edge-on moment with a sparkle.
+        public const float ShuffleDealSec = 0.7f;
+
+        // Shuffle: an animated re-deal. Every car lifts, cars whose color changed glide (eased)
+        // from a spot that held their color to their new spot, then land with a squash, and
+        // Character Creator's sparkle sheet (fx_sparkle_burst) fires on every car as it lands.
         IEnumerator ShuffleFx(Board before)
         {
             _busy = true;
-            var jobs = new List<KeyValuePair<RectTransform, Sprite[]>>();
+            var cars = new List<RectTransform>();
+            var homes = new List<Vector2>();
+            var froms = new List<Vector2>();
+            var changed = new List<bool>();
+            var nows = new List<CarColor>();
+            var sources = new List<KeyValuePair<CarColor, Vector2>>();
+            var used = new List<bool>();
             for (int l = 0; l < _board.Lanes.Count; l++)
                 for (int c = 0; c < _board.Lanes[l].Cells.Count; c++)
                 {
@@ -1507,40 +1521,91 @@ namespace CarMatch
                     if (now.Empty || now.Tunnel || now.Car.Hidden || was.Empty || was.Tunnel) continue;
                     RectTransform rt;
                     if (!_pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, l, c)), out rt) || rt == null) continue;
-                    var img = rt.GetComponent<Image>();
-                    var newSprite = img.sprite;
-                    var oldSprite = CarArt.For(was.Car.Color, img.color == Color.white);
-                    if (oldSprite != null) img.sprite = oldSprite;
-                    jobs.Add(new KeyValuePair<RectTransform, Sprite[]>(rt, new[] { oldSprite, newSprite }));
+                    cars.Add(rt);
+                    homes.Add(rt.anchoredPosition);
+                    froms.Add(rt.anchoredPosition);
+                    bool diff = was.Car.Color != now.Car.Color;
+                    changed.Add(diff);
+                    nows.Add(now.Car.Color);
+                    if (diff) { sources.Add(new KeyValuePair<CarColor, Vector2>(was.Car.Color, rt.anchoredPosition)); used.Add(false); }
                 }
-            const float stagger = 0.035f, flip = 0.32f;
-            float total = stagger * jobs.Count + flip;
-            var swapped = new bool[jobs.Count];
+            // Each changed car starts at a spot that used to hold its new color.
+            for (int i = 0; i < cars.Count; i++)
+            {
+                if (!changed[i]) continue;
+                for (int j = 0; j < sources.Count; j++)
+                {
+                    if (used[j] || sources[j].Key != nows[i]) continue;
+                    used[j] = true;
+                    froms[i] = sources[j].Value;
+                    break;
+                }
+            }
+            int n = cars.Count;
+            float stagger = n > 1 ? Mathf.Min(0.02f, 0.12f / n) : 0f;
+            const float lift = 0.15f, land = 0.12f;
+            float move = ShuffleDealSec - lift - land - stagger * n;
+            if (move < 0.3f) move = 0.3f;
+            float per = lift + move + land;
+            float total = per + stagger * n;
+            var sparked = new bool[n];
+            for (int i = 0; i < n; i++) cars[i].SetAsLastSibling();
             float t = 0f;
             while (t < total)
             {
                 t += Time.unscaledDeltaTime;
-                for (int i = 0; i < jobs.Count; i++)
+                for (int i = 0; i < n; i++)
                 {
-                    var rt = jobs[i].Key;
+                    var rt = cars[i];
                     if (rt == null) continue;
-                    float u = Mathf.Clamp01((t - i * stagger) / flip);
-                    rt.localScale = new Vector3(Mathf.Abs(Mathf.Cos(u * Mathf.PI)), 1f + 0.12f * Mathf.Sin(u * Mathf.PI), 1f);
-                    rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(u * Mathf.PI) * 14f);
-                    if (!swapped[i] && u >= 0.5f)
+                    float lt = t - i * stagger;
+                    if (lt <= 0f) { rt.anchoredPosition = froms[i]; continue; }
+                    Vector2 pos;
+                    float sc;
+                    if (lt < lift)
                     {
-                        swapped[i] = true;
-                        var img = rt.GetComponent<Image>();
-                        if (jobs[i].Value[1] != null) img.sprite = jobs[i].Value[1];
-                        Sparkle(rt.anchoredPosition, new Color(1f, 0.95f, 0.6f, 0.95f), 5);
+                        float u = EaseOut(lt / lift);
+                        pos = froms[i] + new Vector2(0f, 26f * u);
+                        sc = 1f + 0.15f * u;
                     }
+                    else if (lt < lift + move)
+                    {
+                        float u = EaseInOut((lt - lift) / move);
+                        var arc = new Vector2(0f, 26f + 40f * Mathf.Sin(u * Mathf.PI) * (changed[i] ? 1f : 0.2f));
+                        pos = Vector2.Lerp(froms[i], homes[i], u) + arc;
+                        sc = 1.15f;
+                        rt.localRotation = Quaternion.Euler(0f, 0f, changed[i] ? Mathf.Sin(u * Mathf.PI) * 10f * (homes[i].x >= froms[i].x ? -1f : 1f) : 0f);
+                    }
+                    else
+                    {
+                        float u = Mathf.Clamp01((lt - lift - move) / land);
+                        pos = homes[i] + new Vector2(0f, 26f * (1f - EaseOut(u)));
+                        sc = 1f;
+                        rt.localRotation = Quaternion.identity;
+                        float sq = 0.14f * Mathf.Sin(u * Mathf.PI);
+                        rt.localScale = new Vector3(1f + sq, 1f - sq, 1f);
+                        rt.anchoredPosition = pos;
+                        if (!sparked[i]) { sparked[i] = true; Sparkle(homes[i], new Color(1f, 0.95f, 0.6f, 0.95f), 5); }
+                        continue;
+                    }
+                    rt.anchoredPosition = pos;
+                    rt.localScale = new Vector3(sc, sc, 1f);
                 }
                 yield return null;
             }
-            for (int i = 0; i < jobs.Count; i++)
-                if (jobs[i].Key != null) { jobs[i].Key.localScale = Vector3.one; jobs[i].Key.localRotation = Quaternion.identity; }
+            for (int i = 0; i < n; i++)
+            {
+                if (cars[i] == null) continue;
+                if (!sparked[i]) Sparkle(homes[i], new Color(1f, 0.95f, 0.6f, 0.95f), 5);
+                cars[i].anchoredPosition = homes[i];
+                cars[i].localScale = Vector3.one;
+                cars[i].localRotation = Quaternion.identity;
+            }
             _busy = false;
         }
+
+        static float EaseOut(float u) { u = 1f - Mathf.Clamp01(u); return 1f - u * u * u; }
+        static float EaseInOut(float u) { u = Mathf.Clamp01(u); return u < 0.5f ? 4f * u * u * u : 1f - Mathf.Pow(-2f * u + 2f, 3f) / 2f; }
 
         // Super: a gold glow sweeps across the lot and bar, then the chosen three glow and pop away.
         IEnumerator SuperFx(Board before, List<int[]> pulled, CarColor color, int fromBar)
