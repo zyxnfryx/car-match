@@ -266,3 +266,59 @@ def blink():
         d.arc([cx-rx*0.8,cy-ry*0.6,cx+rx*0.8,cy+ry*0.5],20,160,fill=(255,255,255,255),width=int(12*k*S))
     save(big.resize((W,W),Image.LANCZOS),'mascot_blink')
 blink()
+# ---------- board pieces: garage (tunnel), tarp-covered '?' car, side-lot carport, count chip ----------
+def garage(s=256):
+    W,Hh=s,s; out=Image.new('RGBA',(W,Hh),(0,0,0,0))
+    # soft ground shadow
+    sh=Image.new('L',(W,Hh),0); ImageDraw.Draw(sh).rounded_rectangle([20,60,W-20,Hh-6],30,fill=150); sh=sh.filter(ImageFilter.GaussianBlur(10))
+    sl=Image.new('RGBA',(W,Hh),(10,14,30,255)); sl.putalpha(sh); out.alpha_composite(sl,(0,6))
+    body=rrect(W-36,Hh-40,34)
+    b=bevel(body,None,depth=22,spec=0.8,pw=40,grad=vgrad(Hh-40,W-36,(0.95,0.62,0.30),(0.80,0.42,0.20)))
+    out.alpha_composite(toimg(b),(18,14))
+    roof=rrect(W-20,70,30); r_=bevel(roof,None,depth=16,spec=1.0,pw=30,grad=vgrad(70,W-20,(0.30,0.55,0.95),(0.18,0.36,0.75)))
+    out.alpha_composite(toimg(r_),(10,4))
+    ov=Image.new('RGBA',(W,Hh),(0,0,0,0)); d=ImageDraw.Draw(ov)
+    for x in range(30,W-30,36): d.rectangle([x,12,x+14,64],fill=(255,255,255,70))
+    out.alpha_composite(ov)
+    # dark mouth with a half-raised roll-up door
+    m=rrect(W-90,Hh-120,22); hole=np.zeros((Hh-120,W-90,4),np.float32); hole[...,:3]=np.array([0.08,0.09,0.14]); hole[...,3]=m
+    out.alpha_composite(toimg(hole),(45,92))
+    door=Image.new('RGBA',(W-98,60),(0,0,0,0)); dd=ImageDraw.Draw(door)
+    for y in range(0,60,12): dd.rectangle([0,y,W-98,y+9],fill=(222,226,236,255)); dd.line([0,y+10,W-98,y+10],fill=(150,156,170,255),width=2)
+    out.alpha_composite(door,(49,96))
+    save(out,'garage')
+garage()
+def tarp(s=256):
+    p=os.path.join(ROOT,'Assets/_Project/Art/Cars/car_red_closed.png')
+    car=Image.open(p).convert('RGBA').resize((s,s),Image.LANCZOS)
+    a=np.asarray(car,np.float32)/255; al=a[...,3]
+    body=(al>0.85).astype(np.float32); body=ndimage.binary_closing(body,iterations=6).astype(np.float32)
+    body=ndimage.gaussian_filter(body,2.0); body=np.clip((body-0.5)*3+0.5,0,1)
+    t=bevel(body,None,depth=40,spec=0.5,pw=20,grad=vgrad(s,s,(0.55,0.62,0.78),(0.38,0.44,0.62)))
+    # folds
+    Y,X=np.mgrid[0:s,0:s]; fold=(np.sin(X/9.0+np.sin(Y/23.0)*2)*0.06)*body
+    t[...,:3]=np.clip(t[...,:3]+fold[...,None],0,1)
+    shadow=np.clip(al-body,0,1)*0.6
+    outa=np.zeros((s,s,4),np.float32); outa[...,3]=shadow; outa[...,:3]=0.04
+    im=toimg(outa); im.alpha_composite(toimg(t))
+    q=Image.new('RGBA',(s,s),(0,0,0,0)); f=ImageFont.truetype(FONT,int(s*0.5)); dq=ImageDraw.Draw(q)
+    dq.text((s/2,s*0.47),'?',font=f,anchor='mm',fill=(255,226,90,255),stroke_width=int(s*0.035),stroke_fill=(70,40,10,255))
+    im.alpha_composite(q); save(im,'tarp')
+tarp()
+def carport(W=220,Hh=220):
+    out=Image.new('RGBA',(W,Hh),(0,0,0,0))
+    pad=rrect(W-10,Hh-10,30); p=bevel(pad,None,depth=10,spec=0.3,grad=vgrad(Hh-10,W-10,(0.80,0.78,0.72),(0.66,0.64,0.60)))
+    out.alpha_composite(toimg(p),(5,5))
+    ov=Image.new('RGBA',(W,Hh),(0,0,0,0)); d=ImageDraw.Draw(ov)
+    for y in range(60,Hh-20,40): d.line([22,y,W-22,y],fill=(255,255,255,140),width=4)
+    out.alpha_composite(ov)
+    roof=rrect(W-4,46,20); r_=bevel(roof,None,depth=12,spec=1.0,grad=vgrad(46,W-4,(0.98,0.80,0.30),(0.90,0.58,0.12)))
+    out.alpha_composite(toimg(r_),(2,0))
+    save(out,'carport')
+carport()
+def chip(s=96):
+    a=disc(s,(255,110,120),(210,40,70),'')
+    ring=rrect(s,s,s//2)-np.pad(rrect(s-14,s-14,(s-14)//2),7)
+    a[...,:3]=a[...,:3]*(1-ring[...,None])+ring[...,None]
+    save(toimg(a),'chip')
+chip()
