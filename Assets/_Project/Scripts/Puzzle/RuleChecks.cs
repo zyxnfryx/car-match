@@ -189,6 +189,116 @@ namespace CarMatch
             Expect(!Economy.TrySpend(ref wallet, 999999), "the purse cannot go negative");
         }
 
+        public static void OpenEyesOnlyOnAClearExit()
+        {
+            var stacked = Tiny("[[\"coral\",\"teal\"]]");
+            var front = new Tap(TapKind.Lane, 0, 0);
+            var behind = new Tap(TapKind.Lane, 0, 1);
+            Expect(EyeState.IsOpen(stacked, front), "the mouth car is open");
+            Expect(!EyeState.IsOpen(stacked, behind), "the car behind it is closed");
+            var history = new List<Board>();
+            BoardRules.Play(stacked, history, front);
+            Expect(!EyeState.IsOpen(stacked, front), "the empty mouth is not a car");
+            Expect(EyeState.IsOpen(stacked, behind), "teal opens after the car in front leaves");
+            Board restored;
+            Expect(BoosterKit.Undo(history, out restored), "undo should apply");
+            Expect(EyeState.IsOpen(restored, front), "undo opens the mouth again");
+            Expect(!EyeState.IsOpen(restored, behind), "undo closes the car that is covered again");
+
+            var covered = Tiny("[[\"coral\",\"?amber\"]]");
+            Expect(covered.Lanes[0].Cells[1].Car.Hidden, "amber starts hidden");
+            Expect(!EyeState.IsOpen(covered, new Tap(TapKind.Lane, 0, 1)), "a covered car is closed");
+            BoardRules.Play(covered, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(!covered.Lanes[0].Cells[1].Car.Hidden, "amber is revealed when the cell in front empties");
+            Expect(EyeState.IsOpen(covered, new Tap(TapKind.Lane, 0, 1)), "the revealed car is open");
+
+            var tube = Tiny("[[\"tunnel:coral,coral\",\"lime\"]]");
+            Expect(EyeState.IsOpen(tube, new Tap(TapKind.Lane, 0, 0)), "a tunnel mouth with a clear exit is open");
+            Expect(!EyeState.IsOpen(tube, new Tap(TapKind.Lane, 0, 1)), "lime behind the tunnel is closed");
+            BoardRules.Play(tube, null, new Tap(TapKind.Lane, 0, 0));
+            BoardRules.Play(tube, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(tube.Lanes[0].Cells[0].Empty, "the tunnel is gone");
+            Expect(EyeState.IsOpen(tube, new Tap(TapKind.Lane, 0, 1)), "lime opens once the tunnel has left");
+
+            var side = Tiny("[[\"coral\"]]", "[{\"lane\":0,\"at\":0,\"cars\":[\"?lime\"]}]");
+            var curb = new Tap(TapKind.Side, 0, 0);
+            Expect(!EyeState.IsOpen(side, curb), "the side lot is closed while its cell is full");
+            Expect(side.Sides[0].Queue[0].Hidden, "the side mouth stays covered until it can exit");
+            BoardRules.Play(side, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(!side.Sides[0].Queue[0].Hidden, "the side mouth reveals when the path opens");
+            Expect(EyeState.IsOpen(side, curb), "the side lot is open once the path is clear");
+
+            var mix = Tiny("[[\"coral\",\"teal\",\"amber\"],[\"lime\"]]");
+            Expect(BoosterKit.Shuffle(mix, new System.Random(3)), "shuffle should apply");
+            Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 0)), "a shuffle leaves the mouth open");
+            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 1)), "a shuffle leaves a blocked slot closed");
+            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 2)), "the back of the lane stays closed");
+            Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 1, 0)), "an open lane stays open after a shuffle");
+            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 9, 0)), "a missing lane is closed");
+            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Side, 0, 0)), "a missing side lot is closed");
+            Expect(!EyeState.IsOpen(null, front), "a missing board is closed");
+
+            var failed = Tiny("[[\"coral\"],[\"coral\"],[\"amber\"],[\"amber\"],[\"lime\"],[\"lime\"],[\"violet\",\"teal\"]]");
+            var failHistory = new List<Board>();
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(failed, failHistory, new Tap(TapKind.Lane, i, 0));
+            Expect(failed.Failed, "the bar filled");
+            Expect(!EyeState.IsOpen(failed, new Tap(TapKind.Lane, 6, 1)), "a failed lot closes the leftover car");
+            Board continued;
+            Expect(BoosterKit.SuperUndo(failHistory, out continued), "continue restores a snapshot");
+            Expect(EyeState.IsOpen(continued, new Tap(TapKind.Lane, 6, 0)), "the restored mouth is open");
+            Expect(!EyeState.IsOpen(continued, new Tap(TapKind.Lane, 6, 1)), "the car behind the restored mouth stays closed");
+
+            string[] art = { "red", "yellow", "green", "teal", "purple", "red", "blue", "yellow" };
+            var distinct = new System.Collections.Generic.HashSet<string>();
+            for (int i = 0; i < art.Length; i++)
+            {
+                var color = (CarColor)i;
+                distinct.Add(art[i]);
+                Expect(EyeState.Token(color) == art[i], color + " maps to " + art[i]);
+                Expect(EyeState.SpriteFile(color, true) == "car_" + art[i] + "_open.png", color + " open file");
+                Expect(EyeState.SpriteFile(color, false) == "car_" + art[i] + "_closed.png", color + " closed file");
+            }
+            Expect(distinct.Count == 6, "the eight game colors share six painted sets");
+        }
+
+        public static void HeadingUsesTheNearestDirection()
+        {
+            CarFacing facing;
+            Expect(!EyeState.TryNearest(0f, 0f, out facing), "a zero move has no heading");
+            Expect(EyeState.TryNearest(0f, 1f, out facing) && facing == CarFacing.N, "up is N");
+            Expect(EyeState.TryNearest(1f, 1f, out facing) && facing == CarFacing.NE, "up-right is NE");
+            Expect(EyeState.TryNearest(1f, 0f, out facing) && facing == CarFacing.E, "right is E");
+            Expect(EyeState.TryNearest(1f, -1f, out facing) && facing == CarFacing.SE, "down-right is SE");
+            Expect(EyeState.TryNearest(0f, -1f, out facing) && facing == CarFacing.S, "down is S");
+            Expect(EyeState.TryNearest(-1f, -1f, out facing) && facing == CarFacing.SW, "down-left is SW");
+            Expect(EyeState.TryNearest(-1f, 0f, out facing) && facing == CarFacing.W, "left is W");
+            Expect(EyeState.TryNearest(-1f, 1f, out facing) && facing == CarFacing.NW, "up-left is NW");
+            Expect(FacingAt(20f) == CarFacing.E, "20 degrees stays east");
+            Expect(FacingAt(25f) == CarFacing.NE, "25 degrees is northeast");
+            Expect(FacingAt(-20f) == CarFacing.E, "20 degrees south of east stays east");
+            Expect(FacingAt(-25f) == CarFacing.SE, "25 degrees south of east is southeast");
+            Expect(FacingAt(90f) == CarFacing.N, "90 degrees is north");
+            Expect(FacingAt(180f) == CarFacing.W, "180 degrees is west");
+            Expect(FacingAt(-90f) == CarFacing.S, "-90 degrees is south");
+            Expect(FacingAt(135f) == CarFacing.NW, "135 degrees is northwest");
+            Expect(FacingAt(-135f) == CarFacing.SW, "-135 degrees is southwest");
+            Expect(FacingAt(45f) == CarFacing.NE, "45 degrees is northeast");
+            Expect(FacingAt(-45f) == CarFacing.SE, "-45 degrees is southeast");
+
+            string[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
+            Expect(dirs.Length == EyeState.FacingCount, "eight headings");
+            for (int c = 0; c < Palette.Count; c++)
+            {
+                var color = (CarColor)c;
+                for (int d = 0; d < dirs.Length; d++)
+                {
+                    var file = EyeState.SpriteFile(color, (CarFacing)d);
+                    Expect(file == "car_" + EyeState.Token(color) + "_open_" + dirs[d] + ".png", file);
+                }
+            }
+        }
+
         public static void AllLevelsSolvable(string json)
         {
             var levels = LevelJson.Parse(json);
@@ -234,6 +344,8 @@ namespace CarMatch
             ContinueUndoesAFullBar();
             ShuffleKeepsColorCounts();
             MagnetPullsASetOfThree();
+            OpenEyesOnlyOnAClearExit();
+            HeadingUsesTheNearestDirection();
             WinAndFailPayTheSame();
             LivesSpendAndRegen();
             AllLevelsSolvable(json);
@@ -275,6 +387,15 @@ namespace CarMatch
                 sb.Append('|');
             }
             return sb.ToString();
+        }
+
+        static CarFacing FacingAt(float degrees)
+        {
+            double rad = degrees * (System.Math.PI / 180.0);
+            CarFacing facing;
+            bool ok = EyeState.TryNearest((float)System.Math.Cos(rad), (float)System.Math.Sin(rad), out facing);
+            if (!ok) throw new System.InvalidOperationException("no heading at " + degrees);
+            return facing;
         }
 
         static void Expect(bool ok, string message)

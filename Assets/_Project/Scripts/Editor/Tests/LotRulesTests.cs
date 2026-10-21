@@ -78,6 +78,18 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Eyes_OpenOnlyWhenTheExitIsClear()
+        {
+            RuleChecks.OpenEyesOnlyOnAClearExit();
+        }
+
+        [Test]
+        public void Headings_FollowTheNearestDirection()
+        {
+            RuleChecks.HeadingUsesTheNearestDirection();
+        }
+
+        [Test]
         public void Economy_WinsAndFailsPayTheSame()
         {
             RuleChecks.WinAndFailPayTheSame();
