@@ -88,6 +88,7 @@ namespace CarMatch
                     }
                     if (slot.Empty || slot.Car.Color != color) continue;
                     slot.Empty = true;
+                    slot.Box = false;
                     if (pulled != null) pulled.Add(new[] { l, c });
                     need--;
                 }
@@ -95,7 +96,7 @@ namespace CarMatch
             for (int s = 0; s < board.Sides.Count && need > 0; s++)
                 need -= PullQueue(board.Sides[s].Queue, color, need);
             if (need != 0) return false;
-            CloseGaps(board, moves);
+            // Car Match keeps parked cars where they are (ref video): no sliding after a magnet, same as a normal send.
             HiddenReveal.Sweep(board);
             if (BoardQuery.IsClear(board))
                 board.Won = true;
@@ -131,6 +132,75 @@ namespace CarMatch
                     c = segEnd + 1;
                 }
             }
+        }
+
+        // Super: clears one set of three automatically. Prefers the color already waiting in the bar (those bar cars
+        // count toward the set), else the color with the most cars on the lot. Cars are taken from the lot front-first.
+        // pulled gets (lane, cell) of lane cars taken; barTaken gets how many bar cars of that color were used.
+        public static bool Super(Board board, List<int[]> pulled, out CarColor color, out int barTaken)
+        {
+            color = CarColor.Coral;
+            barTaken = 0;
+            if (board == null || board.Won || board.Failed) return false;
+            var hist = BoardQuery.Histogram(board);
+            int pick = -1, bestBar = 0;
+            for (int i = 0; i < hist.Length; i++)
+            {
+                int inBar = MatchClear.Count(board.Bar, (CarColor)i);
+                if (inBar == 0 || inBar + hist[i] < MatchClear.Set) continue;
+                if (inBar > bestBar) { bestBar = inBar; pick = i; }
+            }
+            if (pick < 0)
+            {
+                int best = MatchClear.Set - 1;
+                for (int i = 0; i < hist.Length; i++)
+                    if (hist[i] > best) { best = hist[i]; pick = i; }
+            }
+            if (pick < 0) return false;
+            color = (CarColor)pick;
+            int fromBar = System.Math.Min(MatchClear.Set - 1, MatchClear.Count(board.Bar, color));
+            if (hist[pick] < MatchClear.Set - fromBar) return false;
+            var trial = board.Clone();
+            if (!PullFromLot(trial, color, MatchClear.Set - fromBar, null)) return false;
+            PullFromLot(board, color, MatchClear.Set - fromBar, pulled);
+            for (int k = 0; k < fromBar; k++)
+            {
+                int at = board.Bar.LastIndexOf(color);
+                board.Bar.RemoveAt(at);
+                if (at < board.BarFrom.Count) board.BarFrom.RemoveAt(at);
+            }
+            barTaken = fromBar;
+            HiddenReveal.Sweep(board);
+            if (BoardQuery.IsClear(board)) board.Won = true;
+            return true;
+        }
+
+        static bool PullFromLot(Board board, CarColor color, int need, List<int[]> pulled)
+        {
+            // Front cells first across lanes, so the cars nearest the exit go.
+            int depth = 0;
+            for (int l = 0; l < board.Lanes.Count; l++) depth = System.Math.Max(depth, board.Lanes[l].Cells.Count);
+            for (int c = 0; c < depth && need > 0; c++)
+                for (int l = 0; l < board.Lanes.Count && need > 0; l++)
+                {
+                    var cells = board.Lanes[l].Cells;
+                    if (c >= cells.Count) continue;
+                    var slot = cells[c];
+                    if (slot.Tunnel)
+                    {
+                        need -= PullQueue(slot.Queue, color, need);
+                        TunnelSpawn.CloseIfEmpty(slot);
+                        continue;
+                    }
+                    if (slot.Empty || slot.Car.Color != color) continue;
+                    slot.Empty = true;
+                    slot.Box = false;
+                    if (pulled != null) pulled.Add(new[] { l, c });
+                    need--;
+                }
+            for (int s = 0; s < board.Sides.Count && need > 0; s++)
+                need -= PullQueue(board.Sides[s].Queue, color, need);
+            return need == 0;
         }
 
         struct Paint

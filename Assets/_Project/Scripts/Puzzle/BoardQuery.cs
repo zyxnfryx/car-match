@@ -129,6 +129,7 @@ namespace CarMatch
                         sb.Append(';');
                         continue;
                     }
+                    if (slot.Box) sb.Append('B');
                     sb.Append((int)slot.Car.Color);
                 }
             }

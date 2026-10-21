@@ -49,6 +49,28 @@ namespace CarMatch
         }
     }
 
+    // Parked cars that can move: blink now and then and glance left and right (slight-heading frames).
+    public sealed class CarIdle : MonoBehaviour
+    {
+        public Sprite Open, Blink, LookLeft, LookRight;
+        Image _img; float _next; float _until;
+        void Start() { _img = GetComponent<Image>(); _next = Time.unscaledTime + Random.Range(1.5f, 4f); }
+        void Update()
+        {
+            if (_img == null || Open == null) return;
+            float now = Time.unscaledTime;
+            if (_until > 0f && now >= _until) { _img.sprite = Open; _until = 0f; _next = now + Random.Range(2f, 5f); }
+            if (_until == 0f && now >= _next)
+            {
+                float r = Random.value;
+                Sprite pick = r < 0.5f ? Blink : (r < 0.75f ? LookLeft : LookRight);
+                if (pick == null) { _next = now + 2f; return; }
+                _img.sprite = pick;
+                _until = now + (pick == Blink ? 0.12f : 0.55f);
+            }
+        }
+    }
+
     // Horizontal drift that wraps (clouds) and a small device/time parallax.
     public sealed class Drift : MonoBehaviour
     {

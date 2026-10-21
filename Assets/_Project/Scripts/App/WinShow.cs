@@ -91,7 +91,7 @@ namespace CarMatch
             var ribbon = Img(screen, "Ribbon", UiArt.Get("ribbon"), new Vector2(0f, 590f), new Vector2(1040f, 270f), Color.white);
             var title = Img(screen, "Title", UiArt.Get("title_win"), new Vector2(0f, 640f), new Vector2(980f, 287f), Color.white);
             if (UiArt.Get("title_win") == null)
-                Txt(title, "Lot Cleared!", s.Font, 120, Vector2.zero, new Vector2(980f, 200f), new Color(1f, 0.85f, 0.3f), new Color(0.4f, 0.1f, 0.1f));
+                Txt(title, "PERFECT!", s.Font, 140, Vector2.zero, new Vector2(980f, 200f), new Color(1f, 0.85f, 0.3f), new Color(0.4f, 0.1f, 0.1f));
             ribbon.localScale = Vector3.zero;
             title.localScale = Vector3.zero;
             var piggy = Img(screen, "Piggy", UiArt.Get("piggy"), new Vector2(0f, -190f), new Vector2(360f, 360f), Color.white);
@@ -131,6 +131,7 @@ namespace CarMatch
 #endif
             host.StartCoroutine(Spin(rays, glow));
             host.StartCoroutine(Confetti(screen));
+            host.StartCoroutine(Fireworks(screen));
             host.StartCoroutine(Pop(ribbon, 0.0f, 0.38f));
             host.StartCoroutine(Pop(title, 0.12f, 0.42f));
             yield return Pop(mascot, 0.18f, 0.40f);
@@ -389,6 +390,32 @@ namespace CarMatch
                 yield return null;
             }
             for (int i = 0; i < count; i++) if (bits[i] != null) UnityEngine.Object.Destroy(bits[i].gameObject);
+        }
+
+        // A few firework bursts inside the safe area while the PERFECT! banner pops.
+        static IEnumerator Fireworks(Transform screen)
+        {
+            float halfW = 470f;
+            var srt = screen as RectTransform;
+            if (srt != null && srt.rect.width > 10f) halfW = srt.rect.width * 0.5f - 80f;
+            Color[] cols = { new Color(1f, 0.85f, 0.25f), new Color(0.35f, 0.8f, 1f), new Color(1f, 0.4f, 0.55f), new Color(0.5f, 1f, 0.5f) };
+            for (int b = 0; b < 5; b++)
+            {
+                var center = new Vector2(UnityEngine.Random.Range(-halfW, halfW), UnityEngine.Random.Range(380f, 820f));
+                var col = cols[b % cols.Length];
+                AudioManager.Play(Sfx.SlotArrive, 0.6f);
+                for (int i = 0; i < 18; i++)
+                {
+                    var spark = Img(screen, "Firework", UiArt.Get("glow") ?? SpriteKit.Round, center, new Vector2(30f, 30f), col);
+                    spark.GetComponent<Image>().raycastTarget = false;
+                    var puff = spark.gameObject.AddComponent<Puff>();
+                    float a = i / 18f * Mathf.PI * 2f;
+                    puff.Velocity = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * UnityEngine.Random.Range(280f, 420f);
+                    puff.Life = 0.8f;
+                    puff.Grow = 0.3f;
+                }
+                yield return new WaitForSecondsRealtime(0.35f);
+            }
         }
 
         static IEnumerator FlyCoin(Transform screen, float delay, Vector2 from, Vector2 to, Action landed)

@@ -32,6 +32,7 @@ namespace CarMatch
             var slot = lane.Cells[cell];
             if (slot.Empty) return false;
             if (slot.Tunnel && slot.TunnelCount <= 0) return false;
+            if (slot.Box) return false;
             for (int i = 0; i < cell; i++)
                 if (!lane.Cells[i].Empty) return false;
             return true;
