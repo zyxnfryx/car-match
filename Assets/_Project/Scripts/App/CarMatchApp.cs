@@ -50,6 +50,7 @@ namespace CarMatch
         UiShake _shake;
         readonly List<RectTransform> _barCars = new List<RectTransform>();
         readonly Dictionary<string, bool> _eyes = new Dictionary<string, bool>();
+        readonly Dictionary<string, RectTransform> _pieceAt = new Dictionary<string, RectTransform>();
 
         static readonly Color Ink = new Color(0.15f, 0.17f, 0.22f, 1f);
         static readonly Color Cream = new Color(0.98f, 0.95f, 0.90f, 1f);
@@ -166,6 +167,8 @@ namespace CarMatch
             _coinText = null;
             _livesText = null;
             _retryButton = null;
+            _pieceAt.Clear();
+            _busy = false;
             for (int i = _screen.childCount - 1; i >= 0; i--)
                 Destroy(_screen.GetChild(i).gameObject);
         }
@@ -476,6 +479,7 @@ namespace CarMatch
                 if (bayImage.sprite == null) bayImage.enabled = false;
             }
             var rt = Place(_screen, "Car", pos, size);
+            _pieceAt[PieceKey(tap)] = rt;
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = car.Hidden ? HiddenSprite() : CarArt.For(car.Color, open);
             image.preserveAspect = true;
@@ -1006,9 +1010,11 @@ namespace CarMatch
             if (!BoosterKit.Undo(_history, out restored)) return;
             if (!FreeBoosters.Pay(PrefsFlags.Shared, "Undo", Economy.UndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterUndo);
+            var before = _board;
             _board = restored;
             _lastMatch = false;
             ShowPlay();
+            StartCoroutine(UndoFx(before, restored));
         }
 
         void OnSuper()
@@ -1018,14 +1024,16 @@ namespace CarMatch
             if (!BoosterKit.SuperUndo(_history, out restored)) return;
             if (!FreeBoosters.Pay(PrefsFlags.Shared, "Super", Economy.SuperUndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterSuper);
+            var before = _board;
             _board = restored;
             _lastMatch = false;
-            ShowPlay();
+            StartCoroutine(SuperFx(before, restored));
         }
 
         void OnShuffle()
         {
             if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Shuffle") ? 0 : Economy.ShuffleCost)) return;
+            var before = _board.Clone();
             _history.Add(_board.Clone());
             if (!BoosterKit.Shuffle(_board, new System.Random()))
             {
@@ -1042,13 +1050,16 @@ namespace CarMatch
             AudioManager.Play(Sfx.BoosterShuffle);
             _lastMatch = false;
             ShowPlay();
+            StartCoroutine(ShuffleFx(before));
         }
 
         void OnMagnet()
         {
             if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Magnet") ? 0 : Economy.MagnetCost)) return;
             _history.Add(_board.Clone());
-            if (!BoosterKit.Magnet(_board))
+            var pulled = new List<int[]>();
+            var moves = new List<int[]>();
+            if (!BoosterKit.Magnet(_board, pulled, moves))
             {
                 // Magnet can pull some cars before it gives up; put the untouched snapshot back.
                 _board = _history[_history.Count - 1];
@@ -1064,8 +1075,392 @@ namespace CarMatch
             }
             AudioManager.Play(Sfx.BoosterMagnet);
             _lastMatch = true;
-            if (_board.Won) EnterWin();
-            else ShowPlay();
+            StartCoroutine(MagnetFx(pulled, moves));
+        }
+
+
+        // ===================== Booster FX =====================
+        // Sprite hooks: drop sheets into Resources/FX (fx_sparkle, fx_magnet_trail, fx_gold_glow); multi-sprite sheets
+        // play as flipbooks. Until then everything falls back to procedural glow/round particles.
+        static string PieceKey(Tap tap) { return (int)tap.Kind + ":" + tap.Index + ":" + tap.Cell; }
+
+        static Sprite[] FxFrames(string name)
+        {
+            var frames = Resources.LoadAll<Sprite>("FX/" + name);
+            if (frames == null || frames.Length == 0) return null;
+            System.Array.Sort(frames, (a, b) => string.CompareOrdinal(a.name, b.name));
+            return frames;
+        }
+
+        // Plays one of Character Creator's sheets (Resources/FX/<sheet>/). Returns null if the sheet is missing.
+        RectTransform FxSheet(string sheet, Vector2 pos, Vector2 size, float fps, bool loop)
+        {
+            var frames = FxFrames(sheet);
+            if (frames == null) return null;
+            var rt = Place(_screen, "Fx", pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.raycastTarget = false;
+            img.sprite = frames[0];
+            rt.gameObject.AddComponent<Flipbook>().Play(frames, fps, loop);
+            return rt;
+        }
+
+        RectTransform FxImage(string sheet, Vector2 pos, Vector2 size, Color color, float life)
+        {
+            var rt = Place(_screen, "Fx", pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.raycastTarget = false;
+            var frames = FxFrames(sheet);
+            if (frames != null)
+            {
+                img.sprite = frames[0];
+                if (frames.Length > 1) rt.gameObject.AddComponent<Flipbook>().Init(frames, life);
+            }
+            else img.sprite = UiArt.Get("glow") ?? SpriteKit.Round;
+            img.color = color;
+            return rt;
+        }
+
+        void Sparkle(Vector2 pos, Color tint, int count)
+        {
+            if (FxSheet("fx_sparkle_burst", pos, new Vector2(300f, 300f), 20f, false) != null) return;
+            for (int i = 0; i < count; i++)
+            {
+                var rt = FxImage("fx_sparkle", pos, new Vector2(46f, 46f), tint, 0.5f);
+                var puff = rt.gameObject.AddComponent<Puff>();
+                float a = Random.Range(0f, Mathf.PI * 2f);
+                puff.Velocity = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * Random.Range(160f, 420f);
+                puff.Life = 0.5f;
+                puff.Grow = 0.3f;
+            }
+        }
+
+        static List<Tap> Appeared(Board from, Board to)
+        {
+            var list = new List<Tap>();
+            for (int l = 0; l < to.Lanes.Count && l < from.Lanes.Count; l++)
+                for (int c = 0; c < to.Lanes[l].Cells.Count && c < from.Lanes[l].Cells.Count; c++)
+                {
+                    var a = from.Lanes[l].Cells[c];
+                    var b = to.Lanes[l].Cells[c];
+                    if (!b.Tunnel && !b.Empty && (a.Empty || a.Tunnel)) list.Add(new Tap(TapKind.Lane, l, c));
+                }
+            for (int i = 0; i < to.Sides.Count && i < from.Sides.Count; i++)
+                if (to.Sides[i].Queue.Count > from.Sides[i].Queue.Count) list.Add(new Tap(TapKind.Side, i, 0));
+            return list;
+        }
+
+        static Vector2 PathAt(List<Vector2> pts, float t, out Vector2 facing) { return Along(pts, t, out facing); }
+
+        // Undo: the car reverse-drives out of the bar along its S-curve back to its spot (~0.4 s).
+        IEnumerator UndoFx(Board before, Board after)
+        {
+            var back = Appeared(before, after);
+            if (back.Count == 0) yield break;
+            _busy = true;
+            var tap = back[0];
+            RectTransform piece;
+            _pieceAt.TryGetValue(PieceKey(tap), out piece);
+            CarColor color = CarColor.Coral;
+            if (tap.Kind == TapKind.Lane) color = after.Lanes[tap.Index].Cells[tap.Cell].Car.Color;
+            else if (after.Sides[tap.Index].Queue.Count > 0) color = after.Sides[tap.Index].Queue[0].Color;
+            int slot = Mathf.Clamp(after.Bar.Count, 0, MatchClear.BarCap - 1);
+            for (int i = before.Bar.Count - 1; i >= 0; i--) if (before.Bar[i] == color) { slot = i; break; }
+            var pts = Smooth(BuildDrivePath(tap, slot), 3);
+            pts.Reverse();
+            if (piece != null) piece.gameObject.AddComponent<CanvasGroup>().alpha = 0f;
+            var flyer = SpawnFlyer(color, false, pts[0], new Vector2(BarSlotWidth - 8f, BarCarH));
+            var image = flyer.GetComponent<Image>();
+            var endSize = piece != null ? piece.sizeDelta : _metrics.Piece;
+            float t = 0f;
+            const float dur = 0.4f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                float k = u * u * (3f - 2f * u);
+                Vector2 facing;
+                flyer.anchoredPosition = Along(pts, k, out facing);
+                flyer.sizeDelta = Vector2.Lerp(new Vector2(BarSlotWidth - 8f, BarCarH), endSize, k);
+                // Reversing: the nose points against the travel direction.
+                Steer(flyer, image, color, false, CarFrames.HeadingAngle(-facing), 0f, 1f, 1f);
+                yield return null;
+            }
+            Destroy(flyer.gameObject);
+            if (piece != null)
+            {
+                var g = piece.GetComponent<CanvasGroup>();
+                if (g != null) g.alpha = 1f;
+                StartCoroutine(Wiggle(piece));
+            }
+            _busy = false;
+        }
+
+        // Shuffle: every car flips with a stagger; the color swaps at the edge-on moment with a sparkle.
+        IEnumerator ShuffleFx(Board before)
+        {
+            _busy = true;
+            var jobs = new List<KeyValuePair<RectTransform, Sprite[]>>();
+            for (int l = 0; l < _board.Lanes.Count; l++)
+                for (int c = 0; c < _board.Lanes[l].Cells.Count; c++)
+                {
+                    var now = _board.Lanes[l].Cells[c];
+                    var was = before.Lanes[l].Cells[c];
+                    if (now.Empty || now.Tunnel || now.Car.Hidden || was.Empty || was.Tunnel) continue;
+                    RectTransform rt;
+                    if (!_pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, l, c)), out rt) || rt == null) continue;
+                    var img = rt.GetComponent<Image>();
+                    var newSprite = img.sprite;
+                    var oldSprite = CarArt.For(was.Car.Color, img.color == Color.white);
+                    if (oldSprite != null) img.sprite = oldSprite;
+                    jobs.Add(new KeyValuePair<RectTransform, Sprite[]>(rt, new[] { oldSprite, newSprite }));
+                }
+            const float stagger = 0.035f, flip = 0.32f;
+            float total = stagger * jobs.Count + flip;
+            var swapped = new bool[jobs.Count];
+            float t = 0f;
+            while (t < total)
+            {
+                t += Time.unscaledDeltaTime;
+                for (int i = 0; i < jobs.Count; i++)
+                {
+                    var rt = jobs[i].Key;
+                    if (rt == null) continue;
+                    float u = Mathf.Clamp01((t - i * stagger) / flip);
+                    rt.localScale = new Vector3(Mathf.Abs(Mathf.Cos(u * Mathf.PI)), 1f + 0.12f * Mathf.Sin(u * Mathf.PI), 1f);
+                    rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(u * Mathf.PI) * 14f);
+                    if (!swapped[i] && u >= 0.5f)
+                    {
+                        swapped[i] = true;
+                        var img = rt.GetComponent<Image>();
+                        if (jobs[i].Value[1] != null) img.sprite = jobs[i].Value[1];
+                        Sparkle(rt.anchoredPosition, new Color(1f, 0.95f, 0.6f, 0.95f), 5);
+                    }
+                }
+                yield return null;
+            }
+            for (int i = 0; i < jobs.Count; i++)
+                if (jobs[i].Key != null) { jobs[i].Key.localScale = Vector3.one; jobs[i].Key.localRotation = Quaternion.identity; }
+            _busy = false;
+        }
+
+        // Super: a gold glow sweeps across the lot and bar, then the returned cars pop back into their spots.
+        IEnumerator SuperFx(Board before, Board after)
+        {
+            _busy = true;
+            float t = 0f;
+            // Sheet: gold diagonal shine over the lot and over the bar (10 frames @ 20 fps).
+            var sweepLot = FxSheet("fx_super_glow_sweep", new Vector2(0f, _metrics.BaseY + 300f), new Vector2(1100f, 1100f), 20f, false);
+            var sweepBar = FxSheet("fx_super_glow_sweep", new Vector2(0f, BarY), new Vector2(1060f, 260f), 20f, false);
+            if (sweepLot != null)
+            {
+                yield return new WaitForSecondsRealtime(0.5f);
+                if (sweepBar != null) Destroy(sweepBar.gameObject);
+            }
+            else
+            {
+                var band = FxImage("fx_gold_glow", new Vector2(-900f, -100f), new Vector2(420f, 1500f), new Color(1f, 0.82f, 0.25f, 0.75f), 0.45f);
+                band.localRotation = Quaternion.Euler(0f, 0f, -14f);
+                while (t < 0.45f)
+                {
+                    t += Time.unscaledDeltaTime;
+                    float u = Mathf.Clamp01(t / 0.45f);
+                    band.anchoredPosition = new Vector2(Mathf.Lerp(-900f, 900f, u), -100f);
+                    yield return null;
+                }
+                Destroy(band.gameObject);
+            }
+            // ShowPlay clears the screen and stops coroutines, so the pop runs as a fresh coroutine.
+            ShowPlay();
+            StartCoroutine(SuperPop(before, after));
+        }
+
+        IEnumerator SuperPop(Board before, Board after)
+        {
+            _busy = true;
+            float t;
+            var back = Appeared(before, after);
+            var pops = new List<RectTransform>();
+            foreach (var tap in back)
+            {
+                RectTransform rt;
+                if (_pieceAt.TryGetValue(PieceKey(tap), out rt) && rt != null)
+                {
+                    rt.localScale = Vector3.zero;
+                    pops.Add(rt);
+                }
+            }
+            t = 0f;
+            bool sparkled = false;
+            while (t < 0.35f)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.35f);
+                float k = u < 0.6f ? 1.2f * (u / 0.6f) : 1.2f - 0.2f * ((u - 0.6f) / 0.4f);
+                for (int i = 0; i < pops.Count; i++) if (pops[i] != null) pops[i].localScale = new Vector3(k, k, 1f);
+                if (!sparkled && u > 0.5f)
+                {
+                    sparkled = true;
+                    for (int i = 0; i < pops.Count; i++)
+                    {
+                        if (pops[i] == null) continue;
+                        if (FxSheet("fx_super_glow_pop", pops[i].anchoredPosition, pops[i].sizeDelta * 1.8f, 20f, false) == null)
+                            Sparkle(pops[i].anchoredPosition, new Color(1f, 0.85f, 0.3f, 1f), 7);
+                    }
+                }
+                yield return null;
+            }
+            for (int i = 0; i < pops.Count; i++) if (pops[i] != null) pops[i].localScale = Vector3.one;
+            _busy = false;
+        }
+
+        // Magnet: a magnet pops in over the bar and pulls the three cars along trails, ending in a burst;
+        // then the cars behind any hole slide up to close the gap.
+        IEnumerator MagnetFx(List<int[]> pulled, List<int[]> moves)
+        {
+            _busy = true;
+            var magnetPos = new Vector2(0f, BarY + 190f);
+            var magnet = Place(_screen, "Magnet", magnetPos, new Vector2(170f, 170f));
+            var mImg = magnet.gameObject.AddComponent<Image>();
+            mImg.sprite = UiArt.Get("icon_magnet") ?? SpriteKit.Round;
+            mImg.preserveAspect = true;
+            mImg.raycastTarget = false;
+            var mLoop = FxFrames("fx_magnet_icon_loop");
+            if (mLoop != null) { mImg.sprite = mLoop[0]; magnet.gameObject.AddComponent<Flipbook>().Play(mLoop, 11f, true); magnet.sizeDelta = new Vector2(230f, 230f); }
+            float t = 0f;
+            while (t < 0.18f)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.18f);
+                float k = u < 0.7f ? 1.2f * u / 0.7f : 1.2f - 0.2f * (u - 0.7f) / 0.3f;
+                magnet.localScale = new Vector3(k, k, 1f);
+                magnet.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * 40f) * 8f);
+                yield return null;
+            }
+            var cars = new List<RectTransform>();
+            var starts = new List<Vector2>();
+            foreach (var p in pulled)
+            {
+                RectTransform rt;
+                if (_pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, p[0], p[1])), out rt) && rt != null)
+                {
+                    rt.SetAsLastSibling();
+                    cars.Add(rt);
+                    starts.Add(rt.anchoredPosition);
+                }
+            }
+            // Pull streaks (sheet converges at x=0.81, y=0.5 of its cell): pivot there on the magnet, aimed at each car.
+            var streaks = new List<RectTransform>();
+            for (int i = 0; i < starts.Count; i++)
+            {
+                var d = magnetPos - starts[i];
+                float len = d.magnitude;
+                var st = FxSheet("fx_magnet_pull", magnetPos, new Vector2(len / 0.81f, Mathf.Min(len / 0.81f * 0.5f, 360f)), 16f, true);
+                if (st == null) break;
+                st.pivot = new Vector2(0.81f, 0.5f);
+                st.anchoredPosition = magnetPos;
+                st.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
+                st.SetAsFirstSibling();
+                st.SetSiblingIndex(Mathf.Max(0, cars.Count > 0 && cars[0] != null ? cars[0].GetSiblingIndex() : 0));
+                streaks.Add(st);
+            }
+            bool sheetTrails = streaks.Count > 0;
+            magnet.SetAsLastSibling();
+            t = 0f;
+            float trailClock = 0f;
+            const float pull = 0.5f;
+            while (t < pull)
+            {
+                float dt = Time.unscaledDeltaTime;
+                t += dt;
+                trailClock += dt;
+                float u = Mathf.Clamp01(t / pull);
+                float k = u * u;
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    if (cars[i] == null) continue;
+                    var a = starts[i];
+                    var ctrl = new Vector2(a.x * 0.4f, Mathf.Max(a.y, magnetPos.y) + 160f);
+                    var pos = (1 - k) * (1 - k) * a + 2 * (1 - k) * k * ctrl + k * k * magnetPos;
+                    cars[i].anchoredPosition = pos;
+                    float s = Mathf.Lerp(1f, 0.35f, k);
+                    cars[i].localScale = new Vector3(s, s, 1f);
+                    cars[i].localRotation = Quaternion.Euler(0f, 0f, k * 360f * (i % 2 == 0 ? 1f : -1f));
+                    if (trailClock > 0.03f && !sheetTrails)
+                    {
+                        var dot = FxImage("fx_magnet_trail", pos, new Vector2(60f, 60f), new Color(0.75f, 0.85f, 1f, 0.8f), 0.3f);
+                        var puff = dot.gameObject.AddComponent<Puff>();
+                        puff.Life = 0.3f;
+                        puff.Grow = 0.2f;
+                        dot.SetSiblingIndex(Mathf.Max(0, cars[i].GetSiblingIndex()));
+                    }
+                }
+                if (trailClock > 0.03f) trailClock = 0f;
+                magnet.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * 50f) * 6f);
+                yield return null;
+            }
+            for (int i = 0; i < cars.Count; i++) if (cars[i] != null) cars[i].gameObject.SetActive(false);
+            for (int i = 0; i < streaks.Count; i++) if (streaks[i] != null) Destroy(streaks[i].gameObject);
+            AudioManager.Play(Sfx.MatchClear);
+#if !UNITY_WEBGL
+            Haptics.Success();
+#endif
+            if (_shake != null) _shake.Punch(0.2f, 8f, 0.5f);
+            if (FxSheet("fx_magnet_impact", magnetPos, new Vector2(420f, 420f), 20f, false) == null)
+            {
+                Sparkle(magnetPos, new Color(1f, 0.9f, 0.4f, 1f), 16);
+                var ring = FxImage("fx_gold_glow", magnetPos, new Vector2(120f, 120f), new Color(1f, 0.9f, 0.5f, 0.9f), 0.3f);
+                var rp = ring.gameObject.AddComponent<Puff>();
+                rp.Life = 0.3f;
+                rp.Grow = 3.5f;
+            }
+            t = 0f;
+            while (t < 0.22f)
+            {
+                t += Time.unscaledDeltaTime;
+                float s = 1f - t / 0.22f;
+                magnet.localScale = new Vector3(s, s, 1f);
+                yield return null;
+            }
+            if (_board.Won)
+            {
+                EnterWin();
+                yield break;
+            }
+            ShowPlay();
+            StartCoroutine(MagnetSlide(moves));
+        }
+
+        IEnumerator MagnetSlide(List<int[]> moves)
+        {
+            _busy = true;
+            float t;
+            // Close the gap: cars that moved up glide from their old cell to the new one.
+            var slides = new List<RectTransform>();
+            var from = new List<Vector2>();
+            var to = new List<Vector2>();
+            foreach (var m in moves)
+            {
+                RectTransform rt;
+                if (_pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, m[0], m[2])), out rt) && rt != null)
+                {
+                    slides.Add(rt);
+                    from.Add(LaneAnchor(m[0], m[1]));
+                    to.Add(rt.anchoredPosition);
+                    rt.anchoredPosition = LaneAnchor(m[0], m[1]);
+                }
+            }
+            t = 0f;
+            while (t < 0.28f && slides.Count > 0)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.28f);
+                float k = 1f - (1f - u) * (1f - u);
+                for (int i = 0; i < slides.Count; i++) if (slides[i] != null) slides[i].anchoredPosition = Vector2.Lerp(from[i], to[i], k);
+                yield return null;
+            }
+            for (int i = 0; i < slides.Count; i++) if (slides[i] != null) slides[i].anchoredPosition = to[i];
+            _busy = false;
         }
 
         bool Ready(int cost)

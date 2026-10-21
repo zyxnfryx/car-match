@@ -397,6 +397,9 @@ namespace CarMatch
             BoostersOnEveryLevel(json);
             LevelsAreUnique(json);
             EachBoosterOnceFree();
+            LevelsForGapCheck.Clear();
+            foreach (var d in LevelJson.Parse(json)) LevelsForGapCheck.Add(d.Board);
+            MagnetClosesLaneGaps();
         }
 
         static Board Tiny(string lanes, string sides = null)
@@ -555,5 +558,37 @@ namespace CarMatch
                 Expect(FreeBoosters.Key(name).StartsWith("lotloop."), name + " key is under lotloop.*");
             }
         }
+
+        // After a magnet pulls a car from the middle of a lane, the cars behind it slide up: no hole between cars.
+        public static void MagnetClosesLaneGaps()
+        {
+            var board = Tiny("[[\"teal\",\"coral\",\"amber\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
+            var moves = new List<int[]>();
+            Expect(BoosterKit.Magnet(board, null, moves), "magnet should find coral");
+            var lane = board.Lanes[0].Cells;
+            Expect(!lane[0].Empty && lane[0].Car.Color == CarColor.Teal, "front teal stays put");
+            Expect(!lane[1].Empty && lane[1].Car.Color == CarColor.Amber, "amber slid up into the hole");
+            Expect(!lane[2].Empty && lane[2].Car.Color == CarColor.Teal, "rear teal slid up");
+            Expect(lane.Count < 4 || lane[3].Empty, "the back cell is now free");
+            Expect(moves.Count == 2, "two cars moved");
+            foreach (var def in LevelsForGapCheck)
+            {
+                var b = def.Clone();
+                if (!BoosterKit.Magnet(b)) continue;
+                for (int l = 0; l < b.Lanes.Count; l++)
+                {
+                    var cells = b.Lanes[l].Cells;
+                    bool seenCar = false, seenHole = false;
+                    for (int c = 0; c < cells.Count; c++)
+                    {
+                        if (cells[c].Tunnel) { seenCar = false; seenHole = false; continue; }
+                        if (!cells[c].Empty) { Expect(!(seenCar && seenHole), "gap left mid-lane"); seenCar = true; }
+                        else if (seenCar) seenHole = true;
+                    }
+                }
+            }
+        }
+
+        public static List<Board> LevelsForGapCheck = new List<Board>();
     }
 }

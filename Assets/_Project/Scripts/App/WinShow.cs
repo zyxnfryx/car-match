@@ -104,12 +104,12 @@ namespace CarMatch
             Button next = null;
             if (s.More)
             {
-                next = s.MakeButton(new Vector2(0f, -640f), new Vector2(640f, 234f), "Next", 84, "btn_green", s.OnNext);
+                next = s.MakeButton(new Vector2(0f, -650f), new Vector2(780f, 270f), "Next", 96, /* thumb-sized: >=64pt tall on a 390pt-wide phone */ "btn_green", s.OnNext);
                 next.gameObject.AddComponent<Pulse>();
             }
             else
                 Txt(screen, "You cleared every lot!", s.Font, 52, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
-            var home = s.MakeButton(new Vector2(0f, s.More ? -830f : -780f), new Vector2(330f, 130f), "Home", 52, "btn_blue", s.OnHome);
+            var home = s.MakeButton(new Vector2(0f, s.More ? -890f : -800f), new Vector2(470f, 170f), "Home", 64, "btn_blue", s.OnHome);
             if (next != null) next.gameObject.SetActive(false);
             home.gameObject.SetActive(false);
             host.StartCoroutine(Run(host, screen, s, rays, glow, mascot, ribbon, title, piggy, plus, coinText, next, home));
