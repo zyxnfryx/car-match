@@ -1065,7 +1065,6 @@ namespace CarMatch
             int pay = Economy.Pay(true);
             WinShow.Build(this, _screen, new WinShow.Setup
             {
-                LevelName = _level != null ? "Level " + _level.Number + " \u00B7 " + _level.Title : "Lot clear",
                 Pay = pay,
                 CoinsBefore = Purse.Wallet.Coins - pay,
                 More = _index < _levels.Count - 1,

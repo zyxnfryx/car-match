@@ -13,7 +13,6 @@ namespace CarMatch
     {
         public struct Setup
         {
-            public string LevelName;
             public int Pay;
             public int CoinsBefore;
             public bool More;
@@ -90,10 +89,9 @@ namespace CarMatch
             var mascot = Img(screen, "Mascot", s.Mascot, new Vector2(0f, 250f), new Vector2(460f, 460f), Color.white);
             mascot.localScale = Vector3.zero;
             var ribbon = Img(screen, "Ribbon", UiArt.Get("ribbon"), new Vector2(0f, 590f), new Vector2(1040f, 270f), Color.white);
-            var title = Img(screen, "Title", UiArt.Get("title_win"), new Vector2(0f, 720f), new Vector2(980f, 287f), Color.white);
+            var title = Img(screen, "Title", UiArt.Get("title_win"), new Vector2(0f, 640f), new Vector2(980f, 287f), Color.white);
             if (UiArt.Get("title_win") == null)
                 Txt(title, "Lot Cleared!", s.Font, 120, Vector2.zero, new Vector2(980f, 200f), new Color(1f, 0.85f, 0.3f), new Color(0.4f, 0.1f, 0.1f));
-            Txt(ribbon, s.LevelName, s.Font, 54, new Vector2(0f, 26f), new Vector2(760f, 100f), Color.white, new Color(0.45f, 0.04f, 0.12f, 1f));
             ribbon.localScale = Vector3.zero;
             title.localScale = Vector3.zero;
             var piggy = Img(screen, "Piggy", UiArt.Get("piggy"), new Vector2(0f, -190f), new Vector2(360f, 360f), Color.white);
@@ -109,10 +107,7 @@ namespace CarMatch
                 next.gameObject.AddComponent<Pulse>();
             }
             else
-            {
                 Txt(screen, "You cleared every lot!", s.Font, 52, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
-                host.StartCoroutine(CarFinale(screen));
-            }
             var home = s.MakeButton(new Vector2(0f, s.More ? -830f : -780f), new Vector2(330f, 130f), "Home", 52, "btn_blue", s.OnHome);
             if (next != null) next.gameObject.SetActive(false);
             home.gameObject.SetActive(false);
@@ -123,6 +118,12 @@ namespace CarMatch
             RectTransform mascot, RectTransform ribbon, RectTransform title, RectTransform piggy, Text plus, Text coinText,
             Button next, Button home)
         {
+            // Every win opens with the LOT LOOP car finale (tap anywhere to skip), then the fanfare and coins.
+            rays.gameObject.SetActive(false);
+            glow.gameObject.SetActive(false);
+            yield return CarFinale(screen);
+            rays.gameObject.SetActive(true);
+            glow.gameObject.SetActive(true);
             AudioManager.Play(Sfx.Win);
 #if !UNITY_WEBGL
             Haptics.Success();
@@ -180,18 +181,26 @@ namespace CarMatch
             return "000000000000000";
         }
 
+        static bool _skip;
+
         static IEnumerator CarFinale(Transform screen)
         {
+            _skip = false;
+            // Full-screen invisible catcher: a tap skips to the fanfare.
+            var catcher = Img(screen, "SkipFinale", null, Vector2.zero, new Vector2(4000f, 4000f), new Color(0f, 0f, 0f, 0.001f));
+            catcher.GetComponent<Image>().raycastTarget = true;
+            catcher.gameObject.AddComponent<Button>().onClick.AddListener(() => _skip = true);
             const float cell = 40f;
             string[] words = { "LOT", "LOOP" };
             var cars = new System.Collections.Generic.List<RectTransform>();
             var homes = new System.Collections.Generic.List<Vector2>();
+            var from = new System.Collections.Generic.List<Vector2>();
             int colorIndex = 0;
             for (int w = 0; w < words.Length; w++)
             {
                 string word = words[w];
                 float width = word.Length * 4 * cell - cell;
-                float y0 = 470f - w * 6.2f * cell;
+                float y0 = 420f - w * 6.2f * cell;
                 for (int ch = 0; ch < word.Length; ch++)
                 {
                     string g = Rows(word[ch]);
@@ -201,27 +210,76 @@ namespace CarMatch
                             if (g[r * 3 + c] != '1') continue;
                             var color = (CarColor)(colorIndex++ % 8);
                             var home = new Vector2(-width * 0.5f + (ch * 4 + c) * cell + cell * 0.5f, y0 - r * cell);
-                            var rt = Img(screen, "FinaleCar", CarFrames.Heading(color, 0) ?? CarArt.For(color, true), home + new Vector2(0f, 1400f), new Vector2(cell * 1.25f, cell * 1.25f), Color.white);
+                            // Drive in from the side nearest the spot, facing the way they travel (E or W).
+                            bool left = home.x < 0f;
+                            var start = new Vector2(left ? -760f : 760f, home.y);
+                            var rt = Img(screen, "FinaleCar", CarFrames.Heading(color, left ? 4 : 12) ?? CarArt.For(color, true), start, new Vector2(cell * 1.3f, cell * 1.3f), Color.white);
                             cars.Add(rt);
                             homes.Add(home);
+                            from.Add(start);
                         }
                 }
             }
-            yield return new WaitForSecondsRealtime(0.6f);
+            catcher.SetAsLastSibling();
+            // 1) Drive in and park (~1.0 s, staggered).
             float t = 0f;
-            while (t < 4.5f)
+            const float drive = 0.45f, stagger = 0.012f;
+            float parkEnd = drive + stagger * cars.Count;
+            while (t < parkEnd && !_skip)
             {
                 t += Time.unscaledDeltaTime;
                 for (int i = 0; i < cars.Count; i++)
                 {
-                    if (cars[i] == null) yield break;
-                    float u = Mathf.Clamp01((t - i * 0.025f) / 0.5f);
+                    float u = Mathf.Clamp01((t - i * stagger) / drive);
                     float k = 1f - (1f - u) * (1f - u) * (1f - u);
-                    float hop = t > 2f ? Mathf.Max(0f, Mathf.Sin((t - 2f) * 8f - i * 0.25f)) * 10f : 0f;
-                    cars[i].anchoredPosition = homes[i] + new Vector2(0f, (1f - k) * 1400f + hop);
+                    cars[i].anchoredPosition = Vector2.Lerp(from[i], homes[i], k);
                 }
                 yield return null;
             }
+            // Parked: everyone turns to face the player.
+            for (int i = 0; i < cars.Count; i++)
+            {
+                cars[i].anchoredPosition = homes[i];
+                var img = cars[i].GetComponent<Image>();
+                var sprite = CarFrames.Heading((CarColor)(i % 8), 0);
+                if (sprite != null) img.sprite = sprite;
+            }
+            // 2) Honk in unison and bounce (~0.6 s).
+            if (!_skip)
+            {
+                AudioManager.Play(Sfx.Blocked, 0.9f);
+#if !UNITY_WEBGL
+                Haptics.Thud();
+#endif
+                t = 0f;
+                while (t < 0.6f && !_skip)
+                {
+                    t += Time.unscaledDeltaTime;
+                    float u = t / 0.6f;
+                    float hop = Mathf.Abs(Mathf.Sin(u * Mathf.PI * 2f)) * 18f * (1f - u);
+                    float sq = 1f + 0.12f * Mathf.Sin(u * Mathf.PI * 4f) * (1f - u);
+                    for (int i = 0; i < cars.Count; i++)
+                    {
+                        cars[i].anchoredPosition = homes[i] + new Vector2(0f, hop);
+                        cars[i].localScale = new Vector3(sq, 2f - sq, 1f);
+                    }
+                    yield return null;
+                }
+            }
+            // 3) Clear the stage quickly so the fanfare, banner and coins own the screen.
+            t = 0f;
+            while (t < 0.2f)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.2f);
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    cars[i].localScale = Vector3.one * (1f - u);
+                }
+                yield return null;
+            }
+            for (int i = 0; i < cars.Count; i++) UnityEngine.Object.Destroy(cars[i].gameObject);
+            UnityEngine.Object.Destroy(catcher.gameObject);
         }
 
         // Popcorn: 0 -> 1.18 -> 0.94 -> 1 (Flock Five's letter pop + Settle).
