@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+<title>{{{ PRODUCT_NAME }}}</title>
+<style>
+  html, body { margin:0; padding:0; width:100%; height:100%; background:#111; overflow:hidden; }
+  #frame { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#000; }
+  #unity-canvas { width:100%; height:100%; display:block; }
+</style>
+</head>
+<body>
+<div id="frame"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+<script>
+  // Portrait 390x844, scaled to fit the window and letterboxed.
+  var W = 390, H = 844, frame = document.getElementById("frame");
+  function fit() {
+    var s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    frame.style.width = Math.floor(W * s) + "px";
+    frame.style.height = Math.floor(H * s) + "px";
+  }
+  window.addEventListener("resize", fit); fit();
+  var buildUrl = "Build";
+  var script = document.createElement("script");
+  script.src = buildUrl + "/{{{ LOADER_FILENAME }}}";
+  script.onload = function () {
+    createUnityInstance(document.getElementById("unity-canvas"), {
+      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      matchWebGLToCanvasSize: true
+    }).catch(function (m) { alert(m); });
+  };
+  document.body.appendChild(script);
+</script>
+</body>
+</html>

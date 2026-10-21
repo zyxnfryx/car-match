@@ -66,18 +66,18 @@ def shade(G,base,closed=False,lid=0.0,wide=1.0):
     def wpaint(m,c):
         nonlocal col; m=(m*ws)[:,None]; col=col*(1-m)+np.array(c)*m
     yb=p[:,1]; ec=0.80
-    for x in(-0.17,0.17):
+    for x in(-0.18,0.18):
         if not closed:
-            er=0.11*wide; eye=1-sm(er-aa,er,np.hypot(u-x,(yb-ec)*0.9))
+            er=0.1375*wide; eye=1-sm(er-aa,er,np.hypot(u-x,(yb-ec)*0.9))
             wpaint(eye,[1,1,1])
-            wpaint(1-sm(0.062*wide-aa,0.062*wide,np.hypot(u-x*0.9,yb-ec+0.02)),[.06,.06,.1])
-            wpaint(1-sm(0.02-aa,0.02,np.hypot(u-x*0.9+0.022,yb-ec+0.0)),[1,1,1])
+            wpaint(1-sm(0.0775*wide-aa,0.0775*wide,np.hypot(u-x*0.9,yb-ec+0.02)),[.06,.06,.1])
+            wpaint(1-sm(0.025-aa,0.025,np.hypot(u-x*0.9+0.026,yb-ec+0.0)),[1,1,1])
             if lid>0:
                 edge=ec+er/0.9-lid*2*er/0.9
                 wpaint(eye*sm(edge-0.01,edge+0.01,yb),list(base*0.85))
                 wpaint(eye*(1-sm(0.008,0.016,np.abs(yb-edge))),[.08,.06,.1])
         else:
-            d=np.abs(np.hypot(u-x,yb-ec-0.03)-0.08); wpaint((1-sm(0.024-aa,0.02,d))*(yb<ec+0.03),[.95,.95,1])
+            d=np.abs(np.hypot(u-x,yb-ec-0.04)-0.1); wpaint((1-sm(0.028-aa,0.024,d))*(yb<ec+0.04),[.95,.95,1])
     # mouth on hood
     mz=0.45; hd=(p[:,1]>0.45)&(v>0.3)
     if not closed:
