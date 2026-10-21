@@ -109,7 +109,7 @@ namespace CarMatch
                 ShowHome();
                 return;
             }
-            if (_coinText != null) _coinText.text = Purse.Wallet.Coins.ToString();
+            if (_coinText != null && _phase != Phase.Win) _coinText.text = Purse.Wallet.Coins.ToString();
             if (_livesText != null) _livesText.text = LivesLine();
             if (_phase == Phase.Fail && _retryButton != null)
                 _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
@@ -988,20 +988,21 @@ namespace CarMatch
             _busy = false;
             ClearScreen();
             Backdrop();
-            var mascot = Place(_screen, "Mascot", new Vector2(0f, 240f), new Vector2(480f, 480f));
-            var pic = mascot.gameObject.AddComponent<Image>();
-            pic.sprite = PaintedMascot(MascotArt.Happy);
-            pic.preserveAspect = true;
-            pic.raycastTarget = false;
-            string title = _level != null ? _level.Title + " is clear" : "Lot clear";
-            Label(new Vector2(0f, -120f), new Vector2(900f, 80f), title, 48, Cream, TextAnchor.MiddleCenter);
-            Label(new Vector2(0f, -210f), new Vector2(700f, 60f), "+" + Economy.Pay(true) + " coins", 40, Gold, TextAnchor.MiddleCenter);
-            bool more = _index < _levels.Count - 1;
-            if (more)
-                MakeButton(new Vector2(0f, -400f), new Vector2(640f, 150f), Green, "Next", 56, OnNext);
-            else
-                Label(new Vector2(0f, -340f), new Vector2(800f, 50f), "That's the whole street for v1.", 30, Cream, TextAnchor.MiddleCenter);
-            MakeButton(new Vector2(0f, more ? -590f : -500f), new Vector2(420f, 110f), new Color(0.20f, 0.24f, 0.34f, 0.9f), "Home", 36, OnHome);
+            int pay = Economy.Pay(true);
+            WinShow.Build(this, _screen, new WinShow.Setup
+            {
+                LevelName = _level != null ? "Level " + _level.Number + " \u00B7 " + _level.Title : "Lot clear",
+                Pay = pay,
+                CoinsBefore = Purse.Wallet.Coins - pay,
+                More = _index < _levels.Count - 1,
+                Mascot = PaintedMascot(MascotArt.Cheer ?? MascotArt.Happy),
+                Font = ChunkyFont(),
+                MakeButton = (pos, size, label, fontSize, style, action) => MakeButton(pos, size, Green, label, fontSize, action, style),
+                OnNext = OnNext,
+                OnHome = OnHome,
+                Hud = () => { Hud(0f); return _coinText; },
+                Shake = _shake
+            });
         }
 
         static Sprite PaintedMascot(Sprite painted)
@@ -1046,6 +1047,8 @@ namespace CarMatch
             _phase = Phase.Fail;
             ClearScreen();
             Backdrop();
+            AudioManager.Play(Sfx.Fail);
+            Haptics.Thud();
             Label(new Vector2(0f, 360f), new Vector2(900f, 90f), "Bar's full", 68, Cream, TextAnchor.MiddleCenter);
             string body = "There's no open slot left. Retry uses a life, starts this lot over, and adds " +
                           Economy.FailPay + " coins. Home does the same and leaves. Continue plays a rewarded ad and puts the last three cars back.";
