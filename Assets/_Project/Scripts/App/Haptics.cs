@@ -33,8 +33,10 @@ namespace CarMatch
             float now = Time.unscaledTime;
             if (now < _next) return;
             _next = now + Gap;
+#if !UNITY_WEBGL
             try { LotLoopHaptic(style); }
             catch (System.Exception) { }
+#endif
         }
     }
 }

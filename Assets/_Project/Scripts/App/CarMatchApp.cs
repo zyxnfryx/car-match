@@ -494,7 +494,9 @@ namespace CarMatch
             {
                 if (_busy || _driving) return;
                 AudioManager.Play(Sfx.Blocked);
+#if !UNITY_WEBGL
                 Haptics.Thud();
+#endif
                 StartCoroutine(Wiggle(piece));
             });
         }
@@ -664,7 +666,9 @@ namespace CarMatch
             var flyer = SpawnFlyer(color, hidden, points[0], size);
             AudioManager.CarTap();
             AudioManager.Play(Sfx.DriveOut);
+#if !UNITY_WEBGL
             Haptics.Tap();
+#endif
             LockInput();
             StartCoroutine(Drive(flyer, points, tap, color, hidden));
         }
@@ -813,7 +817,9 @@ namespace CarMatch
             if (move.Matched)
             {
                 AudioManager.Play(Sfx.MatchClear);
+#if !UNITY_WEBGL
                 Haptics.Success();
+#endif
                 if (_shake != null) _shake.Punch(0.22f, 9f, 0.6f);
             }
             if (!move.Accepted)
@@ -1116,7 +1122,9 @@ namespace CarMatch
             ClearScreen();
             Backdrop();
             AudioManager.Play(Sfx.Fail);
+#if !UNITY_WEBGL
             Haptics.Thud();
+#endif
             Label(new Vector2(0f, 360f), new Vector2(900f, 90f), "Bar's full", 68, Cream, TextAnchor.MiddleCenter);
             string body = "There's no open slot left. Retry uses a life, starts this lot over, and adds " +
                           Economy.FailPay + " coins. Home does the same and leaves. Continue plays a rewarded ad and puts the last three cars back.";

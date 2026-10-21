@@ -109,7 +109,10 @@ namespace CarMatch
                 next.gameObject.AddComponent<Pulse>();
             }
             else
-                Txt(screen, "That's the whole street for now!", s.Font, 44, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
+            {
+                Txt(screen, "You cleared every lot!", s.Font, 52, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
+                host.StartCoroutine(CarFinale(screen));
+            }
             var home = s.MakeButton(new Vector2(0f, s.More ? -830f : -780f), new Vector2(330f, 130f), "Home", 52, "btn_blue", s.OnHome);
             if (next != null) next.gameObject.SetActive(false);
             home.gameObject.SetActive(false);
@@ -121,7 +124,9 @@ namespace CarMatch
             Button next, Button home)
         {
             AudioManager.Play(Sfx.Win);
+#if !UNITY_WEBGL
             Haptics.Success();
+#endif
             host.StartCoroutine(Spin(rays, glow));
             host.StartCoroutine(Confetti(screen));
             host.StartCoroutine(Pop(ribbon, 0.0f, 0.38f));
@@ -145,7 +150,9 @@ namespace CarMatch
                         plus.text = "+" + shown;
                         if (coinText != null) coinText.text = (s.CoinsBefore + shown).ToString();
                         AudioManager.Play(Sfx.Coin);
+#if !UNITY_WEBGL
                         Haptics.Tap();
+#endif
                         host.StartCoroutine(Wobble(piggy));
                         host.StartCoroutine(Punch(plus.rectTransform, 1.25f));
                     }));
@@ -158,6 +165,63 @@ namespace CarMatch
             yield return new WaitForSecondsRealtime(0.12f);
             home.gameObject.SetActive(true);
             yield return Pop((RectTransform)home.transform, 0f, 0.3f);
+        }
+
+        // Finale after the last level: painted cars drive in and park to spell LOT LOOP (3x5 dot font),
+        // then hop in a wave. Uses the car sprites only, so the art stays Lot Loop's own.
+        static readonly string[] Glyph =
+        {
+            "L:100100100100111", "O:111101101101111", "T:111010010010010", "P:111101111100100"
+        };
+
+        static string Rows(char c)
+        {
+            for (int i = 0; i < Glyph.Length; i++) if (Glyph[i][0] == c) return Glyph[i].Substring(2);
+            return "000000000000000";
+        }
+
+        static IEnumerator CarFinale(Transform screen)
+        {
+            const float cell = 40f;
+            string[] words = { "LOT", "LOOP" };
+            var cars = new System.Collections.Generic.List<RectTransform>();
+            var homes = new System.Collections.Generic.List<Vector2>();
+            int colorIndex = 0;
+            for (int w = 0; w < words.Length; w++)
+            {
+                string word = words[w];
+                float width = word.Length * 4 * cell - cell;
+                float y0 = 470f - w * 6.2f * cell;
+                for (int ch = 0; ch < word.Length; ch++)
+                {
+                    string g = Rows(word[ch]);
+                    for (int r = 0; r < 5; r++)
+                        for (int c = 0; c < 3; c++)
+                        {
+                            if (g[r * 3 + c] != '1') continue;
+                            var color = (CarColor)(colorIndex++ % 8);
+                            var home = new Vector2(-width * 0.5f + (ch * 4 + c) * cell + cell * 0.5f, y0 - r * cell);
+                            var rt = Img(screen, "FinaleCar", CarFrames.Heading(color, 0) ?? CarArt.For(color, true), home + new Vector2(0f, 1400f), new Vector2(cell * 1.25f, cell * 1.25f), Color.white);
+                            cars.Add(rt);
+                            homes.Add(home);
+                        }
+                }
+            }
+            yield return new WaitForSecondsRealtime(0.6f);
+            float t = 0f;
+            while (t < 4.5f)
+            {
+                t += Time.unscaledDeltaTime;
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    if (cars[i] == null) yield break;
+                    float u = Mathf.Clamp01((t - i * 0.025f) / 0.5f);
+                    float k = 1f - (1f - u) * (1f - u) * (1f - u);
+                    float hop = t > 2f ? Mathf.Max(0f, Mathf.Sin((t - 2f) * 8f - i * 0.25f)) * 10f : 0f;
+                    cars[i].anchoredPosition = homes[i] + new Vector2(0f, (1f - k) * 1400f + hop);
+                }
+                yield return null;
+            }
         }
 
         // Popcorn: 0 -> 1.18 -> 0.94 -> 1 (Flock Five's letter pop + Settle).

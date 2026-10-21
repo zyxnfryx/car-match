@@ -35,7 +35,9 @@ namespace CarMatch
             if (_sel != null && !_sel.IsInteractable()) return;
             LateRest();
             _target = 1f;
+#if !UNITY_WEBGL
             Haptics.Tap();
+#endif
         }
 
         public void OnPointerUp(PointerEventData e) { _target = 0f; }
