@@ -6,8 +6,19 @@ namespace CarMatch
 {
     static class Program
     {
-        static int Main()
+        static int Main(string[] args)
         {
+            // --each <levels.json>: one line per level with its solver outlook (used by tools/levels/gen_levels.py).
+            if (args.Length == 2 && args[0] == "--each")
+            {
+                var defs = LevelJson.Parse(File.ReadAllText(args[1]));
+                foreach (var d in defs)
+                {
+                    var r = LotSolve.Search(d.Board, 200000);
+                    Console.WriteLine(d.Number + " " + r.Outlook + " " + r.Nodes + " " + r.Moves);
+                }
+                return 0;
+            }
             string jsonPath = Path.GetFullPath(Path.Combine(
                 AppContext.BaseDirectory,
                 "..", "..", "..", "..", "..",

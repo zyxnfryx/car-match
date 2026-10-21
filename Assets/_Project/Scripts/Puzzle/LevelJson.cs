@@ -11,6 +11,7 @@ namespace CarMatch
         public string Title;
         public string Blurb;
         public Board Board;
+        public LevelHooks Hooks = new LevelHooks();
     }
 
     // Levels are JSON so the same file feeds the player, the solver, and the tests.
@@ -38,7 +39,8 @@ namespace CarMatch
                     Id = Str(row, "id", "level-" + (i + 1)),
                     Title = Str(row, "title", "Level " + (i + 1)),
                     Blurb = Str(row, "blurb", ""),
-                    Board = Build(row, i + 1)
+                    Board = Build(row, i + 1),
+                    Hooks = LevelHooks.Read(row)
                 };
                 HiddenReveal.Sweep(def.Board);
                 defs.Add(def);

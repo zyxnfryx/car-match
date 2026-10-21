@@ -16,8 +16,9 @@ public static class IosBuild
         PlayerSettings.iOS.buildNumber = Env("CM_BUILD_NUMBER", "1");
         PlayerSettings.iOS.appleDeveloperTeamID = "23K8T866FT";
         PlayerSettings.iOS.appleEnableAutomaticSigning = true;
-        PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPhoneOnly;
+        PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPhoneAndiPad;
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
+        PlayerSettings.iOS.requiresFullScreen = true;
         AssetDatabase.Refresh();
         var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Art/AppIcon.png");
         if (icon == null) throw new Exception("missing Assets/_Project/Art/AppIcon.png");

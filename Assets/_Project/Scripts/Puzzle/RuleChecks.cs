@@ -19,6 +19,49 @@ namespace CarMatch
             Expect(!mixed.Matched && bar.Count == 2, "different colors stay");
         }
 
+        public static void BarKeepsColorsGrouped()
+        {
+            var bar = new List<CarColor>();
+            MatchClear.Push(bar, CarColor.Coral);
+            MatchClear.Push(bar, CarColor.Teal);
+            MatchClear.Push(bar, CarColor.Lime);
+            var r = MatchClear.Push(bar, CarColor.Coral);
+            Expect(r.Index == 1, "second coral goes right after the first, got " + r.Index);
+            Expect(bar.Count == 4 && bar[0] == CarColor.Coral && bar[1] == CarColor.Coral && bar[2] == CarColor.Teal && bar[3] == CarColor.Lime, "teal and lime slide right");
+            var t = MatchClear.Push(bar, CarColor.Teal);
+            Expect(t.Index == 3 && bar[3] == CarColor.Teal && bar[4] == CarColor.Lime, "teal joins teal");
+            var amber = MatchClear.Push(bar, CarColor.Amber);
+            Expect(amber.Index == 5 && bar[5] == CarColor.Amber, "a new color goes to the end");
+            var third = MatchClear.Push(bar, CarColor.Coral);
+            Expect(third.Matched && third.Index == 2 && third.ClearedFrom == 0, "three coral clear from slot 0");
+            Expect(bar.Count == 4 && bar[0] == CarColor.Teal && bar[1] == CarColor.Teal && bar[2] == CarColor.Lime && bar[3] == CarColor.Amber, "the rest slide left");
+            // Undo restores the exact grouped order.
+            var board = Tiny("[[\"coral\",\"coral\"],[\"teal\"],[\"coral\"],[\"teal\",\"teal\"]]");
+            var history = new List<Board>();
+            BoardRules.Play(board, history, new Tap(TapKind.Lane, 0, 0));
+            BoardRules.Play(board, history, new Tap(TapKind.Lane, 1, 0));
+            BoardRules.Play(board, history, new Tap(TapKind.Lane, 2, 0));
+            Expect(board.Bar.Count == 3 && board.Bar[0] == CarColor.Coral && board.Bar[1] == CarColor.Coral && board.Bar[2] == CarColor.Teal, "board bar groups coral");
+            Board back;
+            BoosterKit.Undo(history, out back);
+            Expect(back.Bar.Count == 2 && back.Bar[0] == CarColor.Coral && back.Bar[1] == CarColor.Teal, "undo restores the bar order");
+        }
+
+        public static void ProgressionNeverSkips()
+        {
+            int saved = 0;
+            for (int i = 0; i < 99; i++)
+            {
+                saved = Progress.AfterWin(saved, saved, 100);
+                Expect(saved == i + 1, "win on level " + (i + 1) + " should open " + (i + 2) + ", got " + (saved + 1));
+                // A second settle of the same win, or a stale win on an older level, changes nothing.
+                Expect(Progress.AfterWin(saved, saved - 1, 100) == saved, "repeat win must not advance");
+                Expect(Progress.AfterWin(saved, 0, 100) == saved, "replay of level 1 must not advance");
+            }
+            Expect(Progress.AfterWin(99, 99, 100) == 99, "the last level stays put");
+            Expect(Progress.AfterWin(250, 3, 100) == 99, "out-of-range saves clamp");
+        }
+
         public static void SeventhCarFails()
         {
             var board = Tiny("[[\"coral\"],[\"coral\"],[\"amber\"],[\"amber\"],[\"lime\"],[\"lime\"],[\"violet\",\"teal\"]]");
@@ -334,6 +377,8 @@ namespace CarMatch
         public static void RunAll(string json)
         {
             MatchThreeClears();
+            BarKeepsColorsGrouped();
+            ProgressionNeverSkips();
             SeventhCarFails();
             MatchOnSeventhDoesNotFail();
             HiddenRevealsWhenUncovered();

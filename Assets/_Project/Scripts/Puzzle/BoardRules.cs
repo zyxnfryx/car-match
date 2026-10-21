@@ -8,6 +8,8 @@ namespace CarMatch
         public bool Matched;
         public bool Won;
         public bool Failed;
+        public int BarIndex;
+        public int ClearedFrom;
     }
 
     // The only tap mutation. The solver and the tests call Play immediately.
@@ -62,6 +64,8 @@ namespace CarMatch
             {
                 Accepted = true,
                 Matched = clear.Matched,
+                BarIndex = clear.Index,
+                ClearedFrom = clear.ClearedFrom,
                 Won = won,
                 Failed = failed
             };

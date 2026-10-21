@@ -16,6 +16,8 @@ public static class IosInfoPlist
         plist.ReadFromFile(plistPath);
         plist.root.SetString("CFBundleDisplayName", "Lot Loop");
         plist.root.SetBoolean("ITSAppUsesNonExemptEncryption", false);
+        // Portrait-only on iPad needs full screen (no Split View), or App Store validation rejects it.
+        plist.root.SetBoolean("UIRequiresFullScreen", true);
         plist.WriteToFile(plistPath);
     }
 }

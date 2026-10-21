@@ -10,12 +10,27 @@ namespace CarMatch.Editor
     {
         const string Cars = "Assets/_Project/Art/Cars/";
         const string Mascot = "Assets/_Project/Art/Mascot/";
+        // Painted UI, the 16-heading drive frames and the eye-open frames load from Resources.
+        static readonly string[] Extra =
+        {
+            "Assets/_Project/Resources/UI/",
+            "Assets/_Project/Resources/Cars16/",
+            "Assets/_Project/Resources/CarEyes/"
+        };
+
+        static bool IsExtra(string path)
+        {
+            for (int i = 0; i < Extra.Length; i++)
+                if (path.StartsWith(Extra[i], System.StringComparison.Ordinal)) return true;
+            return false;
+        }
 
         void OnPreprocessTexture()
         {
             var path = assetPath.Replace('\\', '/');
             if (!path.StartsWith(Cars, System.StringComparison.Ordinal) &&
-                !path.StartsWith(Mascot, System.StringComparison.Ordinal))
+                !path.StartsWith(Mascot, System.StringComparison.Ordinal) &&
+                !IsExtra(path))
                 return;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Sprite;
@@ -32,6 +47,14 @@ namespace CarMatch.Editor
             importer.crunchedCompression = false;
             importer.spritePivot = new Vector2(0.5f, 0.5f);
             importer.spritePixelsToUnits = 100f;
+            // 3D buttons and pills slice: keep the rounded ends and bevel, stretch the middle.
+            var file = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (path.StartsWith(Extra[0], System.StringComparison.Ordinal) &&
+                (file.StartsWith("btn_", System.StringComparison.Ordinal) || file == "pill"))
+            {
+                float b = file == "btn_booster" ? 70f : file == "pill" ? 56f : file == "btn_navy" ? 60f : 96f;
+                importer.spriteBorder = new Vector4(b, b * 0.8f, b, b * 0.8f);
+            }
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);

@@ -5,16 +5,32 @@ namespace CarMatch
     // Persists the shared Economy wallet. Rules for pay, prices, and regen live in Economy.
     public static class Purse
     {
-        const string PrefCoins = "carmatch.coins";
-        const string PrefLives = "carmatch.lives";
-        const string PrefNext = "carmatch.nextlife";
-        const string PrefLevel = "carmatch.level";
+        const string PrefCoins = "lotloop.coins";
+        const string PrefLives = "lotloop.lives";
+        const string PrefNext = "lotloop.nextlife";
+        const string PrefLevel = "lotloop.level";
 
         public static Wallet Wallet { get; private set; }
         public static int LevelIndex { get; private set; }
 
+        // Keys were carmatch.* through build 3; copy them over once so testers keep progress.
+        static void Migrate()
+        {
+            string[] keys = { "coins", "lives", "nextlife", "level" };
+            for (int i = 0; i < keys.Length; i++)
+            {
+                string old = "carmatch." + keys[i];
+                string now = "lotloop." + keys[i];
+                if (!PlayerPrefs.HasKey(old) || PlayerPrefs.HasKey(now)) continue;
+                if (keys[i] == "nextlife") PlayerPrefs.SetString(now, PlayerPrefs.GetString(old, "0"));
+                else PlayerPrefs.SetInt(now, PlayerPrefs.GetInt(old, 0));
+                PlayerPrefs.DeleteKey(old);
+            }
+        }
+
         public static void Boot()
         {
+            Migrate();
             Wallet = new Wallet
             {
                 Coins = PlayerPrefs.GetInt(PrefCoins, Economy.StartCoins),
@@ -75,10 +91,11 @@ namespace CarMatch
             Save();
         }
 
-        public static void Advance(int count)
+        // Moves to the level after the one that was actually won (see Progress.AfterWin).
+        public static void Advance(int wonIndex, int count)
         {
             if (count < 1) return;
-            if (LevelIndex < count - 1) LevelIndex += 1;
+            LevelIndex = Progress.AfterWin(LevelIndex, wonIndex, count);
             Save();
         }
 
