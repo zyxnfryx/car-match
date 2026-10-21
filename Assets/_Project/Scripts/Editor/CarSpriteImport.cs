@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace CarMatch.Editor
 {
-    // Dropping car_<color>_open.png / car_<color>_closed.png into Art/Cars
-    // imports them as sprites and points the player-build catalog at them.
+    // Dropping idle or heading PNGs into Art/Cars imports them as sprites
+    // and points the player-build catalog at them.
     public sealed class CarSpriteImport : AssetPostprocessor
     {
         const string Folder = "Assets/_Project/Art/Cars/";
@@ -73,6 +73,9 @@ namespace CarMatch.Editor
                 set.Open = new Sprite[Palette.Count];
             if (set.Closed == null || set.Closed.Length != Palette.Count)
                 set.Closed = new Sprite[Palette.Count];
+            int headingCount = Palette.Count * EyeState.FacingCount;
+            if (set.Headings == null || set.Headings.Length != headingCount)
+                set.Headings = new Sprite[headingCount];
             bool changed = created;
             for (int i = 0; i < Palette.Count; i++)
             {
@@ -87,6 +90,15 @@ namespace CarMatch.Editor
                 if (set.Closed[i] != closed)
                 {
                     set.Closed[i] = closed;
+                    changed = true;
+                }
+                for (int f = 0; f < EyeState.FacingCount; f++)
+                {
+                    var facing = (CarFacing)f;
+                    var heading = CarArt.LoadSprite(CarArt.HeadingPath(color, facing));
+                    int index = i * EyeState.FacingCount + f;
+                    if (set.Headings[index] == heading) continue;
+                    set.Headings[index] = heading;
                     changed = true;
                 }
             }

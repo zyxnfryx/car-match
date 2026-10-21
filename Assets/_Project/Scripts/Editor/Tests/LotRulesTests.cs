@@ -84,6 +84,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Headings_FollowTheNearestDirection()
+        {
+            RuleChecks.HeadingUsesTheNearestDirection();
+        }
+
+        [Test]
         public void Economy_WinsAndFailsPayTheSame()
         {
             RuleChecks.WinAndFailPayTheSame();

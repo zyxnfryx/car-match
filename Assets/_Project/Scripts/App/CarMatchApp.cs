@@ -451,11 +451,12 @@ namespace CarMatch
                 if (button != null) button.interactable = false;
             }
             bool hidden = PieceHidden(tap);
+            var color = ExitPath.ColorOf(_board, tap);
             var size = piece != null ? piece.sizeDelta : _metrics.Piece;
             HidePiece(piece);
-            var flyer = SpawnFlyer(ExitPath.ColorOf(_board, tap), hidden, points[0], size);
+            var flyer = SpawnFlyer(color, hidden, points[0], size);
             LockInput();
-            StartCoroutine(Drive(flyer, points, tap));
+            StartCoroutine(Drive(flyer, points, tap, color, hidden));
         }
 
         bool PieceHidden(Tap tap)
@@ -529,13 +530,14 @@ namespace CarMatch
                 buttons[i].interactable = false;
         }
 
-        IEnumerator Drive(RectTransform flyer, List<Vector2> points, Tap tap)
+        IEnumerator Drive(RectTransform flyer, List<Vector2> points, Tap tap, CarColor color, bool hidden)
         {
             var startSize = flyer.sizeDelta;
             var endSize = new Vector2(BarSlotWidth - 8f, BarCarH);
+            var image = flyer.GetComponent<Image>();
             Vector2 facing;
             Along(points, 0f, out facing);
-            Face(flyer, facing);
+            Aim(flyer, image, color, hidden, facing);
             float elapsed = 0f;
             while (elapsed < DriveSeconds)
             {
@@ -546,11 +548,13 @@ namespace CarMatch
                 float eased = u * u * (3f - 2f * u);
                 flyer.anchoredPosition = Along(points, eased, out facing);
                 flyer.sizeDelta = Vector2.Lerp(startSize, endSize, eased);
-                Face(flyer, facing);
+                Aim(flyer, image, color, hidden, facing);
                 yield return null;
             }
             flyer.anchoredPosition = points[points.Count - 1];
             flyer.sizeDelta = endSize;
+            Along(points, 1f, out facing);
+            Aim(flyer, image, color, hidden, facing);
             var move = BoardRules.Play(_board, _history, tap);
             _driving = false;
             _lastMatch = move.Matched;
@@ -602,6 +606,26 @@ namespace CarMatch
             }
             facing = points[points.Count - 1] - points[points.Count - 2];
             return points[points.Count - 1];
+        }
+
+        static void Aim(RectTransform rt, Image image, CarColor color, bool hidden, Vector2 dir)
+        {
+            if (rt == null) return;
+            if (hidden || image == null)
+            {
+                rt.localRotation = Quaternion.identity;
+                return;
+            }
+            CarFacing facing;
+            Sprite painted;
+            if (EyeState.TryNearest(dir.x, dir.y, out facing) && CarArt.TryHeading(color, facing, out painted))
+            {
+                image.sprite = painted;
+                rt.localRotation = Quaternion.identity;
+                return;
+            }
+            image.sprite = SpriteKit.Car(color, true);
+            Face(rt, dir);
         }
 
         static void Face(RectTransform rt, Vector2 dir)

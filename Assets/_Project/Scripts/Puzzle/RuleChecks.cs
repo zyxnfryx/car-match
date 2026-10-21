@@ -258,6 +258,44 @@ namespace CarMatch
             }
         }
 
+        public static void HeadingUsesTheNearestDirection()
+        {
+            CarFacing facing;
+            Expect(!EyeState.TryNearest(0f, 0f, out facing), "a zero move has no heading");
+            Expect(EyeState.TryNearest(0f, 1f, out facing) && facing == CarFacing.N, "up is N");
+            Expect(EyeState.TryNearest(1f, 1f, out facing) && facing == CarFacing.NE, "up-right is NE");
+            Expect(EyeState.TryNearest(1f, 0f, out facing) && facing == CarFacing.E, "right is E");
+            Expect(EyeState.TryNearest(1f, -1f, out facing) && facing == CarFacing.SE, "down-right is SE");
+            Expect(EyeState.TryNearest(0f, -1f, out facing) && facing == CarFacing.S, "down is S");
+            Expect(EyeState.TryNearest(-1f, -1f, out facing) && facing == CarFacing.SW, "down-left is SW");
+            Expect(EyeState.TryNearest(-1f, 0f, out facing) && facing == CarFacing.W, "left is W");
+            Expect(EyeState.TryNearest(-1f, 1f, out facing) && facing == CarFacing.NW, "up-left is NW");
+            Expect(FacingAt(20f) == CarFacing.E, "20 degrees stays east");
+            Expect(FacingAt(25f) == CarFacing.NE, "25 degrees is northeast");
+            Expect(FacingAt(-20f) == CarFacing.E, "20 degrees south of east stays east");
+            Expect(FacingAt(-25f) == CarFacing.SE, "25 degrees south of east is southeast");
+            Expect(FacingAt(90f) == CarFacing.N, "90 degrees is north");
+            Expect(FacingAt(180f) == CarFacing.W, "180 degrees is west");
+            Expect(FacingAt(-90f) == CarFacing.S, "-90 degrees is south");
+            Expect(FacingAt(135f) == CarFacing.NW, "135 degrees is northwest");
+            Expect(FacingAt(-135f) == CarFacing.SW, "-135 degrees is southwest");
+            Expect(FacingAt(45f) == CarFacing.NE, "45 degrees is northeast");
+            Expect(FacingAt(-45f) == CarFacing.SE, "-45 degrees is southeast");
+
+            string[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
+            string[] names = { "coral", "amber", "lime", "teal", "violet", "rose", "sky", "gold" };
+            Expect(dirs.Length == EyeState.FacingCount, "eight headings");
+            for (int c = 0; c < names.Length; c++)
+            {
+                var color = (CarColor)c;
+                for (int d = 0; d < dirs.Length; d++)
+                {
+                    var file = EyeState.SpriteFile(color, (CarFacing)d);
+                    Expect(file == "car_" + names[c] + "_open_" + dirs[d] + ".png", file);
+                }
+            }
+        }
+
         public static void AllLevelsSolvable(string json)
         {
             var levels = LevelJson.Parse(json);
@@ -304,6 +342,7 @@ namespace CarMatch
             ShuffleKeepsColorCounts();
             MagnetPullsASetOfThree();
             OpenEyesOnlyOnAClearExit();
+            HeadingUsesTheNearestDirection();
             WinAndFailPayTheSame();
             LivesSpendAndRegen();
             AllLevelsSolvable(json);
@@ -345,6 +384,15 @@ namespace CarMatch
                 sb.Append('|');
             }
             return sb.ToString();
+        }
+
+        static CarFacing FacingAt(float degrees)
+        {
+            double rad = degrees * (System.Math.PI / 180.0);
+            CarFacing facing;
+            bool ok = EyeState.TryNearest((float)System.Math.Cos(rad), (float)System.Math.Sin(rad), out facing);
+            if (!ok) throw new System.InvalidOperationException("no heading at " + degrees);
+            return facing;
         }
 
         static void Expect(bool ok, string message)
