@@ -69,7 +69,7 @@ namespace CarMatch
                 cam.backgroundColor = new Color(0.14f, 0.20f, 0.36f, 1f);
             }
             SpriteKit.Warm();
-            _ads = new StubAdService();
+            _ads = AdServices.Create();
             Purse.Boot();
             LoadCatalog();
             BuildShell();
@@ -569,7 +569,7 @@ namespace CarMatch
             _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
             var cont = MakeButton(new Vector2(0f, -400f), new Vector2(640f, 140f), new Color(0.22f, 0.45f, 0.82f, 1f), "Continue", 48, OnContinue);
             cont.interactable = !_busy;
-            Label(new Vector2(0f, -530f), new Vector2(800f, 40f), "Ad stub. No network SDK yet.", 26, new Color(1f, 0.94f, 0.86f, 0.8f), TextAnchor.MiddleCenter);
+            Label(new Vector2(0f, -530f), new Vector2(800f, 40f), "Watch a rewarded ad to continue.", 26, new Color(1f, 0.94f, 0.86f, 0.8f), TextAnchor.MiddleCenter);
             MakeButton(new Vector2(0f, -680f), new Vector2(320f, 90f), new Color(0.20f, 0.24f, 0.34f, 0.9f), "Home", 32, OnHome);
         }
 
