@@ -94,6 +94,7 @@ namespace CarMatch
             SpriteKit.Warm();
             _ads = AdServices.Create();
             Purse.Boot();
+            DebugCoinGrant();
             LoadCatalog();
             BuildShell();
             ShowHome();
@@ -176,6 +177,7 @@ namespace CarMatch
             ClearScreen();
             Backdrop(true);
             Clouds();
+            HomeCars();
             Hud(0f);
             AudioManager.Music(AudioManager.HomeMusic);
             // Hierarchy: HUD (safe top) > title > mascot on its light pool > tagline > Play.
@@ -617,9 +619,17 @@ namespace CarMatch
 
         void Booster(string name, int cost, float x, float y, bool legal, UnityEngine.Events.UnityAction action)
         {
-            bool afford = Economy.CanAfford(Purse.Wallet, cost);
+            bool free = FreeBoosters.IsFree(PrefsFlags.Shared, name);
+            bool afford = free || Economy.CanAfford(Purse.Wallet, cost);
             var button = MakeButton(new Vector2(x, y), new Vector2(220f, 200f), new Color(0.22f, 0.45f, 0.82f, 1f), name, 40, action, "btn_booster");
-            button.interactable = legal && afford && !_busy && !_driving && _board != null && !_board.Won && !_board.Failed;
+            // Unaffordable boosters stay tappable so the tap can explain itself (shake + toast + coin popup).
+            if (!afford)
+            {
+                button.onClick.RemoveAllListeners();
+                var rt = (RectTransform)button.transform;
+                button.onClick.AddListener(delegate { NotEnoughCoins(rt); });
+            }
+            button.interactable = legal && !_busy && !_driving && _board != null && !_board.Won && !_board.Failed;
             var label = button.GetComponentInChildren<Text>();
             if (label != null) label.rectTransform.offsetMin = new Vector2(0f, 90f);
             // Cost chip: coin icon + price in a small pill on the button face.
@@ -635,6 +645,15 @@ namespace CarMatch
             var costLabel = AddText(chip, cost.ToString(), 30, afford ? Cream : new Color(1f, 0.55f, 0.5f, 1f), TextAnchor.MiddleCenter);
             costLabel.rectTransform.offsetMin = new Vector2(30f, 0f);
             costLabel.font = ChunkyFont();
+            if (free)
+            {
+                // '1 FREE' badge replaces the price until the free use is spent.
+                coin.gameObject.SetActive(false);
+                chipImage.color = new Color(0.30f, 0.80f, 0.35f, 1f);
+                costLabel.text = "1 FREE";
+                costLabel.color = Color.white;
+                costLabel.rectTransform.offsetMin = Vector2.zero;
+            }
         }
 
         bool CanMagnet()
@@ -982,10 +1001,10 @@ namespace CarMatch
 
         void OnUndo()
         {
-            if (!Ready(Economy.UndoCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Undo") ? 0 : Economy.UndoCost)) return;
             Board restored;
             if (!BoosterKit.Undo(_history, out restored)) return;
-            if (!Purse.TrySpend(Economy.UndoCost)) return;
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Undo", Economy.UndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterUndo);
             _board = restored;
             _lastMatch = false;
@@ -994,10 +1013,10 @@ namespace CarMatch
 
         void OnSuper()
         {
-            if (!Ready(Economy.SuperUndoCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Super") ? 0 : Economy.SuperUndoCost)) return;
             Board restored;
             if (!BoosterKit.SuperUndo(_history, out restored)) return;
-            if (!Purse.TrySpend(Economy.SuperUndoCost)) return;
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Super", Economy.SuperUndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterSuper);
             _board = restored;
             _lastMatch = false;
@@ -1006,14 +1025,14 @@ namespace CarMatch
 
         void OnShuffle()
         {
-            if (!Ready(Economy.ShuffleCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Shuffle") ? 0 : Economy.ShuffleCost)) return;
             _history.Add(_board.Clone());
             if (!BoosterKit.Shuffle(_board, new System.Random()))
             {
                 _history.RemoveAt(_history.Count - 1);
                 return;
             }
-            if (!Purse.TrySpend(Economy.ShuffleCost))
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Shuffle", Economy.ShuffleCost, Purse.TrySpend))
             {
                 Board back;
                 BoosterKit.Undo(_history, out back);
@@ -1027,7 +1046,7 @@ namespace CarMatch
 
         void OnMagnet()
         {
-            if (!Ready(Economy.MagnetCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Magnet") ? 0 : Economy.MagnetCost)) return;
             _history.Add(_board.Clone());
             if (!BoosterKit.Magnet(_board))
             {
@@ -1036,7 +1055,7 @@ namespace CarMatch
                 _history.RemoveAt(_history.Count - 1);
                 return;
             }
-            if (!Purse.TrySpend(Economy.MagnetCost))
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Magnet", Economy.MagnetCost, Purse.TrySpend))
             {
                 Board back;
                 BoosterKit.Undo(_history, out back);
@@ -1251,6 +1270,39 @@ namespace CarMatch
             fit.aspectRatio = painted.rect.width / painted.rect.height;
         }
 
+        // Decorative parked cars on the home lot, laid out from the real canvas bottom so they stay
+        // fully visible at 390x844 and taller and keep clear of the Level button (y -342..-598).
+        void HomeCars()
+        {
+            var area = ((RectTransform)_screen).rect;
+            float halfW = area.width > 10f ? area.width * 0.5f : 490f;
+            float bottom = area.height > 10f ? -area.height * 0.5f : -1060f;
+            float size = Mathf.Min(190f, halfW * 0.36f);
+            float rowLow = bottom + size * 0.62f;
+            float rowHigh = Mathf.Min(rowLow + size * 1.15f, -598f - 30f - size * 0.5f);
+            if (rowHigh < rowLow + size * 0.8f) rowHigh = rowLow + size * 0.8f;
+            var spots = new[]
+            {
+                new Vector3(-0.72f, rowHigh, 0), new Vector3(0.72f, rowHigh, 1), new Vector3(-0.24f, rowLow, 2),
+                new Vector3(0.26f, rowLow, 3), new Vector3(-0.78f, rowLow - size * 0.05f, 4), new Vector3(0.78f, rowLow, 5)
+            };
+            var colors = new[] { CarColor.Coral, CarColor.Sky, CarColor.Gold, CarColor.Teal, CarColor.Lime, CarColor.Violet };
+            for (int i = 0; i < spots.Length; i++)
+            {
+                var sp = spots[i];
+                // Keep the low outer pair only on tall screens where there is room between the inner cars and the edge.
+                if (i >= 4 && halfW * 0.52f < size) continue;
+                var sprite = CarFrames.Heading(colors[(int)sp.z], 0) ?? CarArt.For(colors[(int)sp.z], true);
+                if (sprite == null) continue;
+                var rt = Place(_screen, "HomeCar", new Vector2(sp.x * (halfW - size * 0.5f), sp.y), new Vector2(size, size));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = sprite;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                img.color = new Color(0.9f, 0.9f, 0.92f, 1f);
+            }
+        }
+
         // Drifting cloud band over the sky with a little tilt parallax.
         void Clouds()
         {
@@ -1410,7 +1462,7 @@ namespace CarMatch
                 var plusButton = plus.gameObject.AddComponent<Button>();
                 plusButton.transition = Selectable.Transition.None;
                 plus.gameObject.AddComponent<PressSquash>().Sink = 3f;
-                plusButton.onClick.AddListener(OnPlus);
+                plusButton.onClick.AddListener(coins ? (UnityEngine.Events.UnityAction)OpenCoinPopup : OnPlus);
             }
             if (coins) _coinText = text;
             else _livesText = text;
@@ -1419,6 +1471,132 @@ namespace CarMatch
         void OnPlus()
         {
             AudioManager.Play(Sfx.Click);
+        }
+
+        // ---- Coin feedback: shake + toast + a small "how to earn coins" popup (no prices changed). ----
+        RectTransform _coinPopup;
+
+        void NotEnoughCoins(RectTransform source)
+        {
+            AudioManager.Play(Sfx.Blocked);
+#if !UNITY_WEBGL
+            Haptics.Thud();
+#endif
+            if (source != null) StartCoroutine(Shake(source));
+            Toast("Not enough coins");
+            OpenCoinPopup();
+        }
+
+        IEnumerator Shake(RectTransform rt)
+        {
+            var home = rt.anchoredPosition;
+            float t = 0f;
+            while (t < 0.35f && rt != null)
+            {
+                t += Time.unscaledDeltaTime;
+                rt.anchoredPosition = home + new Vector2(Mathf.Sin(t * 60f) * 18f * (1f - t / 0.35f), 0f);
+                yield return null;
+            }
+            if (rt != null) rt.anchoredPosition = home;
+        }
+
+        void Toast(string message)
+        {
+            var rt = Place(_screen, "Toast", new Vector2(0f, 260f), new Vector2(720f, 120f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = UiArt.Get("pill") ?? SpriteKit.Round;
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.08f, 0.09f, 0.16f, 0.92f);
+            img.raycastTarget = false;
+            var text = AddText(rt, message, 46, Cream, TextAnchor.MiddleCenter);
+            text.font = ChunkyFont();
+            text.raycastTarget = false;
+            var group = rt.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            StartCoroutine(FadeToast(rt, group));
+        }
+
+        IEnumerator FadeToast(RectTransform rt, CanvasGroup group)
+        {
+            float t = 0f;
+            var start = rt.anchoredPosition;
+            while (t < 1.6f && rt != null)
+            {
+                t += Time.unscaledDeltaTime;
+                group.alpha = t < 1.1f ? 1f : 1f - (t - 1.1f) / 0.5f;
+                rt.anchoredPosition = start + new Vector2(0f, t * 30f);
+                yield return null;
+            }
+            if (rt != null) Destroy(rt.gameObject);
+        }
+
+        void OpenCoinPopup()
+        {
+            if (_coinPopup != null) return;
+            var dim = Place(_screen, "CoinPopup", Vector2.zero, new Vector2(1080f, 2400f));
+            var dimImage = dim.gameObject.AddComponent<Image>();
+            dimImage.color = new Color(0f, 0f, 0f, 0.55f);
+            _coinPopup = dim;
+            var panel = Place(dim, "Panel", new Vector2(0f, 40f), new Vector2(860f, 760f));
+            var panelImage = panel.gameObject.AddComponent<Image>();
+            panelImage.sprite = UiArt.Get("pill") ?? SpriteKit.Round;
+            panelImage.type = Image.Type.Sliced;
+            panelImage.color = new Color(0.16f, 0.22f, 0.42f, 0.98f);
+            var icon = Place(panel, "Coin", new Vector2(0f, 270f), new Vector2(150f, 150f));
+            var iconImage = icon.gameObject.AddComponent<Image>();
+            iconImage.sprite = UiArt.Get("icon_coin") ?? SpriteKit.Coin;
+            iconImage.preserveAspect = true;
+            var title = Place(panel, "Title", new Vector2(0f, 150f), new Vector2(800f, 90f));
+            var titleText = AddText(title, "Need more coins?", 60, Cream, TextAnchor.MiddleCenter);
+            titleText.font = ChunkyFont();
+            var body = Place(panel, "Body", new Vector2(0f, 30f), new Vector2(760f, 150f));
+            AddText(body, "Earn " + Economy.WinPay + " coins for every lot you play.\nWatch a short video for bonus coins.", 38, Cream, TextAnchor.MiddleCenter);
+            MakeButton(new Vector2(0f, -130f), new Vector2(620f, 150f), new Color(0.2f, 0.7f, 0.3f, 1f), "Watch ad  +" + Economy.AdCoinReward, 46, OnAdCoins, "btn_green", panel);
+            MakeButton(new Vector2(0f, -290f), new Vector2(360f, 110f), new Color(0.2f, 0.4f, 0.8f, 1f), "Close", 42, CloseCoinPopup, "btn_blue", panel);
+        }
+
+        void CloseCoinPopup()
+        {
+            if (_coinPopup != null) Destroy(_coinPopup.gameObject);
+            _coinPopup = null;
+        }
+
+        void OnAdCoins()
+        {
+            if (_busy) return;
+            StartCoroutine(AdCoins());
+        }
+
+        IEnumerator AdCoins()
+        {
+            _busy = true;
+            bool granted = false;
+            yield return _ads.ShowRewarded("coins", delegate (bool ok) { granted = ok; });
+            _busy = false;
+            CloseCoinPopup();
+            if (!granted)
+            {
+                Toast("No video right now. Try again later");
+                yield break;
+            }
+            Purse.Grant(Economy.AdCoinReward);
+            AudioManager.Play(Sfx.Coin);
+            if (_coinText != null) _coinText.text = Purse.Wallet.Coins.ToString();
+            Toast("+" + Economy.AdCoinReward + " coins");
+            if (_phase == Phase.Play) ShowPlay();
+        }
+
+        // Debug-only coin grant: ?coins=5000 in the page URL. Compiled only into WebGL and development builds,
+        // never into the iOS release build.
+        static void DebugCoinGrant()
+        {
+#if UNITY_WEBGL || DEVELOPMENT_BUILD
+            string url = Application.absoluteURL;
+            if (string.IsNullOrEmpty(url)) return;
+            var m = System.Text.RegularExpressions.Regex.Match(url, @"[?&]coins=(\d{1,7})");
+            int n;
+            if (m.Success && int.TryParse(m.Groups[1].Value, out n) && n > 0) Purse.Grant(n);
+#endif
         }
 
         Text Label(Vector2 pos, Vector2 size, string value, int fontSize, Color color, TextAnchor anchor)

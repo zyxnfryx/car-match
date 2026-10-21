@@ -36,7 +36,8 @@ def make(n,seed):
     pool=[]
     for i in range(k['sets']): pool+= [pal[i%len(pal)]]*3
     # Start grouped, then a growing number of swaps mixes colors apart.
-    for _ in range(k['mix']):
+    # Each re-roll adds a swap so tiny early levels can't repeat an earlier layout.
+    for _ in range(k['mix']+seed):
         a=r.randrange(len(pool)); b=min(len(pool)-1,max(0,a+r.randint(-6,6))); pool[a],pool[b]=pool[b],pool[a]
     lanes=[[] for _ in range(k['lanes'])]
     sides=[]
@@ -76,9 +77,15 @@ def check(levels):
 subprocess.run([DOTNET,'build',os.path.join(ROOT,'tools/SolveCheck'),'-c','Release'],capture_output=True)
 seeds={n:0 for n in range(1,101)}
 levels=[make(n,0) for n in range(1,101)]
-for rnd in range(60):
+def sig(lv): return json.dumps([lv['lanes'],lv.get('sides',[])],sort_keys=True)
+for rnd in range(200):
     res=check(levels)
     bad=[n for n in range(1,101) if res.get(n)!='Winnable']
+    seen=set()
+    for n in range(1,101):  # no two levels share a layout and colors
+        k=sig(levels[n-1])
+        if k in seen and n not in bad: bad.append(n)
+        seen.add(k)
     print('round',rnd,'unsolved',len(bad),bad[:12],flush=True)
     if not bad: break
     for n in bad:

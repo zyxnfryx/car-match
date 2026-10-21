@@ -193,7 +193,11 @@ namespace CarMatch
             var catcher = Img(screen, "SkipFinale", null, Vector2.zero, new Vector2(4000f, 4000f), new Color(0f, 0f, 0f, 0.001f));
             catcher.GetComponent<Image>().raycastTarget = true;
             catcher.gameObject.AddComponent<Button>().onClick.AddListener(() => _skip = true);
-            const float cell = 40f;
+            // Fit the letters and the drive-in lanes inside the visible canvas (390x844 and taller included).
+            float halfW = 490f;
+            var srt = screen as RectTransform;
+            if (srt != null && srt.rect.width > 10f) halfW = srt.rect.width * 0.5f;
+            float cell = Mathf.Min(40f, (halfW * 2f * 0.86f) / (16f * 1.0f));
             string[] words = { "LOT", "LOOP" };
             var cars = new System.Collections.Generic.List<RectTransform>();
             var homes = new System.Collections.Generic.List<Vector2>();
@@ -215,7 +219,8 @@ namespace CarMatch
                             var home = new Vector2(-width * 0.5f + (ch * 4 + c) * cell + cell * 0.5f, y0 - r * cell);
                             // Drive in from the side nearest the spot, facing the way they travel (E or W).
                             bool left = home.x < 0f;
-                            var start = new Vector2(left ? -760f : 760f, home.y);
+                            float edge = halfW - cell * 0.9f;
+                            var start = new Vector2(left ? -edge : edge, home.y);
                             var rt = Img(screen, "FinaleCar", CarFrames.Heading(color, left ? 4 : 12) ?? CarArt.For(color, true), start, new Vector2(cell * 1.3f, cell * 1.3f), Color.white);
                             cars.Add(rt);
                             homes.Add(home);
@@ -236,6 +241,9 @@ namespace CarMatch
                     float u = Mathf.Clamp01((t - i * stagger) / drive);
                     float k = 1f - (1f - u) * (1f - u) * (1f - u);
                     cars[i].anchoredPosition = Vector2.Lerp(from[i], homes[i], k);
+                    // Pop in at the safe edge instead of sliding in from off-canvas.
+                    float pop = Mathf.Clamp01(u / 0.2f);
+                    cars[i].localScale = new Vector3(pop, pop, 1f);
                 }
                 yield return null;
             }
@@ -243,6 +251,7 @@ namespace CarMatch
             for (int i = 0; i < cars.Count; i++)
             {
                 cars[i].anchoredPosition = homes[i];
+                cars[i].localScale = Vector3.one;
                 var img = cars[i].GetComponent<Image>();
                 var sprite = CarFrames.Heading((CarColor)(i % 8), 0);
                 if (sprite != null) img.sprite = sprite;
@@ -351,6 +360,9 @@ namespace CarMatch
                 spin[i] = UnityEngine.Random.Range(-540f, 540f);
                 flip[i] = UnityEngine.Random.Range(4f, 10f);
             }
+            float wall = 470f;
+            var srt = screen as RectTransform;
+            if (srt != null && srt.rect.width > 10f) wall = srt.rect.width * 0.5f - 30f;
             float t = 0f;
             while (t < 3.2f)
             {
@@ -363,6 +375,9 @@ namespace CarMatch
                     vel[i] *= 1f - 1.6f * dt;
                     if (vel[i].y < -320f) vel[i].y = -320f;
                     bits[i].anchoredPosition += vel[i] * dt;
+                    // Bounce off the safe side edges so nothing clips at the canvas border.
+                    var bp = bits[i].anchoredPosition;
+                    if (Mathf.Abs(bp.x) > wall) { bp.x = Mathf.Sign(bp.x) * wall; vel[i].x = -vel[i].x * 0.5f; bits[i].anchoredPosition = bp; }
                     bits[i].localRotation = Quaternion.Euler(0f, 0f, spin[i] * t);
                     bits[i].localScale = new Vector3(Mathf.Sin(t * flip[i]), 1f, 1f);
                     if (t > 2.4f)
