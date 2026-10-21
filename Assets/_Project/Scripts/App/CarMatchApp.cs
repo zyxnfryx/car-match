@@ -619,7 +619,8 @@ namespace CarMatch
 
         void Booster(string name, int cost, float x, float y, bool legal, UnityEngine.Events.UnityAction action)
         {
-            bool afford = Economy.CanAfford(Purse.Wallet, cost);
+            bool free = FreeBoosters.IsFree(PrefsFlags.Shared, name);
+            bool afford = free || Economy.CanAfford(Purse.Wallet, cost);
             var button = MakeButton(new Vector2(x, y), new Vector2(220f, 200f), new Color(0.22f, 0.45f, 0.82f, 1f), name, 40, action, "btn_booster");
             // Unaffordable boosters stay tappable so the tap can explain itself (shake + toast + coin popup).
             if (!afford)
@@ -644,6 +645,15 @@ namespace CarMatch
             var costLabel = AddText(chip, cost.ToString(), 30, afford ? Cream : new Color(1f, 0.55f, 0.5f, 1f), TextAnchor.MiddleCenter);
             costLabel.rectTransform.offsetMin = new Vector2(30f, 0f);
             costLabel.font = ChunkyFont();
+            if (free)
+            {
+                // '1 FREE' badge replaces the price until the free use is spent.
+                coin.gameObject.SetActive(false);
+                chipImage.color = new Color(0.30f, 0.80f, 0.35f, 1f);
+                costLabel.text = "1 FREE";
+                costLabel.color = Color.white;
+                costLabel.rectTransform.offsetMin = Vector2.zero;
+            }
         }
 
         bool CanMagnet()
@@ -991,10 +1001,10 @@ namespace CarMatch
 
         void OnUndo()
         {
-            if (!Ready(Economy.UndoCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Undo") ? 0 : Economy.UndoCost)) return;
             Board restored;
             if (!BoosterKit.Undo(_history, out restored)) return;
-            if (!Purse.TrySpend(Economy.UndoCost)) return;
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Undo", Economy.UndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterUndo);
             _board = restored;
             _lastMatch = false;
@@ -1003,10 +1013,10 @@ namespace CarMatch
 
         void OnSuper()
         {
-            if (!Ready(Economy.SuperUndoCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Super") ? 0 : Economy.SuperUndoCost)) return;
             Board restored;
             if (!BoosterKit.SuperUndo(_history, out restored)) return;
-            if (!Purse.TrySpend(Economy.SuperUndoCost)) return;
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Super", Economy.SuperUndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterSuper);
             _board = restored;
             _lastMatch = false;
@@ -1015,14 +1025,14 @@ namespace CarMatch
 
         void OnShuffle()
         {
-            if (!Ready(Economy.ShuffleCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Shuffle") ? 0 : Economy.ShuffleCost)) return;
             _history.Add(_board.Clone());
             if (!BoosterKit.Shuffle(_board, new System.Random()))
             {
                 _history.RemoveAt(_history.Count - 1);
                 return;
             }
-            if (!Purse.TrySpend(Economy.ShuffleCost))
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Shuffle", Economy.ShuffleCost, Purse.TrySpend))
             {
                 Board back;
                 BoosterKit.Undo(_history, out back);
@@ -1036,7 +1046,7 @@ namespace CarMatch
 
         void OnMagnet()
         {
-            if (!Ready(Economy.MagnetCost)) return;
+            if (!Ready(FreeBoosters.IsFree(PrefsFlags.Shared, "Magnet") ? 0 : Economy.MagnetCost)) return;
             _history.Add(_board.Clone());
             if (!BoosterKit.Magnet(_board))
             {
@@ -1045,7 +1055,7 @@ namespace CarMatch
                 _history.RemoveAt(_history.Count - 1);
                 return;
             }
-            if (!Purse.TrySpend(Economy.MagnetCost))
+            if (!FreeBoosters.Pay(PrefsFlags.Shared, "Magnet", Economy.MagnetCost, Purse.TrySpend))
             {
                 Board back;
                 BoosterKit.Undo(_history, out back);

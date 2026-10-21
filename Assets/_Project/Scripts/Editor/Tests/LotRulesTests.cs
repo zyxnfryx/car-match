@@ -102,6 +102,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_EachIsFreeOnceThenPriced()
+        {
+            RuleChecks.EachBoosterOnceFree();
+        }
+
+        [Test]
         public void Eyes_OpenOnlyWhenTheExitIsClear()
         {
             RuleChecks.OpenEyesOnlyOnAClearExit();

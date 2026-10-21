@@ -396,6 +396,7 @@ namespace CarMatch
             AllLevelsSolvable(json);
             BoostersOnEveryLevel(json);
             LevelsAreUnique(json);
+            EachBoosterOnceFree();
         }
 
         static Board Tiny(string lanes, string sides = null)
@@ -531,6 +532,27 @@ namespace CarMatch
                 if (seen.TryGetValue(key, out other))
                     throw new System.InvalidOperationException("level " + def.Number + " repeats level " + other);
                 seen[key] = def.Number;
+            }
+        }
+
+        // Every booster is free exactly once, then costs its normal price; a fresh store (existing player) starts free.
+        public static void EachBoosterOnceFree()
+        {
+            var store = new MemoryFlags();
+            int[] costs = { Economy.UndoCost, Economy.ShuffleCost, Economy.SuperUndoCost, Economy.MagnetCost };
+            for (int i = 0; i < FreeBoosters.Names.Length; i++)
+            {
+                string name = FreeBoosters.Names[i];
+                int coins = 0;
+                int charged = -1;
+                System.Func<int, bool> spend = delegate (int c) { if (coins < c) return false; coins -= c; charged = c; return true; };
+                Expect(FreeBoosters.IsFree(store, name), name + " starts free");
+                Expect(FreeBoosters.Pay(store, name, costs[i], spend) && charged < 0, name + " first use is free with 0 coins");
+                Expect(!FreeBoosters.IsFree(store, name), name + " free use is spent");
+                Expect(!FreeBoosters.Pay(store, name, costs[i], spend), name + " second use needs coins");
+                coins = costs[i];
+                Expect(FreeBoosters.Pay(store, name, costs[i], spend) && charged == costs[i] && coins == 0, name + " then charges the normal price");
+                Expect(FreeBoosters.Key(name).StartsWith("lotloop."), name + " key is under lotloop.*");
             }
         }
     }
