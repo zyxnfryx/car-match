@@ -195,7 +195,8 @@ def backdrop(W=1080,Hh=2340):
     for i in range(-6,7):
         x0=W/2+i*170; t0=0.06; 
         xa=vx+(x0-vx)*((lotTop+30-vy)/(Hh-vy)); d.line([(xa,lotTop+30),(x0,Hh)],fill=(235,232,220,200),width=10)
-    for c,(xx,yy,sc) in zip(['red','blue','yellow','teal','green','purple'],[(90,1640,0.9),(980,1700,0.95),(250,1980,1.0),(860,2040,1.0),(70,2260,1.0),(1010,2290,1.0)]):
+    # Decorative cars are now live UI on the home screen (placed for the real safe area), not painted in.
+    for c,(xx,yy,sc) in zip([],[(90,1640,0.9),(980,1700,0.95),(250,1980,1.0),(860,2040,1.0),(70,2260,1.0),(1010,2290,1.0)]):
         p=os.path.join(ROOT,f'Assets/_Project/Art/Cars/car_{c}_open.png')
         if os.path.exists(p):
             car=Image.open(p).convert('RGBA'); car=car.resize((int(260*sc),int(260*sc)),Image.LANCZOS)

@@ -20,6 +20,8 @@ namespace CarMatch
         public const int MaxLives = 5;
         public const int LifeRegenSeconds = 20 * 60;
         public const int StartCoins = 400;
+        // Rewarded-video coin bonus. Placeholder equal to one win's pay; Brandon to set the real number.
+        public const int AdCoinReward = WinPay;
 
         public static int Pay(bool won) => won ? WinPay : FailPay;
 

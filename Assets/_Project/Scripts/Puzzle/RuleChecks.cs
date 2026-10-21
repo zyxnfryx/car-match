@@ -395,6 +395,7 @@ namespace CarMatch
             LivesSpendAndRegen();
             AllLevelsSolvable(json);
             BoostersOnEveryLevel(json);
+            LevelsAreUnique(json);
         }
 
         static Board Tiny(string lanes, string sides = null)
@@ -517,6 +518,20 @@ namespace CarMatch
         static void Ensure(bool ok, string message)
         {
             if (!ok) throw new System.InvalidOperationException(message);
+        }
+
+        // No two levels may share the same layout and colors.
+        public static void LevelsAreUnique(string json)
+        {
+            var seen = new Dictionary<string, int>();
+            foreach (var def in LevelJson.Parse(json))
+            {
+                string key = BoardQuery.Key(def.Board);
+                int other;
+                if (seen.TryGetValue(key, out other))
+                    throw new System.InvalidOperationException("level " + def.Number + " repeats level " + other);
+                seen[key] = def.Number;
+            }
         }
     }
 }

@@ -53,30 +53,30 @@
   },
   {
    "id": "lot-004",
-   "title": "Plaza Court",
+   "title": "Pier Garage",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "coral",
+     "teal",
      "teal"
     ],
     [
      "coral",
      "teal",
-     "teal"
+     "coral"
     ]
    ]
   },
   {
    "id": "lot-005",
-   "title": "Corner Bay",
+   "title": "Pier Stop",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "coral",
-     "teal"
+     "teal",
+     "coral"
     ],
     [
      "coral",
@@ -104,18 +104,18 @@
   },
   {
    "id": "lot-007",
-   "title": "Festival Square",
+   "title": "Garden Circle",
    "blurb": "",
    "lanes": [
     [
-     "coral",
      "teal",
-     "teal"
+     "teal",
+     "coral"
     ],
     [
      "coral",
-     "teal",
-     "coral"
+     "coral",
+     "teal"
     ]
    ]
   },
@@ -178,21 +178,21 @@
   },
   {
    "id": "lot-011",
-   "title": "Arcade Loop",
+   "title": "Sunny Lane",
    "blurb": "",
    "lanes": [
     [
      "coral",
      "coral",
-     "teal",
      "amber",
+     "teal",
      "amber"
     ],
     [
      "coral",
+     "amber",
      "teal",
-     "teal",
-     "amber"
+     "teal"
     ]
    ]
   },

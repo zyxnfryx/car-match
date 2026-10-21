@@ -96,6 +96,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Levels_NoTwoShareALayout()
+        {
+            RuleChecks.LevelsAreUnique(Json());
+        }
+
+        [Test]
         public void Eyes_OpenOnlyWhenTheExitIsClear()
         {
             RuleChecks.OpenEyesOnlyOnAClearExit();
