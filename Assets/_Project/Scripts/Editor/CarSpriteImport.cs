@@ -10,12 +10,27 @@ namespace CarMatch.Editor
     {
         const string Cars = "Assets/_Project/Art/Cars/";
         const string Mascot = "Assets/_Project/Art/Mascot/";
+        // Painted UI, the 16-heading drive frames and the eye-open frames load from Resources.
+        static readonly string[] Extra =
+        {
+            "Assets/_Project/Resources/UI/",
+            "Assets/_Project/Resources/Cars16/",
+            "Assets/_Project/Resources/CarEyes/"
+        };
+
+        static bool IsExtra(string path)
+        {
+            for (int i = 0; i < Extra.Length; i++)
+                if (path.StartsWith(Extra[i], System.StringComparison.Ordinal)) return true;
+            return false;
+        }
 
         void OnPreprocessTexture()
         {
             var path = assetPath.Replace('\\', '/');
             if (!path.StartsWith(Cars, System.StringComparison.Ordinal) &&
-                !path.StartsWith(Mascot, System.StringComparison.Ordinal))
+                !path.StartsWith(Mascot, System.StringComparison.Ordinal) &&
+                !IsExtra(path))
                 return;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Sprite;

@@ -170,21 +170,26 @@ namespace CarMatch
             _busy = false;
             ClearScreen();
             Backdrop();
-            Arch(new Vector2(-250f, 260f), new Vector2(180f, 320f), new Color(0.93f, 0.86f, 0.72f, 1f));
-            Arch(new Vector2(230f, 300f), new Vector2(150f, 260f), new Color(0.55f, 0.70f, 0.78f, 1f));
-            Arch(new Vector2(0f, 180f), new Vector2(220f, 280f), new Color(0.96f, 0.90f, 0.80f, 1f));
-            Hud(820f);
-            var mascot = Place(_screen, "Mascot", new Vector2(0f, 120f), new Vector2(520f, 520f));
+            Hud(0f);
+            // Hierarchy: HUD (safe top) > title > mascot on its light pool > tagline > Play.
+            var pool = Place(_screen, "MascotPool", new Vector2(0f, -40f), new Vector2(760f, 260f));
+            var poolImage = pool.gameObject.AddComponent<Image>();
+            poolImage.sprite = UiArt.Get("glow") ?? SpriteKit.Round;
+            poolImage.color = new Color(1f, 0.95f, 0.80f, 0.55f);
+            poolImage.raycastTarget = false;
+            var mascot = Place(_screen, "Mascot", new Vector2(0f, 110f), new Vector2(560f, 560f));
             var pic = mascot.gameObject.AddComponent<Image>();
             pic.sprite = PaintedMascot(celebrate ? MascotArt.Happy : MascotArt.Idle);
             pic.preserveAspect = true;
             pic.raycastTarget = false;
             if (celebrate) StartCoroutine(CheerHome(mascot, pic));
-            Label(new Vector2(0f, -250f), new Vector2(800f, 90f), "Lot Loop", 72, Cream, TextAnchor.MiddleCenter);
-            Label(new Vector2(0f, -330f), new Vector2(800f, 50f), "Clear the lane. Match three.", 32, new Color(1f, 0.95f, 0.88f, 1f), TextAnchor.MiddleCenter);
+            var title = Label(new Vector2(0f, 560f), new Vector2(980f, 200f), "Lot Loop", 150, Cream, TextAnchor.MiddleCenter);
+            Outlined(title, new Color(0.35f, 0.12f, 0.10f, 1f), 6f);
+            var tag = Label(new Vector2(0f, -250f), new Vector2(900f, 64f), "Clear the lane. Match three.", 44, Cream, TextAnchor.MiddleCenter);
+            Outlined(tag, new Color(0.10f, 0.12f, 0.28f, 0.8f), 3f);
             int number = NextNumber();
             bool canPlay = _levels.Count > 0 && Purse.Wallet.Lives > 0;
-            var play = MakeButton(new Vector2(0f, -500f), new Vector2(640f, 170f), Green, "Level " + number, 64, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null);
+            var play = MakeButton(new Vector2(0f, -470f), new Vector2(680f, 184f), Green, "Level " + number, 64, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null);
             play.interactable = canPlay;
         }
 
@@ -884,6 +889,45 @@ namespace CarMatch
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
             rt.sizeDelta = Vector2.zero;
+            var painted = UiArt.Get("home_bg");
+            if (painted == null) return;
+            var bg = Place(_screen, "Backdrop", Vector2.zero, new Vector2(1080f, 2340f));
+            var bgImage = bg.gameObject.AddComponent<Image>();
+            bgImage.sprite = painted;
+            bgImage.raycastTarget = false;
+            var fit = bg.gameObject.AddComponent<AspectRatioFitter>();
+            fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fit.aspectRatio = painted.rect.width / painted.rect.height;
+        }
+
+        static RectTransform Stretch(Transform parent, string name)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            return rt;
+        }
+
+        // Safe-area aware layer for anything pinned to the top edge.
+        RectTransform SafeLayer()
+        {
+            var rt = Stretch(_screen, "Safe");
+            rt.gameObject.AddComponent<SafeArea>();
+            return rt;
+        }
+
+        static void Outlined(Text text, Color color, float size)
+        {
+            var outline = text.gameObject.AddComponent<Outline>();
+            outline.effectColor = color;
+            outline.effectDistance = new Vector2(size, -size);
+            var shadow = text.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = new Color(0f, 0f, 0f, 0.35f);
+            shadow.effectDistance = new Vector2(0f, -size * 1.6f);
         }
 
         void Arch(Vector2 pos, Vector2 size, Color color)
@@ -898,13 +942,15 @@ namespace CarMatch
 
         void Hud(float y)
         {
-            Pill(new Vector2(-250f, y), SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
-            Pill(new Vector2(250f, y), SpriteKit.Heart, LivesLine(), false);
+            var safe = SafeLayer();
+            Pill(safe, new Vector2(-250f, -70f), SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
+            Pill(safe, new Vector2(250f, -70f), SpriteKit.Heart, LivesLine(), false);
         }
 
-        void Pill(Vector2 pos, Sprite icon, string value, bool coins)
+        void Pill(RectTransform parent, Vector2 pos, Sprite icon, string value, bool coins)
         {
-            var rt = Place(_screen, coins ? "Coins" : "Lives", pos, new Vector2(340f, 88f));
+            var rt = Place(parent, coins ? "Coins" : "Lives", pos, new Vector2(340f, 88f));
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 1f);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = SpriteKit.Round;
             image.type = Image.Type.Sliced;
