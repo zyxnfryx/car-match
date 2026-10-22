@@ -74,6 +74,8 @@ namespace CarMatch
         const float BarSlotWidth = 112f;
         const float BarGap = 10f;
         const float BarCarH = 100f;
+        // Parked-bar trucks fill their well snugly (longer-bed art sits ~8% smaller in its canvas).
+        const float BarCarScale = 1.12f;
 
         struct LotMetrics
         {
@@ -480,15 +482,16 @@ namespace CarMatch
             // Tight packing: thin painted lines between lanes instead of wide gaps.
             // Leave room for the ring road on both sides (Lot Loop: cars loop around the lot).
             float gutter = sides ? 130f : 74f;
-            float gap = 8f;
+            // Snug packing sized from the parked truck art (h00 body is ~49% x 81% of its 192px
+            // canvas; the h01/h15 idle glances reach ~67% x 87%). Lane pitch and row pitch are set
+            // from those so neighbours sit close but never overlap, even mid-glance.
+            const float PitchX = 0.70f, PitchY = 0.88f, MaxPiece = 426f;
+            float gap = 6f;
             float availW = 1064f - gutter * 2f;
-            float cellW = (availW - gap * (lanes - 1)) / lanes;
-            if (cellW > 420f) cellW = 420f;
             float availH = 930f;
-            // Fill the width: cars grow until the deepest lane would overflow the lot height.
-            if (cellW * 1.04f * depth > availH) cellW = Mathf.Max(availH / (1.04f * depth), Mathf.Min(cellW, 150f));
-            float cellH = cellW * 1.04f;
-            if (cellH * depth > availH) cellH = availH / depth;
+            float pieceS = Mathf.Min((availW + gap) / (lanes * PitchX), availH / (depth * PitchY), MaxPiece);
+            float cellW = pieceS * PitchX - gap;
+            float cellH = pieceS * PitchY;
             float boardW = lanes * cellW + (lanes - 1) * gap;
             float left = -boardW * 0.5f + cellW * 0.5f;
             float baseY = -370f + cellH * 0.5f;
@@ -500,7 +503,7 @@ namespace CarMatch
                 Gap = gap,
                 Left = left,
                 BaseY = baseY,
-                Piece = new Vector2(cellW + 6f, cellH + 6f)
+                Piece = new Vector2(pieceS, pieceS)
             };
             float roadW = 58f;
             float lotEdge = boardW * 0.5f;
@@ -748,7 +751,7 @@ namespace CarMatch
             float x = _metrics.Left + side.Lane * (_metrics.CellW + _metrics.Gap);
             float dir = side.Lane < _metrics.Lanes * 0.5f ? -1f : 1f;
             if (_metrics.Lanes <= 1) dir = -1f;
-            x += dir * (_metrics.CellW * 0.92f);
+            x += dir * (_metrics.CellW + _metrics.Gap); // one full lane pitch: snug, never overlapping
             return new Vector2(x, _metrics.BaseY + side.Cell * _metrics.CellH);
         }
 
@@ -1024,7 +1027,7 @@ namespace CarMatch
                 seen.Add(e);
                 if (!e.Landed) { _barCars.Add(null); continue; }
                 float x = BarSlotCenter(i, n).x;
-                var size = slotArt != null ? new Vector2(BarSlotWidth + 4f, BarCarH + 8f) : new Vector2(BarSlotWidth - 8f, BarCarH);
+                var size = (slotArt != null ? new Vector2(BarSlotWidth + 4f, BarCarH + 8f) : new Vector2(BarSlotWidth - 8f, BarCarH)) * BarCarScale;
                 float from;
                 if (!_barX.TryGetValue(e, out from)) from = x;
                 var car = Place(tray, "Car", new Vector2(from, y), size);
@@ -1288,7 +1291,7 @@ namespace CarMatch
             // The reserved slot can shift while we drive (later taps insert before it); steer to where it is now.
             var plannedEnd = points[points.Count - 1];
             var startSize = flyer.sizeDelta;
-            var endSize = new Vector2(BarSlotWidth - 8f, BarCarH);
+            var endSize = new Vector2(BarSlotWidth + 4f, BarCarH + 8f) * BarCarScale;
             var image = flyer.GetComponent<Image>();
             Vector2 facing;
             Along(points, 0f, out facing);
@@ -1395,7 +1398,7 @@ namespace CarMatch
             var set = new List<RectTransform>();
             for (int i = 0; i < spots.Count; i++)
             {
-                var rt = Place(_flyLayer, "Pop", spots[i], new Vector2(BarSlotWidth - 8f, BarCarH));
+                var rt = Place(_flyLayer, "Pop", spots[i], new Vector2(BarSlotWidth + 4f, BarCarH + 8f) * BarCarScale);
                 var img = rt.gameObject.AddComponent<Image>();
                 img.sprite = CarArt.For(color, true);
                 img.preserveAspect = true;
