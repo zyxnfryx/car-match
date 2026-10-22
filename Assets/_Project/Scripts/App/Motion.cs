@@ -94,7 +94,7 @@ namespace CarMatch
                 case IdleEyes.Wide: pick = Wide; break;
                 default:
                     float l = _idle.Look;
-                    pick = l < -0.75f ? LookLeftFar : l < -0.3f ? LookLeft : l > 0.75f ? LookRightFar : l > 0.3f ? LookRight : Open;
+                    pick = l < -0.8f ? LookLeftFar : l < -0.45f ? LookLeft : l > 0.8f ? LookRightFar : l > 0.45f ? LookRight : Open;
                     break;
             }
             if (pick == null) pick = Open;

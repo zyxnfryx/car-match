@@ -851,9 +851,9 @@ namespace CarMatch
                     idle.Squint = CarFrames.Eye(car.Color, 2);
                     idle.Wide = CarFrames.Eye(car.Color, 3);
                     idle.LookLeft = CarFrames.Heading(car.Color, 15);
-                    idle.LookLeftFar = CarFrames.Heading(car.Color, 14);
+                    idle.LookLeftFar = idle.LookLeft;   // h14/h02 turn the whole body too far for a glance
                     idle.LookRight = CarFrames.Heading(car.Color, 1);
-                    idle.LookRightFar = CarFrames.Heading(car.Color, 2);
+                    idle.LookRightFar = idle.LookRight;
                     idle.Puff = _idlePuff ?? (_idlePuff = IdlePuff);
                 }
             }
