@@ -6,7 +6,7 @@ Teaching pattern for every new mechanic (Flock Five coach style): a one-line blu
 
 | # | Band (intro level) | Mechanic | Status |
 |---|---|---|---|
-| 1 | 1–2 (1) | Clear lane + match three, 2 lanes, 2 colors | Live |
+| 1 | 1–2 (1) | Clear lane + match three, 2 lanes, 2 colors. A car may leave out **either end** of its lane (front to the bar road, or the back onto the ring road) when that end is clear | Live (rear exit: build 11) |
 | 2 | 3–15 (3) | More lanes (to 6) and colors (to 8), mixing grows each level | Live |
 | 3 | 16–25 (16) | Side lots (carports) | Live |
 | 4 | 26–30 (26) | Mystery boxes: cardboard `?` boxes break when a neighboring car is cleared in a match | Live (build 9) |
@@ -79,6 +79,9 @@ Level token `box:<color>`. A box fills a lane cell, blocks the lane and can't be
 - **Tutorial:** a counter chip on the barrier; the glove points at other lanes first.
 - **Art:** a striped barrier arm, number chip, lift animation.
 - **Data:** `"barriers": [{ "lane": 4, "at": 0, "opensAfter": 5 }]`
+
+## Build 11 retune (rear exits)
+Rear exits made mid/late levels easier. `tools/levels/retune_backexit.py` re-rolled every level from 25 up whose casual-player win rate (`SolveCheck --rate`: 400 greedy playthroughs) rose more than 10 points above its pre-build-11 rate (`tools/levels/rate_before_b11.txt`). It added sets, mixing and `?` cars until the rate was back near its old value. `?` cars and boxes never sit at either end of a lane. Levels 1–24 are unchanged (levels 1–5 still win 100%). All 100 are still Winnable.
 
 ## Rules for adding a mechanic
 1. Add rules in `Assets/_Project/Scripts/Puzzle` (pure C#, no Unity types), then teach `LotSolve` and `RuleChecks`.
