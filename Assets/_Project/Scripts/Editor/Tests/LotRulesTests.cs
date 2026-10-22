@@ -96,6 +96,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Idle_AliveLoopNeverBlocksInput()
+        {
+            RuleChecks.IdleLoopNeverBlocksInput();
+        }
+
+        [Test]
         public void Garages_RefillWhenSpotsClear()
         {
             RuleChecks.GarageRefillsWhenSpotsClear();

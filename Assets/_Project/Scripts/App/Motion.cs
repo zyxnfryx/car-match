@@ -49,25 +49,56 @@ namespace CarMatch
         }
     }
 
-    // Parked cars that can move: blink now and then and glance left and right (slight-heading frames).
+    // Parked trucks feel alive. Awake (movable) trucks look around with eased glances
+    // (left, right, eye contact with the player, a peek at the bar), blink every 2-5 s with
+    // occasional double-blinks and happy squints, bounce with a 3-4% squash/stretch on a
+    // random phase, and puff from the tailpipe every 1.5-3 s. Blocked or sleeping trucks only
+    // breathe. Pure view state: no raycasts, no input gating, no per-frame allocations.
     public sealed class CarIdle : MonoBehaviour
     {
-        public Sprite Open, Blink, LookLeft, LookRight;
-        Image _img; float _next; float _until;
-        void Start() { _img = GetComponent<Image>(); _next = Time.unscaledTime + Random.Range(1.5f, 4f); }
+        public Sprite Open, Blink, Squint, Wide, LookLeft, LookLeftFar, LookRight, LookRightFar;
+        public System.Action<RectTransform> Puff;
+        public bool Awake;
+        AliveIdle _idle; Image _img; RectTransform _rt; EyeAnim _wake; Vector3 _rest; bool _live;
+        static uint _seed = 1;
+
+        void Start()
+        {
+            _img = GetComponent<Image>();
+            _rt = (RectTransform)transform;
+            _rest = _rt.localScale;
+            _idle = AliveIdle.Create(_seed++ * 7919u + (uint)GetInstanceID(), Awake);
+            TryGetComponent(out _wake);
+            _live = true;
+        }
+
+        void OnDisable() { if (_live && _rt != null) { _rt.localScale = _rest; _rt.localRotation = Quaternion.identity; } }
+
         void Update()
         {
-            if (_img == null || Open == null) return;
-            float now = Time.unscaledTime;
-            if (_until > 0f && now >= _until) { _img.sprite = Open; _until = 0f; _next = now + Random.Range(2f, 5f); }
-            if (_until == 0f && now >= _next)
+            if (_img == null) return;
+            if (_wake != null) return;              // let the wake-up / doze-off play first
+            _idle.Tick(Time.unscaledDeltaTime);
+            float up = Awake ? _idle.LookUp : 0f, down = Awake ? _idle.LookDown : 0f;
+            float sy = _idle.ScaleY + 0.02f * up - 0.025f * down;
+            float sx = _idle.ScaleX - 0.01f * up + 0.012f * down;
+            _rt.localScale = new Vector3(_rest.x * sx, _rest.y * sy, 1f);
+            if (!Awake) return;
+            _rt.localRotation = Quaternion.Euler(0f, 0f, -_idle.Look * 1.6f);
+            if (_idle.PuffNow && Puff != null) Puff(_rt);
+            Sprite pick;
+            switch (_idle.Eyes)
             {
-                float r = Random.value;
-                Sprite pick = r < 0.5f ? Blink : (r < 0.75f ? LookLeft : LookRight);
-                if (pick == null) { _next = now + 2f; return; }
-                _img.sprite = pick;
-                _until = now + (pick == Blink ? 0.12f : 0.55f);
+                case IdleEyes.Blink: pick = Blink; break;
+                case IdleEyes.Squint: pick = Squint; break;
+                case IdleEyes.Wide: pick = Wide; break;
+                default:
+                    float l = _idle.Look;
+                    pick = l < -0.75f ? LookLeftFar : l < -0.3f ? LookLeft : l > 0.75f ? LookRightFar : l > 0.3f ? LookRight : Open;
+                    break;
             }
+            if (pick == null) pick = Open;
+            if (_img.sprite != pick) _img.sprite = pick;
         }
     }
 
