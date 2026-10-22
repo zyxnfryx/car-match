@@ -477,7 +477,11 @@ namespace CarMatch
                     float ang = k * 0.0982f, mag = 0.5f + (k % 4) * 0.5f;
                     float ox, oy;
                     lay.PupilOffset((float)System.Math.Cos(ang) * mag, (float)System.Math.Sin(ang) * mag, out ox, out oy);
-                    float e = (ox * ox) / (lay.TravelX * lay.TravelX) + (oy * oy) / (lay.TravelY * lay.TravelY);
+                    // A zero travel axis (side headings) means the pupil must not move on that axis at all.
+                    if (lay.TravelX <= 0f) Expect(ox == 0f, "no horizontal pupil travel when the art allows none");
+                    if (lay.TravelY <= 0f) Expect(oy == 0f, "no vertical pupil travel when the art allows none");
+                    float e = (lay.TravelX > 0f ? (ox * ox) / (lay.TravelX * lay.TravelX) : 0f)
+                        + (lay.TravelY > 0f ? (oy * oy) / (lay.TravelY * lay.TravelY) : 0f);
                     Expect(e <= 1.0001f, "pupil stays inside the travel ellipse");
                 }
             }

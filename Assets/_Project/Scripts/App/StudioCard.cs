@@ -6,7 +6,7 @@ namespace CarMatch
 {
     // ZFX studio card (ported from Flock Five): warm-white cover, ZFX logo, 3 s jingle with a gold
     // sparkle tracing the Z swoosh (StudioSync). The game preloads and lays out Home underneath;
-    // the card holds >= 3.0 s + 0.5 s (max 6 s), fades, then the LOT LOOP formation plays as the intro.
+    // the card holds >= 3.0 s + 0.5 s (max 6 s), fades, then Home shows (music starts then).
     public sealed class StudioCard : MonoBehaviour
     {
         static readonly Color StudioWhite = new Color(0.992f, 0.984f, 0.965f, 1f);
@@ -69,6 +69,7 @@ namespace CarMatch
             _starImg.sprite = spark; _starImg.raycastTarget = false; _starImg.color = new Color(1f, 0.9f, 0.5f, 0f);
             Layout();
             _bg = bgImg;
+            StudioTruck.Attach((RectTransform)transform, _logo);
             _jingle = gameObject.AddComponent<AudioSource>();
             _jingle.playOnAwake = false;
             _jingle.clip = Resources.Load<AudioClip>("Audio/zfx_jingle");
