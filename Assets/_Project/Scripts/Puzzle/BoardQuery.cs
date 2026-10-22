@@ -20,6 +20,8 @@ namespace CarMatch
             }
             for (int s = 0; s < board.Sides.Count; s++)
                 if (board.Sides[s].Queue.Count > 0) return false;
+            for (int g = 0; g < board.Garages.Count; g++)
+                if (board.Garages[g].Queue.Count > 0) return false;
             return true;
         }
 
@@ -37,6 +39,23 @@ namespace CarMatch
         {
             int n = 0;
             Each(board, delegate { n++; });
+            return n;
+        }
+
+        // Colors on the surface only (not still underground in a garage); what the magnet can reach.
+        public static int[] SurfaceHistogram(Board board)
+        {
+            var n = Histogram(board);
+            if (board == null) return n;
+            for (int g = 0; g < board.Garages.Count; g++)
+            {
+                var queue = board.Garages[g].Queue;
+                for (int q = 0; q < queue.Count; q++)
+                {
+                    int i = (int)queue[q].Color;
+                    if ((uint)i < (uint)n.Length) n[i]--;
+                }
+            }
             return n;
         }
 
@@ -99,6 +118,12 @@ namespace CarMatch
                 for (int q = 0; q < queue.Count; q++)
                     visit(queue[q]);
             }
+            for (int g = 0; g < board.Garages.Count; g++)
+            {
+                var queue = board.Garages[g].Queue;
+                for (int q = 0; q < queue.Count; q++)
+                    visit(queue[q]);
+            }
         }
 
         // Bar is a multiset. Hidden flags are view-only, so they stay out of the key.
@@ -141,6 +166,13 @@ namespace CarMatch
                 for (int q = 0; q < side.Queue.Count; q++)
                     sb.Append((int)side.Queue[q].Color);
                 sb.Append(';');
+            }
+            for (int g = 0; g < board.Garages.Count; g++)
+            {
+                sb.Append('G');
+                var queue = board.Garages[g].Queue;
+                for (int q = 0; q < queue.Count; q++)
+                    sb.Append((int)queue[q].Color);
             }
             sb.Append('B');
             var bar = new List<CarColor>(board.Bar);

@@ -65,6 +65,7 @@ namespace CarMatch
     {
         public readonly List<Lane> Lanes = new List<Lane>();
         public readonly List<SideLot> Sides = new List<SideLot>();
+        public readonly List<Garage> Garages = new List<Garage>();
         public readonly List<CarColor> Bar = new List<CarColor>();
         // Parallel to Bar: where each bar car came from (lane * 100 + cell), or -1 for side lots and tunnels' queues.
         public readonly List<int> BarFrom = new List<int>();
@@ -78,6 +79,8 @@ namespace CarMatch
                 copy.Lanes.Add(Lanes[i].Clone());
             for (int i = 0; i < Sides.Count; i++)
                 copy.Sides.Add(Sides[i].Clone());
+            for (int i = 0; i < Garages.Count; i++)
+                copy.Garages.Add(Garages[i].Clone());
             copy.Bar.AddRange(Bar);
             copy.BarFrom.AddRange(BarFrom);
             while (copy.BarFrom.Count < copy.Bar.Count) copy.BarFrom.Add(-1);

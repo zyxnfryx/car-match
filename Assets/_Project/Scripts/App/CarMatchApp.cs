@@ -264,6 +264,7 @@ namespace CarMatch
             _seed = _board.Clone();
             _history.Clear();
             _eyes.Clear();
+            _garageOpens.Clear();
             _settled = false;
             _failPaid = false;
             _lastMatch = false;
@@ -295,6 +296,7 @@ namespace CarMatch
             DrawBar();
             DrawBoosters();
             if (_level != null && _level.SuperHard) SuperHardBadge(new Vector2(0f, 650f));
+            if (_fly != null) GarageRampFx();
             if (_pendingBoxBreaks.Count > 0)
             {
                 var breaks = new List<int[]>(_pendingBoxBreaks);
@@ -459,6 +461,7 @@ namespace CarMatch
             _metrics.RingBottom = baseY - cellH * 0.5f - Mathf.Min(cellH * 0.45f, 64f) - 8f;
             _metrics.RingR0 = Mathf.Min(90f, (_metrics.RingTop - _metrics.RingBottom) * 0.3f);
             DrawLot(lanes, depth, boardW, gutter);
+            DrawGarages();
 
             var piece = _metrics.Piece;
             for (int lane = 0; lane < lanes; lane++)
@@ -596,6 +599,83 @@ namespace CarMatch
                 for (int i = 0; i < n; i++) pts.Add(Vector2.Lerp(from, nxt, i / (float)n));
             }
             return pts;
+        }
+
+        readonly Dictionary<int, int> _garageOpens = new Dictionary<int, int>();
+
+        // Underground garages: a striped hatch under its spots with the count still below.
+        // When a hatch has just opened, the new cars ride a curved ramp (a small loop) up into place.
+        void DrawGarages()
+        {
+            for (int gi = 0; gi < _board.Garages.Count; gi++)
+            {
+                var g = _board.Garages[gi];
+                if (g.Cells.Count == 0) continue;
+                float y0 = float.MaxValue, y1 = float.MinValue;
+                for (int i = 0; i < g.Cells.Count; i++)
+                {
+                    var a = LaneAnchor(g.Lane, g.Cells[i]);
+                    y0 = Mathf.Min(y0, a.y); y1 = Mathf.Max(y1, a.y);
+                }
+                var c = new Vector2(LaneAnchor(g.Lane, 0).x, (y0 + y1) * 0.5f);
+                var size = new Vector2(_metrics.CellW - 14f, y1 - y0 + _metrics.CellH - 14f);
+                Bar("GarageRim", c, size + new Vector2(12f, 12f), new Color(0.98f, 0.80f, 0.15f, g.Queue.Count > 0 ? 1f : 0.35f));
+                Bar("GarageHatch", c, size, new Color(0.12f, 0.12f, 0.15f, 1f));
+                for (float sy = -size.y * 0.5f + 18f; sy < size.y * 0.5f - 10f; sy += 36f)
+                    Bar("GarageStripe", c + new Vector2(0f, sy), new Vector2(size.x - 16f, 6f), new Color(0.98f, 0.80f, 0.15f, 0.35f));
+                if (g.Queue.Count > 0)
+                {
+                    var badge = Place(_screen, "GarageCount", c + new Vector2(size.x * 0.5f - 26f, size.y * 0.5f - 26f), new Vector2(64f, 52f));
+                    var bi = badge.gameObject.AddComponent<Image>();
+                    bi.sprite = SpriteKit.Round;
+                    bi.type = Image.Type.Sliced;
+                    bi.color = new Color(0.98f, 0.80f, 0.15f, 1f);
+                    bi.raycastTarget = false;
+                    var t = AddText(badge, g.Queue.Count.ToString(), 34, Ink, TextAnchor.MiddleCenter);
+                    t.font = ChunkyFont();
+                    badge.SetAsLastSibling();
+                }
+            }
+        }
+
+        void GarageRampFx()
+        {
+            for (int gi = 0; gi < _board.Garages.Count; gi++)
+            {
+                var g = _board.Garages[gi];
+                int seen;
+                _garageOpens.TryGetValue(gi, out seen);
+                _garageOpens[gi] = g.Opens;
+                if (g.Opens <= seen) continue;
+                for (int i = 0; i < g.Cells.Count; i++)
+                {
+                    RectTransform rt;
+                    if (_pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, g.Lane, g.Cells[i])), out rt) && rt != null)
+                        _fly.StartCoroutine(RampUp(rt, i * 0.06f));
+                }
+            }
+        }
+
+        IEnumerator RampUp(RectTransform rt, float delay)
+        {
+            var home = rt.anchoredPosition;
+            rt.localScale = Vector3.zero;
+            if (delay > 0f) yield return new WaitForSecondsRealtime(delay);
+            float t = 0f;
+            const float dur = 0.42f, r = 34f;
+            while (t < dur && rt != null)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                float k = 1f - (1f - u) * (1f - u);
+                // Spiral up out of the hatch: one turn of a shrinking loop while growing to full size.
+                float ang = k * Mathf.PI * 2f;
+                rt.anchoredPosition = home + new Vector2(Mathf.Sin(ang), -Mathf.Cos(ang) + 1f) * r * (1f - k);
+                rt.localScale = Vector3.one * Mathf.Lerp(0.3f, 1f, k);
+                rt.localRotation = Quaternion.Euler(0f, 0f, -ang * Mathf.Rad2Deg * (1f - k));
+                yield return null;
+            }
+            if (rt != null) { rt.anchoredPosition = home; rt.localScale = Vector3.one; rt.localRotation = Quaternion.identity; }
         }
 
         void Bar(string name, Vector2 pos, Vector2 size, Color color)
@@ -968,7 +1048,7 @@ namespace CarMatch
         bool CanMagnet()
         {
             if (_board == null) return false;
-            var hist = BoardQuery.Histogram(_board);
+            var hist = BoardQuery.SurfaceHistogram(_board);
             for (int i = 0; i < hist.Length; i++)
                 if (hist[i] >= MatchClear.Set) return true;
             return false;

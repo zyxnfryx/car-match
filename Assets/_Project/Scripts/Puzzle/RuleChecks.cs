@@ -317,6 +317,38 @@ namespace CarMatch
             Expect(same, what);
         }
 
+        static Board Garaged(string lanes, string garages)
+        {
+            string json = "{\"levels\":[{\"id\":\"t\",\"title\":\"T\",\"lanes\":" + lanes + ",\"garages\":" + garages + "}]}";
+            return LevelJson.Parse(json)[0].Board;
+        }
+
+        // Underground garage: the hatch under spots (0,1)-(0,2) opens only when both are empty,
+        // then queued cars come up hidden into those spots; the lot is not clear until it is empty.
+        public static void GarageRefillsWhenSpotsClear()
+        {
+            var board = Garaged("[[\"teal\",\"coral\",\"amber\",\"lime\"],[\"coral\",\"coral\"]]",
+                "[{\"lane\":0,\"cells\":[1,2],\"cars\":[\"amber\",\"amber\",\"teal\"]}]");
+            var g = board.Garages[0];
+            Expect(g.Queue.Count == 3, "three cars wait underground");
+            Expect(!BoardQuery.IsClear(board), "garage cars count");
+            Expect(BoardQuery.Count(board, CarColor.Amber) == 3, "amber counted underground too");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0)); // teal (front)
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 1)); // coral leaves spot 1
+            Expect(g.Queue.Count == 3 && g.Opens == 0, "hatch stays shut while spot 2 is taken");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 2)); // amber leaves spot 2
+            Expect(g.Opens == 1 && g.Queue.Count == 1, "hatch opened and two cars came up");
+            var up = board.Lanes[0].Cells[1];
+            Expect(!up.Empty && up.Car.Color == CarColor.Amber, "first queued car parks on the first spot");
+            Expect(!up.Car.Hidden, "the arrival at the open front is revealed");
+            Expect(board.Lanes[0].Cells[2].Car.Hidden, "the one behind stays a '?' (lime still parks behind it)");
+            var r = LotSolve.Search(board);
+            Expect(r.Outlook == LotSolve.Outlook.Winnable, "the solver plays through the garage");
+            var copy = board.Clone();
+            Expect(copy.Garages.Count == 1 && copy.Garages[0].Queue.Count == 1, "clone keeps the garage");
+            Expect(BoardQuery.Key(copy) == BoardQuery.Key(board), "key includes the garage");
+        }
+
         public static void MagnetPullsASetOfThree()
         {
             var board = Tiny("[[\"coral\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
@@ -556,6 +588,7 @@ namespace CarMatch
             ShuffleKeepsColorCounts();
             ShuffleRefusesWhenNothingCanChange();
             RapidMultiTap();
+            GarageRefillsWhenSpotsClear();
             BackOfLaneCanExit();
             ReservedSlotsMatchInOrder();
             ReservedSlotsCountTowardFail();

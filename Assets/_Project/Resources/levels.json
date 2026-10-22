@@ -465,33 +465,36 @@
   },
   {
    "id": "lot-021",
-   "title": "Hilltop Lane",
-   "blurb": "",
+   "title": "Underground",
+   "blurb": "Clear the spots on a hatch and more cars drive up from below.",
    "lanes": [
     [
+     "coral",
      "teal",
-     "amber",
+     "teal"
+    ],
+    [
+     "teal",
+     "coral",
      "amber"
     ],
     [
-     "coral",
      "amber",
-     "coral"
-    ],
-    [
-     "teal",
-     "teal",
+     "amber",
      "coral"
     ]
    ],
-   "sides": [
+   "garages": [
     {
-     "lane": 0,
-     "at": 0,
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
      "cars": [
-      "coral",
-      "coral",
-      "coral"
+      "lime",
+      "lime",
+      "lime"
      ]
     }
    ]
@@ -523,6 +526,20 @@
      "at": 1,
      "cars": [
       "teal",
+      "coral",
+      "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "coral",
       "coral",
       "coral"
      ]
@@ -560,6 +577,20 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -591,6 +622,20 @@
      "cars": [
       "coral",
       "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
      ]
     }
    ]
@@ -626,6 +671,20 @@
      "at": 0,
      "cars": [
       "lime",
+      "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "coral",
+      "coral",
       "coral"
      ]
     }
@@ -693,6 +752,20 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -729,6 +802,20 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -763,6 +850,20 @@
      "cars": [
       "lime",
       "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
      ]
     }
    ]
@@ -808,6 +909,20 @@
       "amber",
       "coral",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "lime"
      ]
     }
    ]
@@ -877,6 +992,20 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -912,6 +1041,20 @@
      "lane": 1,
      "at": 0,
      "cars": [
+      "coral",
+      "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "coral",
       "coral",
       "coral"
      ]
@@ -955,6 +1098,20 @@
       "teal"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -994,6 +1151,20 @@
      "cars": [
       "teal",
       "lime"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
      ]
     }
    ]
@@ -1063,6 +1234,20 @@
       "teal"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -1110,6 +1295,20 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -1146,6 +1345,20 @@
      "at": 0,
      "cars": [
       "lime",
+      "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "teal",
+      "teal",
       "teal"
      ]
     }
@@ -1196,6 +1409,20 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -1235,6 +1462,20 @@
       "teal",
       "amber",
       "violet"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral"
      ]
     }
    ]
@@ -1287,6 +1528,20 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -1329,6 +1584,20 @@
      "cars": [
       "teal",
       "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
      ]
     }
    ]
@@ -1374,6 +1643,20 @@
       "amber",
       "amber",
       "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
      ]
     }
    ]
@@ -1426,6 +1709,20 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "violet",
+      "violet",
+      "violet"
+     ]
+    }
    ]
   },
   {
@@ -1476,6 +1773,20 @@
       "violet"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -1521,6 +1832,20 @@
      "cars": [
       "coral",
       "lime",
+      "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "teal",
+      "teal",
       "teal"
      ]
     }
@@ -1586,6 +1911,20 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -1629,6 +1968,20 @@
      "cars": [
       "teal",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "lime"
      ]
     }
    ]
@@ -1684,6 +2037,20 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -1735,6 +2102,23 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "coral",
+      "teal",
+      "coral",
+      "teal",
+      "coral",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -1778,6 +2162,23 @@
       "teal",
       "violet",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "coral",
+      "coral",
+      "amber",
+      "coral"
      ]
     }
    ]
@@ -1824,6 +2225,23 @@
       "amber",
       "coral",
       "violet"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "violet",
+      "violet",
+      "teal",
+      "teal",
+      "violet",
+      "teal"
      ]
     }
    ]
@@ -1877,6 +2295,23 @@
       "violet"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "teal",
+      "lime",
+      "lime",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -1921,6 +2356,23 @@
      "cars": [
       "amber",
       "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber",
+      "amber",
+      "amber",
+      "amber"
      ]
     }
    ]
@@ -1971,6 +2423,23 @@
       "violet",
       "lime",
       "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "lime",
+      "amber",
+      "amber",
+      "amber"
      ]
     }
    ]
@@ -2034,6 +2503,23 @@
       "sky"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "teal",
+      "teal",
+      "teal",
+      "sky"
+     ]
+    }
    ]
   },
   {
@@ -2091,6 +2577,23 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "violet",
+      "lime",
+      "lime",
+      "violet",
+      "violet",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -2138,6 +2641,23 @@
      "cars": [
       "coral",
       "coral",
+      "lime"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "violet",
+      "lime",
+      "violet",
+      "lime",
+      "violet",
       "lime"
      ]
     }
@@ -2208,6 +2728,23 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -2256,6 +2793,23 @@
      "cars": [
       "amber",
       "lime"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "sky",
+      "lime",
+      "lime",
+      "lime",
+      "sky",
+      "sky"
      ]
     }
    ]
@@ -2307,6 +2861,23 @@
       "lime",
       "lime",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral"
      ]
     }
    ]
@@ -2371,6 +2942,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "sky",
+      "sky",
+      "sky",
+      "sky"
+     ]
+    }
    ]
   },
   {
@@ -2423,6 +3011,23 @@
      "cars": [
       "amber",
       "violet"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "sky",
+      "teal",
+      "teal",
+      "sky",
+      "sky",
+      "teal"
      ]
     }
    ]
@@ -2490,6 +3095,23 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      6,
+      7
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "sky",
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -2550,6 +3172,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -2607,6 +3246,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "teal",
+      "coral",
+      "coral",
+      "teal",
+      "coral",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -2657,6 +3313,23 @@
      "at": 0,
      "cars": [
       "lime",
+      "amber",
+      "violet"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "amber",
+      "violet",
+      "violet",
+      "amber",
       "amber",
       "violet"
      ]
@@ -2719,6 +3392,23 @@
      "cars": [
       "lime",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "lime",
+      "lime",
+      "lime",
+      "lime"
      ]
     }
    ]
@@ -2787,6 +3477,23 @@
       "teal"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "lime",
+      "teal",
+      "teal",
+      "teal",
+      "lime",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -2843,6 +3550,23 @@
       "sky",
       "lime",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "sky",
+      "sky",
+      "sky",
+      "sky"
      ]
     }
    ]
@@ -2915,6 +3639,23 @@
       "sky"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "violet",
+      "amber",
+      "violet",
+      "amber",
+      "violet",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -2980,6 +3721,23 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "violet",
+      "violet",
+      "violet",
+      "sky"
+     ]
+    }
    ]
   },
   {
@@ -3040,6 +3798,23 @@
      "cars": [
       "rose",
       "sky"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "rose",
+      "rose",
+      "rose",
+      "rose",
+      "rose",
+      "rose"
      ]
     }
    ]
@@ -3107,6 +3882,23 @@
       "rose"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "amber",
+      "amber",
+      "amber",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -3167,6 +3959,23 @@
       "lime",
       "violet",
       "rose"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral",
+      "coral"
      ]
     }
    ]
@@ -3238,6 +4047,23 @@
       "rose"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "lime",
+      "sky",
+      "sky",
+      "sky",
+      "lime",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -3306,6 +4132,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "amber",
+      "amber",
+      "teal",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -3368,6 +4211,23 @@
      "cars": [
       "rose",
       "rose"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "teal",
+      "teal",
+      "violet",
+      "violet",
+      "teal",
+      "violet"
      ]
     }
    ]
@@ -3451,6 +4311,23 @@
       "violet"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "sky",
+      "sky",
+      "sky",
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
@@ -3530,6 +4407,23 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      5,
+      6
+     ],
+     "cars": [
+      "sky",
+      "rose",
+      "sky",
+      "rose",
+      "sky",
+      "rose"
+     ]
+    }
    ]
   },
   {
@@ -3592,6 +4486,23 @@
       "coral",
       "coral",
       "sky"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "amber",
+      "teal",
+      "teal",
+      "amber",
+      "amber"
      ]
     }
    ]
@@ -3668,6 +4579,23 @@
       "teal"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "rose",
+      "coral",
+      "rose",
+      "coral",
+      "coral",
+      "rose"
+     ]
+    }
    ]
   },
   {
@@ -3739,6 +4667,23 @@
       "sky"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "lime",
+      "coral",
+      "lime",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -3807,6 +4752,23 @@
       "amber",
       "coral",
       "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "sky",
+      "sky",
+      "teal",
+      "teal",
+      "sky"
      ]
     }
    ]
@@ -3883,6 +4845,23 @@
       "rose"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "rose",
+      "rose",
+      "violet",
+      "violet",
+      "rose",
+      "violet"
+     ]
+    }
    ]
   },
   {
@@ -3949,6 +4928,23 @@
      "cars": [
       "violet",
       "rose"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "amber",
+      "lime",
+      "lime",
+      "amber",
+      "lime",
+      "amber"
      ]
     }
    ]
@@ -4025,6 +5021,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "lime",
+      "lime",
+      "sky",
+      "sky",
+      "sky",
+      "lime"
+     ]
+    }
    ]
   },
   {
@@ -4096,6 +5109,23 @@
      "cars": [
       "coral",
       "sky"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      6,
+      7
+     ],
+     "cars": [
+      "violet",
+      "lime",
+      "lime",
+      "lime",
+      "violet",
+      "violet"
      ]
     }
    ]
@@ -4189,6 +5219,23 @@
       "lime"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "sky",
+      "amber",
+      "sky",
+      "amber",
+      "sky",
+      "amber"
+     ]
+    }
    ]
   },
   {
@@ -4268,6 +5315,23 @@
       "teal"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [
+      4,
+      5
+     ],
+     "cars": [
+      "rose",
+      "rose",
+      "teal",
+      "teal",
+      "rose",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -4341,6 +5405,23 @@
      "cars": [
       "teal",
       "amber"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "amber",
+      "amber",
+      "amber",
+      "coral"
      ]
     }
    ]
@@ -4422,6 +5503,23 @@
       "rose"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [
+      2,
+      3
+     ],
+     "cars": [
+      "teal",
+      "rose",
+      "rose",
+      "teal",
+      "rose",
+      "teal"
+     ]
+    }
    ]
   },
   {
@@ -4498,6 +5596,23 @@
       "coral"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      1,
+      2
+     ],
+     "cars": [
+      "amber",
+      "violet",
+      "amber",
+      "violet",
+      "amber",
+      "violet"
+     ]
+    }
    ]
   },
   {
@@ -4572,6 +5687,23 @@
      "cars": [
       "teal",
       "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "rose",
+      "lime",
+      "lime",
+      "rose",
+      "rose",
+      "lime"
      ]
     }
    ]
@@ -4664,6 +5796,23 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      7,
+      8
+     ],
+     "cars": [
+      "amber",
+      "amber",
+      "sky",
+      "amber",
+      "sky",
+      "sky"
+     ]
+    }
    ]
   },
   {
@@ -4746,6 +5895,23 @@
       "amber"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      0,
+      1
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "rose",
+      "rose",
+      "coral",
+      "rose"
+     ]
+    }
    ]
   },
   {
@@ -4820,6 +5986,23 @@
       "teal",
       "coral",
       "teal"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 3,
+     "cells": [
+      3,
+      4
+     ],
+     "cars": [
+      "gold",
+      "gold",
+      "lime",
+      "lime",
+      "gold",
+      "lime"
      ]
     }
    ]
@@ -4915,6 +6098,23 @@
       "sky"
      ]
     }
+   ],
+   "garages": [
+    {
+     "lane": 0,
+     "cells": [
+      7,
+      8
+     ],
+     "cars": [
+      "coral",
+      "coral",
+      "gold",
+      "gold",
+      "coral",
+      "gold"
+     ]
+    }
    ]
   },
   {
@@ -5004,6 +6204,23 @@
       "sky",
       "rose",
       "sky"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 4,
+     "cells": [
+      8,
+      9
+     ],
+     "cars": [
+      "rose",
+      "gold",
+      "gold",
+      "rose",
+      "rose",
+      "gold"
      ]
     }
    ]

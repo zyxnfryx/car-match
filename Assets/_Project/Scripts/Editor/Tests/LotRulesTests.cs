@@ -96,6 +96,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Garages_RefillWhenSpotsClear()
+        {
+            RuleChecks.GarageRefillsWhenSpotsClear();
+        }
+
+        [Test]
         public void Taps_RapidMultiTap()
         {
             RuleChecks.RapidMultiTap();
