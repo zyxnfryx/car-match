@@ -13,22 +13,22 @@ namespace CarMatch
 
         static readonly EyeLayout[] Table =
         {
-            new EyeLayout { Valid = true, MidX = -0.31f, MidY = -6.81f, TravelX = 4.80f, TravelY = 2.80f },
-            new EyeLayout { Valid = true, MidX = 7.38f, MidY = -5.52f, TravelX = 4.40f, TravelY = 3.20f },
-            new EyeLayout { Valid = true, MidX = 13.91f, MidY = -1.84f, TravelX = 3.60f, TravelY = 4.00f },
-            new EyeLayout { Valid = true, MidX = 18.28f, MidY = 3.70f, TravelX = 1.60f, TravelY = 4.40f },
-            new EyeLayout { Valid = true, MidX = 19.84f, MidY = 10.24f, TravelX = 0.80f, TravelY = 4.40f },
-            new EyeLayout { Valid = true, MidX = 18.30f, MidY = 16.84f, TravelX = 2.40f, TravelY = 4.80f },
+            new EyeLayout { Valid = true, MidX = -0.30f, MidY = -9.78f, TravelX = 4.40f, TravelY = 2.40f },
+            new EyeLayout { Valid = true, MidX = 6.78f, MidY = -8.58f, TravelX = 4.00f, TravelY = 3.20f },
+            new EyeLayout { Valid = true, MidX = 12.77f, MidY = -5.19f, TravelX = 3.20f, TravelY = 3.60f },
+            new EyeLayout { Valid = true, MidX = 16.80f, MidY = -0.09f, TravelX = 1.60f, TravelY = 4.40f },
+            new EyeLayout { Valid = true, MidX = 18.25f, MidY = 5.88f, TravelX = 0.40f, TravelY = 4.40f },
+            new EyeLayout { Valid = true, MidX = 16.78f, MidY = 12.03f, TravelX = 2.00f, TravelY = 4.00f },
             default(EyeLayout),
             default(EyeLayout),
             default(EyeLayout),
             default(EyeLayout),
             default(EyeLayout),
-            new EyeLayout { Valid = true, MidX = -18.93f, MidY = 16.81f, TravelX = 1.60f, TravelY = 4.40f },
-            new EyeLayout { Valid = true, MidX = -20.47f, MidY = 10.22f, TravelX = 0.80f, TravelY = 4.40f },
-            new EyeLayout { Valid = true, MidX = -18.91f, MidY = 3.70f, TravelX = 2.00f, TravelY = 4.80f },
-            new EyeLayout { Valid = true, MidX = -14.53f, MidY = -1.84f, TravelX = 3.20f, TravelY = 4.00f },
-            new EyeLayout { Valid = true, MidX = -8.02f, MidY = -5.52f, TravelX = 4.40f, TravelY = 3.20f },
+            new EyeLayout { Valid = true, MidX = -17.39f, MidY = 12.04f, TravelX = 1.60f, TravelY = 4.00f },
+            new EyeLayout { Valid = true, MidX = -18.87f, MidY = 5.90f, TravelX = 0.80f, TravelY = 4.40f },
+            new EyeLayout { Valid = true, MidX = -17.41f, MidY = -0.09f, TravelX = 1.60f, TravelY = 4.40f },
+            new EyeLayout { Valid = true, MidX = -13.41f, MidY = -5.19f, TravelX = 2.80f, TravelY = 3.60f },
+            new EyeLayout { Valid = true, MidX = -7.40f, MidY = -8.58f, TravelX = 3.60f, TravelY = 3.20f },
         };
 
         public static EyeLayout For(int heading) { return Table[((heading % 16) + 16) % 16]; }
