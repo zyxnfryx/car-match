@@ -74,6 +74,8 @@ namespace CarMatch
         const float BarSlotWidth = 112f;
         const float BarGap = 10f;
         const float BarCarH = 100f;
+        // Parked-bar trucks fill their well snugly (longer-bed art sits ~8% smaller in its canvas).
+        const float BarCarScale = 1.12f;
 
         struct LotMetrics
         {
@@ -1025,7 +1027,7 @@ namespace CarMatch
                 seen.Add(e);
                 if (!e.Landed) { _barCars.Add(null); continue; }
                 float x = BarSlotCenter(i, n).x;
-                var size = slotArt != null ? new Vector2(BarSlotWidth + 4f, BarCarH + 8f) : new Vector2(BarSlotWidth - 8f, BarCarH);
+                var size = (slotArt != null ? new Vector2(BarSlotWidth + 4f, BarCarH + 8f) : new Vector2(BarSlotWidth - 8f, BarCarH)) * BarCarScale;
                 float from;
                 if (!_barX.TryGetValue(e, out from)) from = x;
                 var car = Place(tray, "Car", new Vector2(from, y), size);
@@ -1289,7 +1291,7 @@ namespace CarMatch
             // The reserved slot can shift while we drive (later taps insert before it); steer to where it is now.
             var plannedEnd = points[points.Count - 1];
             var startSize = flyer.sizeDelta;
-            var endSize = new Vector2(BarSlotWidth - 8f, BarCarH);
+            var endSize = new Vector2(BarSlotWidth + 4f, BarCarH + 8f) * BarCarScale;
             var image = flyer.GetComponent<Image>();
             Vector2 facing;
             Along(points, 0f, out facing);
@@ -1396,7 +1398,7 @@ namespace CarMatch
             var set = new List<RectTransform>();
             for (int i = 0; i < spots.Count; i++)
             {
-                var rt = Place(_flyLayer, "Pop", spots[i], new Vector2(BarSlotWidth - 8f, BarCarH));
+                var rt = Place(_flyLayer, "Pop", spots[i], new Vector2(BarSlotWidth + 4f, BarCarH + 8f) * BarCarScale);
                 var img = rt.gameObject.AddComponent<Image>();
                 img.sprite = CarArt.For(color, true);
                 img.preserveAspect = true;
