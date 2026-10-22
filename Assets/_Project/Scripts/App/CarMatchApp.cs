@@ -105,17 +105,50 @@ namespace CarMatch
                 cam.clearFlags = CameraClearFlags.SolidColor;
                 cam.backgroundColor = new Color(0.14f, 0.20f, 0.36f, 1f);
             }
+            var runner = new GameObject("Boot").AddComponent<BootRunner>();
+            runner.transform.SetParent(transform, false);
+            runner.StartCoroutine(Boot(runner));
+        }
+
+        sealed class BootRunner : MonoBehaviour { }
+
+        bool _introHold;
+
+        // Studio card first (it covers the loading), preload underneath, then the LOT LOOP formation intro.
+        IEnumerator Boot(BootRunner runner)
+        {
+            _introHold = true;
+            var card = StudioCard.Show(runner.transform);
+            yield return null; // let the card render before the heavy work
+            var music = Resources.LoadAsync<AudioClip>("Audio/" + AudioManager.HomeMusic);
             SpriteKit.Warm();
+            yield return null;
             _ads = AdServices.Create();
             Purse.Boot();
             DebugCoinGrant();
             LoadCatalog();
+            yield return null;
             BuildShell();
             ShowHome();
+            bool ready = false;
+            runner.StartCoroutine(WaitFor(music, () => ready = true));
+            yield return card.HoldAndFade(() => ready);
+            if (_phase == Phase.Home && _flyLayer != null)
+                yield return WinShow.CarFinale(_flyLayer);
+            _introHold = false;
+            if (_phase == Phase.Home) AudioManager.Music(AudioManager.HomeMusic);
+            Destroy(runner.gameObject);
+        }
+
+        static IEnumerator WaitFor(ResourceRequest req, System.Action done)
+        {
+            while (req != null && !req.isDone) yield return null;
+            done();
         }
 
         void Update()
         {
+            if (_screen == null) return; // still booting under the studio card
             if (Time.unscaledTime < _tick) return;
             _tick = Time.unscaledTime + 0.5f;
             int lives = Purse.Wallet.Lives;
@@ -206,7 +239,7 @@ namespace CarMatch
             Clouds();
             HomeCars();
             Hud(0f);
-            AudioManager.Music(AudioManager.HomeMusic);
+            if (!_introHold) AudioManager.Music(AudioManager.HomeMusic);
             // Hierarchy: HUD (safe top) > title > mascot on its light pool > tagline > Play.
             var pool = Place(_screen, "MascotPool", new Vector2(0f, -40f), new Vector2(760f, 260f));
             var poolImage = pool.gameObject.AddComponent<Image>();
