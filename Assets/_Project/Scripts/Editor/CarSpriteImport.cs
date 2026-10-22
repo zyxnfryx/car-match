@@ -16,6 +16,7 @@ namespace CarMatch.Editor
             "Assets/_Project/Resources/UI/",
             "Assets/_Project/Resources/Cars16/",
             "Assets/_Project/Resources/CarEyes/",
+            "Assets/_Project/Art/CarEyes/",
             "Assets/_Project/Resources/CarLayers/",
             "Assets/_Project/Resources/FX/"
         };
@@ -80,9 +81,42 @@ namespace CarMatch.Editor
 
             Uncompressed(importer, "DefaultTexturePlatform", false);
             Uncompressed(importer, "Standalone", true);
-            Uncompressed(importer, "iOS", true);
+            // iPhone/iPad: ASTC by path so new or replaced art (e.g. longer truck beds) picks it up.
+            Astc(importer, IosFormat(path));
             Uncompressed(importer, "Android", true);
             Uncompressed(importer, "WebGL", true);
+        }
+
+        // Bump when the rules below change so Unity reimports every matching texture.
+        public override uint GetVersion() { return 2; }
+
+        const string UiPath = "Assets/_Project/Resources/UI/";
+        const string FxPath = "Assets/_Project/Resources/FX/";
+
+        // Big soft backgrounds and decorative glows tolerate 6x6; anything with text or hard edges stays 4x4.
+        static readonly string[] UiSoft = { "home_bg", "clouds", "rays", "asphalt", "glow", "confetti", "dust", "shine", "sparkle" };
+
+        // 4x4 (8 bpp) for trucks, eyes, mascot and UI with text; 6x6 (3.56 bpp) for backgrounds and effects.
+        public static TextureImporterFormat IosFormat(string path)
+        {
+            var file = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (path.StartsWith(UiPath, System.StringComparison.Ordinal))
+                return System.Array.IndexOf(UiSoft, file) >= 0 ? TextureImporterFormat.ASTC_6x6 : TextureImporterFormat.ASTC_4x4;
+            if (path.StartsWith(FxPath, System.StringComparison.Ordinal))
+                return path.StartsWith(FxPath + "win_truck_", System.StringComparison.Ordinal) ? TextureImporterFormat.ASTC_4x4 : TextureImporterFormat.ASTC_6x6;
+            return TextureImporterFormat.ASTC_4x4;   // Art/Cars, Art/CarEyes, Cars16, CarEyes, CarLayers, Mascot
+        }
+
+        static void Astc(TextureImporter importer, TextureImporterFormat format)
+        {
+            var settings = importer.GetPlatformTextureSettings("iPhone");
+            settings.overridden = true;
+            settings.maxTextureSize = 2048;
+            settings.textureCompression = TextureImporterCompression.Compressed;
+            settings.crunchedCompression = false;
+            settings.format = format;
+            settings.compressionQuality = 100;   // ASTC "best"
+            importer.SetPlatformTextureSettings(settings);
         }
 
         static void Uncompressed(TextureImporter importer, string platform, bool overridden)
