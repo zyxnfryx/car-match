@@ -76,7 +76,7 @@ namespace CarMatch
         // Logo-centred lap: ellipse just outside the logo, plus one vertical loop at the top.
         Vector2 Lap(float u, float lw, float lh)
         {
-            float rx = lw * 0.56f, ry = lh * 0.5f + lw * 0.12f;
+            float rx = lw * 0.60f, ry = lh * 0.5f + lw * 0.15f;
             float th = Mathf.PI * 2f * u;
             var p = new Vector2(rx * Mathf.Sin(th), -ry * Mathf.Cos(th));
             const float d = 0.42f; // loop spans th in [pi-d, pi+d]
@@ -84,7 +84,7 @@ namespace CarMatch
             if (k > 0f && k < 1f)
             {
                 float psi = Mathf.PI * 2f * (k * k * (3f - 2f * k));
-                float rl = lw * 0.075f;
+                float rl = lw * 0.09f;
                 p += new Vector2(rl * Mathf.Sin(psi), rl * (1f - Mathf.Cos(psi)));
             }
             return p;
@@ -95,7 +95,7 @@ namespace CarMatch
             float dt = Mathf.Min(Time.unscaledDeltaTime, 0.05f);
             _t += dt;
             float lw = _logo.sizeDelta.x, lh = _logo.sizeDelta.y;
-            float size = lw * 0.15f;
+            float size = lw * 0.26f;
             _truck.sizeDelta = new Vector2(size, size);
             float u = Mathf.Clamp01((_t - LapStart) / (LapEnd - LapStart));
             float e = u * u * u * (u * (u * 6f - 15f) + 10f); // smootherstep: ease out of and into the spot
