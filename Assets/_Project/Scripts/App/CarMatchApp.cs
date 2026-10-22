@@ -134,7 +134,22 @@ namespace CarMatch
             runner.StartCoroutine(WaitFor(music, () => ready = true));
             yield return card.HoldAndFade(() => ready);
             if (_phase == Phase.Home && _flyLayer != null)
+            {
+                // Soft scrim so the formation reads over the busy Home art, like the win screen.
+                var scrim = new GameObject("IntroScrim", typeof(RectTransform)).AddComponent<Image>();
+                scrim.transform.SetParent(_flyLayer, false);
+                var srt = scrim.rectTransform;
+                srt.anchorMin = Vector2.zero; srt.anchorMax = Vector2.one; srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
+                scrim.raycastTarget = false;
+                scrim.color = new Color(0.08f, 0.10f, 0.20f, 0.55f);
                 yield return WinShow.CarFinale(_flyLayer);
+                for (float f = 0f; f < 0.25f; f += Time.unscaledDeltaTime)
+                {
+                    scrim.color = new Color(0.08f, 0.10f, 0.20f, 0.55f * (1f - f / 0.25f));
+                    yield return null;
+                }
+                Destroy(scrim.gameObject);
+            }
             _introHold = false;
             if (_phase == Phase.Home) AudioManager.Music(AudioManager.HomeMusic);
             Destroy(runner.gameObject);
