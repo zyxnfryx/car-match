@@ -92,7 +92,8 @@ namespace CarMatch
 
         public static void HiddenRevealsWhenUncovered()
         {
-            var board = Tiny("[[\"coral\",\"?amber\",\"?lime\"]]");
+            // Teal parks at the back so the '?' cars are covered from both ends.
+            var board = Tiny("[[\"coral\",\"?amber\",\"?lime\",\"teal\"]]");
             Expect(!FrontHidden(board, 0), "the exit car is uncovered on load");
             var covered = board.Lanes[0].Cells[1].Car;
             Expect(covered.Hidden && covered.Color == CarColor.Amber, "the car behind stays a '?'");
@@ -107,7 +108,7 @@ namespace CarMatch
             Expect(board.Lanes[0].Cells[0].TunnelCount == 3, "tunnel shows 3");
             var taps = new List<Tap>();
             ExitPath.Collect(board, taps);
-            Expect(taps.Count == 1 && taps[0].Cell == 0, "only the tunnel mouth is open");
+            Expect(taps.Count == 2 && taps[0].Cell == 0 && taps[1].Cell == 3, "the tunnel mouth and the back lime (out the rear) are open");
             BoardRules.Play(board, null, taps[0]);
             Expect(board.Lanes[0].Cells[0].TunnelCount == 2, "count drops when a car leaves");
             Expect(!ExitPath.LaneOpen(board.Lanes[0], 1), "lime stays blocked");
@@ -218,6 +219,104 @@ namespace CarMatch
             }
         }
 
+        // Rapid taps: each tap applies to the board at once (the car leaves its spot at tap time),
+        // so the car behind it is tappable on the very next tap, with no waiting on a drive.
+        public static void RapidMultiTap()
+        {
+            var board = Tiny("[[\"coral\",\"teal\",\"amber\"],[\"coral\",\"teal\"],[\"coral\",\"amber\"],[\"teal\"]]");
+            var history = new List<Board>();
+            var legal = new LegalMoves();
+            var bar = new BarReservations();
+            bar.Reset(board.Bar);
+            var flying = new List<BarEntry>();
+            Tap[] taps =
+            {
+                new Tap(TapKind.Lane, 0, 0), new Tap(TapKind.Lane, 0, 1), new Tap(TapKind.Lane, 1, 0),
+                new Tap(TapKind.Lane, 2, 0), new Tap(TapKind.Lane, 1, 1), new Tap(TapKind.Lane, 3, 0),
+            };
+            for (int i = 0; i < taps.Length; i++)
+            {
+                legal.Rebuild(board);
+                Expect(legal.IsLegal(taps[i]), "tap " + i + " is legal immediately (no landing needed)");
+                Expect(legal.IsLegal(taps[i]) == ExitPath.IsLegal(board, taps[i]), "cache agrees with ExitPath");
+                var color = ExitPath.ColorOf(board, taps[i]);
+                var move = BoardRules.Play(board, history, taps[i]);
+                Expect(move.Accepted, "tap " + i + " accepted");
+                flying.Add(bar.Reserve(color, move.Matched));
+            }
+            Expect(bar.InFlight == 6, "six cars in flight at once");
+            Expect(history.Count == 6, "every tap is undoable");
+            // Blocked taps are simply refused and do not disturb anything.
+            legal.Rebuild(board);
+            Expect(!legal.IsLegal(new Tap(TapKind.Lane, 2, 1)) || ExitPath.IsLegal(board, new Tap(TapKind.Lane, 2, 1)), "cache matches rules for blocked cars");
+            // Two sets were made (coral x3, teal x3); the lot's cars are all gone except amber x2.
+            Expect(BoardQuery.Count(board, CarColor.Coral) == 0 && BoardQuery.Count(board, CarColor.Teal) == 0, "coral and teal cleared logically");
+            for (int i = flying.Count - 1; i >= 0; i--) bar.Land(flying[i]);
+            Expect(bar.Settled, "everything landed and popped");
+            ExpectSame(bar.Remaining(), board.Bar, "view bar equals board bar after rapid taps");
+        }
+
+        // Reserved slots: a set pops only when all three of its cars have parked, sets pop in
+        // the order they were made, and arrivals out of order never break color grouping.
+        public static void ReservedSlotsMatchInOrder()
+        {
+            var bar = new BarReservations();
+            bar.Reset(new List<CarColor> { CarColor.Amber });
+            var c1 = bar.Reserve(CarColor.Coral, false);
+            var t1 = bar.Reserve(CarColor.Teal, false);
+            var c2 = bar.Reserve(CarColor.Coral, false);
+            Expect(bar.IndexOf(c2) == bar.IndexOf(c1) + 1, "second coral parks next to the first");
+            var t2 = bar.Reserve(CarColor.Teal, false);
+            var c3 = bar.Reserve(CarColor.Coral, true);   // coral set (group 0)
+            var t3 = bar.Reserve(CarColor.Teal, true);    // teal set (group 1)
+            Expect(c3.Group == 0 && c1.Group == 0 && c2.Group == 0, "three corals share set 0");
+            Expect(t3.Group == 1 && t1.Group == 1 && t2.Group == 1, "three teals share set 1");
+            var c4 = bar.Reserve(CarColor.Coral, false);
+            Expect(c4.Group < 0, "a fourth coral starts a new group");
+            Expect(bar.IndexOf(c4) == bar.Entries.Count - 1, "a coral after a promised set goes to the end");
+            // Teal lands completely first, but must wait for the coral set (made first).
+            Expect(bar.Land(t3).Count == 0, "teal 3 landed");
+            Expect(bar.Land(t1).Count == 0, "teal 1 landed");
+            Expect(bar.Land(t2).Count == 0, "teal set complete but waits for the coral set");
+            Expect(bar.Land(c3).Count == 0, "coral 3 landed first, out of order");
+            Expect(bar.Land(c1).Count == 0, "coral 1 landed");
+            var popped = bar.Land(c2);
+            Expect(popped.Count == 2, "coral set then teal set pop together, in order");
+            Expect(popped[0][0].Color == CarColor.Coral && popped[1][0].Color == CarColor.Teal, "sets pop in the order they were made");
+            Expect(!bar.Settled, "coral 4 still driving");
+            bar.Land(c4);
+            Expect(bar.Settled, "settled");
+            ExpectSame(bar.Remaining(), new List<CarColor> { CarColor.Amber, CarColor.Coral }, "amber and the last coral remain");
+        }
+
+        // Fail check counts reserved slots: seven different colors tapped in a burst fail the lot
+        // at the seventh tap, before any of them has parked, and further taps are refused.
+        public static void ReservedSlotsCountTowardFail()
+        {
+            var board = Tiny("[[\"coral\"],[\"rose\"],[\"amber\"],[\"gold\"],[\"lime\"],[\"teal\"],[\"sky\"],[\"violet\"]]");
+            var history = new List<Board>();
+            var bar = new BarReservations();
+            bar.Reset(board.Bar);
+            for (int i = 0; i < 7; i++)
+            {
+                var tap = new Tap(TapKind.Lane, i, 0);
+                var move = BoardRules.Play(board, history, tap);
+                Expect(move.Accepted, "burst tap " + i + " accepted");
+                bar.Reserve(board.Bar[board.Bar.Count - 1], move.Matched);
+                Expect(move.Failed == (i == 6), "only the seventh reserved slot fails the lot");
+            }
+            Expect(bar.InFlight == 7, "all seven still driving");
+            Expect(board.Failed, "the lot failed on reserved slots");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 7, 0)), "no taps after the bar is full");
+        }
+
+        static void ExpectSame(IList<CarColor> a, IList<CarColor> b, string what)
+        {
+            bool same = a.Count == b.Count;
+            for (int i = 0; same && i < a.Count; i++) same = a[i] == b[i];
+            Expect(same, what);
+        }
+
         public static void MagnetPullsASetOfThree()
         {
             var board = Tiny("[[\"coral\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
@@ -266,9 +365,42 @@ namespace CarMatch
             Expect(!Economy.TrySpend(ref wallet, 999999), "the purse cannot go negative");
         }
 
+        // Car Match rule: a car may leave out either end of its lane. The back car of a
+        // stacked lane is awake and tappable (rear exit onto the ring road); middle cars are not.
+        public static void BackOfLaneCanExit()
+        {
+            var board = Tiny("[[\"teal\",\"teal\",\"coral\"],[\"amber\",\"coral\",\"amber\"]]");
+            var back = new Tap(TapKind.Lane, 0, 2);
+            Expect(ExitPath.IsLegal(board, back), "the back car with open road behind it can leave");
+            Expect(EyeState.IsOpen(board, back), "and it is drawn awake");
+            Expect(ExitPath.ExitsBack(board, back), "it drives out the rear");
+            Expect(!ExitPath.ExitsBack(board, new Tap(TapKind.Lane, 0, 0)), "the front car uses the front");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "a middle car is blocked both ways");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 1)), "the middle coral is blocked both ways");
+            var taps = new List<Tap>();
+            ExitPath.Collect(board, taps);
+            Expect(taps.Count == 4, "front and back of both lanes are offered");
+            var legal = new LegalMoves();
+            legal.Rebuild(board);
+            for (int l = 0; l < board.Lanes.Count; l++)
+                for (int c = 0; c < board.Lanes[l].Cells.Count; c++)
+                {
+                    var t = new Tap(TapKind.Lane, l, c);
+                    Expect(legal.IsLegal(t) == ExitPath.IsLegal(board, t), "cache matches the rule at " + l + "," + c);
+                }
+            var move = BoardRules.Play(board, null, back);
+            Expect(move.Accepted && board.Bar.Count == 1 && board.Bar[0] == CarColor.Coral, "the rear exit reaches the bar");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "the middle teal is now the back car");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 2));
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 1)), "coral opens from the rear");
+            var m2 = BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 1));
+            Expect(m2.Accepted && board.Bar.Count == 3 && board.Bar[0] == CarColor.Coral && board.Bar[1] == CarColor.Coral, "two coral grouped, amber after");
+        }
+
         public static void OpenEyesOnlyOnAClearExit()
         {
-            var stacked = Tiny("[[\"coral\",\"teal\"]]");
+            // Gold parks at the back so teal is covered from both ends.
+            var stacked = Tiny("[[\"coral\",\"teal\",\"gold\"]]");
             var front = new Tap(TapKind.Lane, 0, 0);
             var behind = new Tap(TapKind.Lane, 0, 1);
             Expect(EyeState.IsOpen(stacked, front), "the mouth car is open");
@@ -282,14 +414,14 @@ namespace CarMatch
             Expect(EyeState.IsOpen(restored, front), "undo opens the mouth again");
             Expect(!EyeState.IsOpen(restored, behind), "undo closes the car that is covered again");
 
-            var covered = Tiny("[[\"coral\",\"?amber\"]]");
+            var covered = Tiny("[[\"coral\",\"?amber\",\"gold\"]]");
             Expect(covered.Lanes[0].Cells[1].Car.Hidden, "amber starts hidden");
             Expect(!EyeState.IsOpen(covered, new Tap(TapKind.Lane, 0, 1)), "a covered car is closed");
             BoardRules.Play(covered, null, new Tap(TapKind.Lane, 0, 0));
             Expect(!covered.Lanes[0].Cells[1].Car.Hidden, "amber is revealed when the cell in front empties");
             Expect(EyeState.IsOpen(covered, new Tap(TapKind.Lane, 0, 1)), "the revealed car is open");
 
-            var tube = Tiny("[[\"tunnel:coral,coral\",\"lime\"]]");
+            var tube = Tiny("[[\"tunnel:coral,coral\",\"lime\",\"gold\"]]");
             Expect(EyeState.IsOpen(tube, new Tap(TapKind.Lane, 0, 0)), "a tunnel mouth with a clear exit is open");
             Expect(!EyeState.IsOpen(tube, new Tap(TapKind.Lane, 0, 1)), "lime behind the tunnel is closed");
             BoardRules.Play(tube, null, new Tap(TapKind.Lane, 0, 0));
@@ -309,13 +441,13 @@ namespace CarMatch
             Expect(BoosterKit.Shuffle(mix, new System.Random(3)), "shuffle should apply");
             Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 0)), "a shuffle leaves the mouth open");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 1)), "a shuffle leaves a blocked slot closed");
-            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 2)), "the back of the lane stays closed");
+            Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 2)), "the back of the lane is open out the rear");
             Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 1, 0)), "an open lane stays open after a shuffle");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 9, 0)), "a missing lane is closed");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Side, 0, 0)), "a missing side lot is closed");
             Expect(!EyeState.IsOpen(null, front), "a missing board is closed");
 
-            var failed = Tiny("[[\"coral\"],[\"coral\"],[\"amber\"],[\"amber\"],[\"lime\"],[\"lime\"],[\"violet\",\"teal\"]]");
+            var failed = Tiny("[[\"coral\"],[\"coral\"],[\"amber\"],[\"amber\"],[\"lime\"],[\"lime\"],[\"violet\",\"teal\",\"gold\"]]");
             var failHistory = new List<Board>();
             for (int i = 0; i < 7; i++)
                 BoardRules.Play(failed, failHistory, new Tap(TapKind.Lane, i, 0));
@@ -423,6 +555,10 @@ namespace CarMatch
             ContinueUndoesAFullBar();
             ShuffleKeepsColorCounts();
             ShuffleRefusesWhenNothingCanChange();
+            RapidMultiTap();
+            BackOfLaneCanExit();
+            ReservedSlotsMatchInOrder();
+            ReservedSlotsCountTowardFail();
             MagnetPullsASetOfThree();
             OpenEyesOnlyOnAClearExit();
             HeadingUsesTheNearestDirection();

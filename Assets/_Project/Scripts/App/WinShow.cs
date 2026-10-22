@@ -23,6 +23,69 @@ namespace CarMatch
             public UnityEngine.Events.UnityAction OnHome;
             public Func<Text> Hud;
             public UiShake Shake;
+            // Color of the last matched set; picks the hero truck still (red uses the animated idle/cheer).
+            public CarColor HeroColor;
+        }
+
+        // Character Creator's premium win art (Resources/FX/win_*): 1280-canvas frames downscaled to 512,
+        // pivot (0.5, 0.1016) = ground contact; the piggy's coin slot sits at (640, 486) of 1280.
+        public const float HeroPivotY = 0.1016f;
+        public const float SlotFromFloor = (1f - 486f / 1280f) - HeroPivotY; // in units of the sprite height
+
+        static Sprite[] Frames(string folder)
+        {
+            var f = Resources.LoadAll<Sprite>("FX/" + folder);
+            if (f == null || f.Length == 0) return null;
+            System.Array.Sort(f, (a, b) => string.CompareOrdinal(a.name, b.name));
+            return f;
+        }
+
+        static string ArtColor(CarColor c)
+        {
+            switch (c)
+            {
+                case CarColor.Coral: case CarColor.Rose: return "red";
+                case CarColor.Amber: case CarColor.Gold: return "yellow";
+                case CarColor.Lime: return "green";
+                case CarColor.Teal: return "teal";
+                case CarColor.Sky: return "blue";
+                default: return "purple";
+            }
+        }
+
+        // Flipbook on a UI Image: plays 'Frames' at 'Fps'; one-shots fall back to 'Then' (looping) when done.
+        public sealed class FrameAnim : MonoBehaviour
+        {
+            public Sprite[] Frames;
+            public float Fps = 12f;
+            public bool Loop = true;
+            public Sprite[] Then;
+            public float ThenFps = 12f;
+            public bool HideWhenDone;
+            Image _img;
+            float _t;
+
+            public void Play(Sprite[] frames, float fps, bool loop)
+            {
+                Frames = frames; Fps = fps; Loop = loop; _t = 0f;
+                if (_img == null) _img = GetComponent<Image>();
+                if (_img != null && frames != null && frames.Length > 0) { _img.sprite = frames[0]; _img.enabled = true; }
+            }
+
+            void Update()
+            {
+                if (Frames == null || Frames.Length == 0) return;
+                if (_img == null) _img = GetComponent<Image>();
+                _t += Time.unscaledDeltaTime;
+                int i = Mathf.FloorToInt(_t * Fps);
+                if (i >= Frames.Length)
+                {
+                    if (Loop) i %= Frames.Length;
+                    else if (Then != null) { Play(Then, ThenFps, true); Then = null; return; }
+                    else { if (HideWhenDone) _img.enabled = false; Frames = null; return; }
+                }
+                _img.sprite = Frames[i];
+            }
         }
 
         public const float CoinFlyStaggerSec = 0.09f;
@@ -86,7 +149,18 @@ namespace CarMatch
             dim.SetSiblingIndex(2);
             var rays = Img(screen, "Rays", UiArt.Get("rays"), new Vector2(0f, 260f), new Vector2(1500f, 1500f), new Color(1f, 1f, 1f, 0f));
             var glow = Img(screen, "Glow", UiArt.Get("glow"), new Vector2(0f, 260f), new Vector2(700f, 700f), new Color(1f, 0.9f, 0.5f, 0f));
-            var mascot = Img(screen, "Mascot", s.Mascot, new Vector2(0f, 250f), new Vector2(460f, 460f), Color.white);
+            RectTransform mascot;
+            var truckIdle = Frames("win_truck_idle");
+            var truckStill = Resources.Load<Sprite>("FX/win_truck_colors/truck_" + ArtColor(s.HeroColor) + "_idle_static");
+            bool redHero = ArtColor(s.HeroColor) == "red" && truckIdle != null;
+            if (truckIdle != null || truckStill != null)
+            {
+                // Floor point at y = 20 (same footprint the old mascot used).
+                mascot = Img(screen, "HeroTruck", redHero ? truckIdle[0] : truckStill, new Vector2(0f, 20f), new Vector2(560f, 560f), Color.white);
+                mascot.pivot = new Vector2(0.5f, HeroPivotY);
+                if (redHero) mascot.gameObject.AddComponent<FrameAnim>().Play(truckIdle, 12f, true);
+            }
+            else mascot = Img(screen, "Mascot", s.Mascot, new Vector2(0f, 250f), new Vector2(460f, 460f), Color.white);
             mascot.localScale = Vector3.zero;
             var ribbon = Img(screen, "Ribbon", UiArt.Get("ribbon"), new Vector2(0f, 590f), new Vector2(1040f, 270f), Color.white);
             var title = Img(screen, "Title", UiArt.Get("title_win"), new Vector2(0f, 640f), new Vector2(980f, 287f), Color.white);
@@ -94,22 +168,50 @@ namespace CarMatch
                 Txt(title, "PERFECT!", s.Font, 140, Vector2.zero, new Vector2(980f, 200f), new Color(1f, 0.85f, 0.3f), new Color(0.4f, 0.1f, 0.1f));
             ribbon.localScale = Vector3.zero;
             title.localScale = Vector3.zero;
-            var piggy = Img(screen, "Piggy", UiArt.Get("piggy"), new Vector2(0f, -190f), new Vector2(360f, 360f), Color.white);
+            RectTransform piggy;
+            var pigIdle = Frames("win_piggy_idle");
+            if (pigIdle != null)
+            {
+                piggy = Img(screen, "HeroPiggy", pigIdle[0], new Vector2(0f, -370f), new Vector2(420f, 420f), Color.white);
+                piggy.pivot = new Vector2(0.5f, HeroPivotY);
+                piggy.gameObject.AddComponent<FrameAnim>().Play(pigIdle, 12f, true);
+                var sp = Img(piggy, "Sparkle", null, Vector2.zero, piggy.sizeDelta, Color.white);
+                sp.anchorMin = sp.anchorMax = new Vector2(0.5f, HeroPivotY);
+                sp.pivot = new Vector2(0.5f, HeroPivotY);
+                sp.anchoredPosition = Vector2.zero;
+                sp.GetComponent<Image>().enabled = false;
+                sp.gameObject.AddComponent<FrameAnim>().HideWhenDone = true;
+            }
+            else piggy = Img(screen, "Piggy", UiArt.Get("piggy"), new Vector2(0f, -190f), new Vector2(360f, 360f), Color.white);
             // Reward plate: coin icon + big counting '+N'.
             var plate = Img(screen, "Plate", UiArt.Get("pill"), new Vector2(0f, -420f), new Vector2(420f, 136f), Color.white);
             plate.GetComponent<Image>().preserveAspect = false;
             Img(plate, "Coin", UiArt.Get("icon_coin") ?? SpriteKit.Coin, new Vector2(-130f, 4f), new Vector2(110f, 110f), Color.white);
             var plus = Txt(plate, "+0", s.Font, 96, new Vector2(40f, 6f), new Vector2(300f, 120f), new Color(1f, 0.88f, 0.32f), new Color(0.35f, 0.18f, 0.02f));
             plate.gameObject.SetActive(false); // shown when the coin count-up starts (no '+0' during confetti)
+            // Bottom buttons stack up from the safe bottom edge, so both fit on iPad (4:3) and every iPhone.
+            float halfH = 960f;
+            var srt0 = screen as RectTransform;
+            if (srt0 != null && srt0.rect.height > 10f) halfH = srt0.rect.height * 0.5f;
+            float bottom = -halfH + AspectFit.BottomInset(halfH * 2f) + 24f;
+            const float homeH = 170f, gap = 16f, plateBottom = -420f - 68f;
+            float homeY = Mathf.Max(s.More ? -890f : -800f, bottom + homeH * 0.5f);
+            float nextH = 270f;
+            float nextY = Mathf.Max(-650f, homeY + homeH * 0.5f + gap + nextH * 0.5f);
+            if (nextY + nextH * 0.5f > plateBottom - 8f)
+            {
+                nextH = Mathf.Max(190f, plateBottom - 8f - (homeY + homeH * 0.5f + gap));
+                nextY = homeY + homeH * 0.5f + gap + nextH * 0.5f;
+            }
             Button next = null;
             if (s.More)
             {
-                next = s.MakeButton(new Vector2(0f, -650f), new Vector2(780f, 270f), "Next", 96, /* thumb-sized: >=64pt tall on a 390pt-wide phone */ "btn_green", s.OnNext);
+                next = s.MakeButton(new Vector2(0f, nextY), new Vector2(780f, nextH), "Next", 96, /* thumb-sized: >=64pt tall on a 390pt-wide phone */ "btn_green", s.OnNext);
                 next.gameObject.AddComponent<Pulse>();
             }
             else
                 Txt(screen, "You cleared every lot!", s.Font, 52, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
-            var home = s.MakeButton(new Vector2(0f, s.More ? -890f : -800f), new Vector2(470f, 170f), "Home", 64, "btn_blue", s.OnHome);
+            var home = s.MakeButton(new Vector2(0f, homeY), new Vector2(470f, homeH), "Home", 64, "btn_blue", s.OnHome);
             if (next != null) next.gameObject.SetActive(false);
             home.gameObject.SetActive(false);
             host.StartCoroutine(Run(host, screen, s, rays, glow, mascot, ribbon, title, piggy, plus, coinText, next, home));
@@ -136,7 +238,29 @@ namespace CarMatch
             host.StartCoroutine(Pop(title, 0.12f, 0.42f));
             yield return Pop(mascot, 0.18f, 0.40f);
             AudioManager.Play(Sfx.MascotCheer);
-            mascot.gameObject.AddComponent<Bob>().Height = 22f;
+            var heroAnim = mascot.GetComponent<FrameAnim>();
+            var cheer = heroAnim != null ? Frames("win_truck_cheer") : null;
+            if (cheer != null)
+            {
+                // Truck cheers once (hop + happy eyes), then settles back into its idle loop.
+                heroAnim.Then = heroAnim.Frames;
+                heroAnim.ThenFps = 12f;
+                heroAnim.Play(cheer, 20f, false);
+            }
+            else mascot.gameObject.AddComponent<Bob>().Height = 22f;
+            var pigAnim = piggy.GetComponent<FrameAnim>();
+            var pigIdleFrames = pigAnim != null ? pigAnim.Frames : null;
+            var jiggle = pigAnim != null ? Frames("win_piggy_jiggle") : null;
+            var sparkle = pigAnim != null ? Frames("win_piggy_sparkle") : null;
+            FrameAnim sparkleAnim = null;
+            if (pigAnim != null)
+            {
+                var spT = piggy.Find("Sparkle");
+                if (spT != null) sparkleAnim = spT.GetComponent<FrameAnim>();
+            }
+            var slot = pigAnim != null
+                ? piggy.anchoredPosition + new Vector2(0f, SlotFromFloor * piggy.sizeDelta.y)
+                : piggy.anchoredPosition + new Vector2(0f, 120f);
             if (s.Shake != null) s.Shake.Punch(0.3f, 10f, 0.8f);
             // Coins pop out of the mascot, arc, and fly into the piggy's slot.
             int n = Mathf.Clamp(s.Pay, 1, CoinFlyMax);
@@ -148,7 +272,7 @@ namespace CarMatch
             {
                 int worth = s.Pay / n + (i < s.Pay % n ? 1 : 0);
                 host.StartCoroutine(FlyCoin(screen, i * CoinFlyStaggerSec, mascot.anchoredPosition + new Vector2(0f, -40f),
-                    piggy.anchoredPosition + new Vector2(0f, 120f), () =>
+                    slot, () =>
                     {
                         landed++;
                         shown += worth;
@@ -158,7 +282,15 @@ namespace CarMatch
 #if !UNITY_WEBGL
                         Haptics.Tap();
 #endif
-                        host.StartCoroutine(Wobble(piggy));
+                        if (jiggle != null)
+                        {
+                            // Jiggle and sparkle start on the same tick, then back to idle.
+                            pigAnim.Then = pigIdleFrames;
+                            pigAnim.ThenFps = 12f;
+                            pigAnim.Play(jiggle, 24f, false);
+                            if (sparkleAnim != null && sparkle != null) sparkleAnim.Play(sparkle, 20f, false);
+                        }
+                        else host.StartCoroutine(Wobble(piggy));
                         host.StartCoroutine(Punch(plus.rectTransform, 1.25f));
                     }));
             }
@@ -438,7 +570,9 @@ namespace CarMatch
         static IEnumerator FlyCoin(Transform screen, float delay, Vector2 from, Vector2 to, Action landed)
         {
             yield return new WaitForSecondsRealtime(delay);
-            var coin = Img(screen, "Coin", UiArt.Get("coin_big") ?? SpriteKit.Coin, from, new Vector2(110f, 110f), Color.white);
+            var spinFrames = Frames("win_coin_spin");
+            var coin = Img(screen, "Coin", spinFrames != null ? spinFrames[0] : (UiArt.Get("coin_big") ?? SpriteKit.Coin), from, new Vector2(110f, 110f), Color.white);
+            if (spinFrames != null) coin.gameObject.AddComponent<FrameAnim>().Play(spinFrames, 16f, true);
             // Pop out: a little burst sideways before the arc.
             var start = from + new Vector2(UnityEngine.Random.Range(-160f, 160f), UnityEngine.Random.Range(40f, 140f));
             float spin = UnityEngine.Random.Range(540f, 900f);
@@ -455,6 +589,7 @@ namespace CarMatch
                 float sc = Mathf.Lerp(1.2f, 0.55f, k);
                 float sx = Mathf.Cos(spin * k * Mathf.Deg2Rad);
                 if (Mathf.Abs(sx) < 0.12f) sx = 0.12f * Mathf.Sign(sx == 0f ? 1f : sx);
+                if (spinFrames != null) sx = 1f; // the sheet spins the coin itself
                 coin.localScale = new Vector3(sc * sx, sc, 1f);
                 yield return null;
             }

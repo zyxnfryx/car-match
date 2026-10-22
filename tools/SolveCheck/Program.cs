@@ -19,6 +19,38 @@ namespace CarMatch
                 }
                 return 0;
             }
+            // --rate <levels.json>: share of 400 random-legal-tap playthroughs that win (difficulty proxy).
+            if (args.Length == 2 && args[0] == "--rate")
+            {
+                var defs = LevelJson.Parse(File.ReadAllText(args[1]));
+                var taps = new System.Collections.Generic.List<Tap>();
+                foreach (var d in defs)
+                {
+                    var rng = new Random(d.Number);
+                    int wins = 0;
+                    for (int run = 0; run < 400; run++)
+                    {
+                        var b = d.Board.Clone();
+                        HiddenReveal.Sweep(b);
+                        while (!b.Won && !b.Failed)
+                        {
+                            ExitPath.Collect(b, taps);
+                            if (taps.Count == 0) break;
+                            // Casual-player policy: take a tap that adds to the biggest bar group, else random.
+                            int best = -1, pick = rng.Next(taps.Count);
+                            for (int ti = 0; ti < taps.Count; ti++)
+                            {
+                                int have = MatchClear.Count(b.Bar, ExitPath.ColorOf(b, taps[ti])) * 10 + rng.Next(10);
+                                if (have > best) { best = have; pick = ti; }
+                            }
+                            BoardRules.TryTap(b, taps[pick]);
+                        }
+                        if (b.Won) wins++;
+                    }
+                    Console.WriteLine(d.Number + " " + (wins / 4.0).ToString("0.0") + (d.SuperHard ? " SH" : ""));
+                }
+                return 0;
+            }
             string jsonPath = Path.GetFullPath(Path.Combine(
                 AppContext.BaseDirectory,
                 "..", "..", "..", "..", "..",

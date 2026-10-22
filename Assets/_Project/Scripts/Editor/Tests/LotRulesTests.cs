@@ -90,6 +90,30 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Lanes_BackOfLaneCanExit()
+        {
+            RuleChecks.BackOfLaneCanExit();
+        }
+
+        [Test]
+        public void Taps_RapidMultiTap()
+        {
+            RuleChecks.RapidMultiTap();
+        }
+
+        [Test]
+        public void Taps_ReservedSlotsMatchInOrder()
+        {
+            RuleChecks.ReservedSlotsMatchInOrder();
+        }
+
+        [Test]
+        public void Taps_ReservedSlotsCountTowardFail()
+        {
+            RuleChecks.ReservedSlotsCountTowardFail();
+        }
+
+        [Test]
         public void Boosters_MagnetPullsASetOfThree()
         {
             RuleChecks.MagnetPullsASetOfThree();

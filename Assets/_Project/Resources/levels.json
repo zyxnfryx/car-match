@@ -733,34 +733,34 @@
   },
   {
    "id": "lot-029",
-   "title": "Canal Row",
+   "title": "River Loop",
    "blurb": "",
    "lanes": [
     [
+     "amber",
+     "box:teal",
+     "amber",
+     "lime",
+     "coral"
+    ],
+    [
+     "teal",
      "teal",
      "coral",
-     "amber",
      "lime"
     ],
     [
      "coral",
+     "coral",
      "amber",
-     "box:amber",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral",
      "coral"
     ]
    ],
    "sides": [
     {
      "lane": 2,
-     "at": 1,
+     "at": 0,
      "cars": [
-      "lime",
       "lime",
       "coral"
      ]
@@ -1067,39 +1067,46 @@
   },
   {
    "id": "lot-038",
-   "title": "Corner Bay",
+   "title": "Lantern Drive",
    "blurb": "",
    "lanes": [
     [
-     "amber",
-     "box:lime",
-     "amber",
+     "coral",
+     "?teal",
+     "box:teal",
+     "box:teal",
      "teal"
     ],
     [
      "coral",
-     "teal",
+     "tunnel:lime,lime,coral,amber",
+     "amber",
+     "lime",
+     "coral",
+     "amber"
+    ],
+    [
+     "coral",
+     "?lime",
+     "lime",
+     "amber",
      "teal"
     ],
     [
-     "coral",
-     "coral",
-     "box:lime"
-    ],
-    [
      "teal",
-     "tunnel:teal,coral",
-     "?amber",
+     "amber",
+     "coral",
+     "amber",
      "coral"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
-     "at": 0,
+     "lane": 3,
+     "at": 1,
      "cars": [
       "coral",
-      "teal",
+      "coral",
       "lime"
      ]
     }
@@ -1146,137 +1153,138 @@
   },
   {
    "id": "lot-040",
-   "title": "Midtown Loop",
+   "title": "Canal Loop",
    "blurb": "",
    "lanes": [
     [
-     "coral",
+     "teal",
+     "?amber",
+     "lime",
+     "lime"
+    ],
+    [
      "amber",
      "amber",
-     "amber"
-    ],
-    [
-     "teal",
-     "tunnel:lime,lime,amber",
-     "lime",
-     "teal",
-     "amber"
+     "box:lime",
+     "teal"
     ],
     [
      "teal",
      "coral",
-     "teal",
-     "box:coral"
+     "lime"
     ],
     [
+     "tunnel:amber,coral,teal,coral",
+     "amber",
      "coral",
-     "?lime",
-     "box:amber"
+     "teal"
     ],
     [
      "teal",
-     "lime",
-     "coral"
+     "box:coral",
+     "lime"
     ]
    ],
    "tier": "superhard",
    "sides": [
     {
-     "lane": 4,
+     "lane": 2,
      "at": 1,
      "cars": [
-      "teal",
-      "lime",
-      "coral"
+      "coral",
+      "amber",
+      "lime"
      ]
     }
    ]
   },
   {
    "id": "lot-041",
-   "title": "Festival Strip",
+   "title": "Pier Court",
    "blurb": "",
    "lanes": [
     [
-     "teal",
-     "tunnel:teal,teal,coral,violet",
-     "teal",
-     "box:violet",
-     "lime"
+     "lime",
+     "coral",
+     "coral",
+     "teal"
     ],
     [
-     "coral",
      "teal",
+     "box:teal",
      "lime",
+     "amber"
+    ],
+    [
+     "tunnel:violet,teal,coral,lime",
+     "box:coral",
+     "?teal",
      "coral"
     ],
     [
-     "coral",
-     "?amber",
-     "coral",
-     "box:amber"
-    ],
-    [
-     "coral",
      "amber",
-     "?lime"
+     "?violet",
+     "coral"
     ]
    ],
    "sides": [
     {
      "lane": 0,
-     "at": 1,
+     "at": 0,
      "cars": [
-      "violet",
-      "teal"
+      "teal",
+      "amber",
+      "violet"
      ]
     }
    ]
   },
   {
    "id": "lot-042",
-   "title": "Meadow Yard",
+   "title": "Park Lot",
    "blurb": "",
    "lanes": [
     [
-     "amber",
-     "box:teal",
-     "amber"
-    ],
-    [
      "teal",
-     "?teal",
+     "coral",
+     "amber",
      "lime"
     ],
     [
      "coral",
      "?coral",
-     "lime"
+     "?amber",
+     "violet"
     ],
     [
-     "tunnel:coral,teal,coral",
+     "tunnel:teal,amber,coral,lime",
+     "box:violet",
+     "box:teal",
      "coral",
+     "violet"
+    ],
+    [
      "amber",
-     "box:lime"
+     "teal",
+     "lime"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
-     "at": 1,
+     "lane": 2,
+     "at": 0,
      "cars": [
       "teal",
-      "violet",
-      "violet"
+      "amber"
      ]
     },
     {
-     "lane": 0,
-     "at": 1,
+     "lane": 3,
+     "at": 0,
      "cars": [
+      "amber",
       "teal",
-      "coral",
-      "violet"
+      "coral"
      ]
     }
    ]
@@ -1372,192 +1380,210 @@
   },
   {
    "id": "lot-045",
-   "title": "Sunny Yard",
+   "title": "Sunny Garage",
    "blurb": "",
    "lanes": [
     [
+     "tunnel:lime,amber,teal,lime",
+     "box:amber",
+     "?coral",
+     "coral",
+     "teal"
+    ],
+    [
      "amber",
-     "tunnel:violet,coral",
-     "teal",
-     "lime",
-     "teal",
+     "violet",
+     "?coral",
+     "teal"
+    ],
+    [
+     "coral",
+     "box:lime",
      "amber"
     ],
     [
-     "coral",
-     "?coral",
-     "box:amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "box:violet",
      "amber",
+     "teal",
      "coral"
-    ],
-    [
-     "teal",
-     "teal",
-     "?lime",
-     "teal"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
-     "at": 1,
+     "lane": 2,
+     "at": 0,
      "cars": [
-      "amber",
+      "teal",
+      "coral",
       "violet"
      ]
     },
     {
-     "lane": 3,
+     "lane": 0,
      "at": 0,
      "cars": [
+      "violet",
       "teal",
-      "amber",
-      "coral"
+      "amber"
      ]
     }
    ]
   },
   {
    "id": "lot-046",
-   "title": "Willow Strip",
+   "title": "Festival Loop",
    "blurb": "",
    "lanes": [
     [
+     "coral",
+     "?lime",
+     "amber",
+     "?lime",
      "teal",
+     "amber"
+    ],
+    [
      "coral",
      "amber",
+     "amber",
+     "teal",
+     "box:amber",
+     "lime"
+    ],
+    [
      "coral",
+     "teal",
+     "violet",
+     "violet",
+     "?lime",
      "coral"
     ],
     [
-     "coral",
      "teal",
-     "lime",
-     "coral",
-     "?violet"
-    ],
-    [
-     "amber",
-     "lime",
+     "tunnel:violet,lime,amber,teal",
      "box:lime",
+     "teal",
+     "coral",
      "violet"
-    ],
-    [
-     "tunnel:amber,violet,teal,teal",
-     "amber",
-     "box:teal",
-     "?coral",
-     "teal"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
+     "lane": 3,
      "at": 1,
      "cars": [
-      "amber",
-      "amber"
+      "violet",
+      "coral",
+      "violet"
      ]
     }
    ]
   },
   {
    "id": "lot-047",
-   "title": "Festival Deck",
+   "title": "Seaside Lot",
    "blurb": "",
    "lanes": [
     [
      "teal",
+     "coral",
      "box:lime",
-     "box:teal",
-     "violet",
-     "amber"
-    ],
-    [
-     "tunnel:coral,teal",
-     "coral",
-     "teal",
-     "teal",
-     "?violet",
-     "?teal"
-    ],
-    [
-     "coral",
-     "lime",
-     "violet",
-     "lime",
-     "amber"
-    ],
-    [
      "amber",
+     "teal",
+     "lime"
+    ],
+    [
      "coral",
+     "tunnel:lime,amber,lime",
+     "amber",
+     "amber",
      "amber",
      "coral"
+    ],
+    [
+     "coral",
+     "lime",
+     "violet",
+     "teal",
+     "teal"
+    ],
+    [
+     "teal",
+     "?violet",
+     "box:violet",
+     "?coral",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
-     "at": 0,
+     "lane": 2,
+     "at": 1,
      "cars": [
-      "amber",
-      "amber",
-      "coral"
+      "coral",
+      "lime",
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-048",
-   "title": "River Yard",
+   "title": "Lantern Garage",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "coral",
-     "amber",
-     "violet"
+     "?coral",
+     "lime",
+     "violet",
+     "box:amber",
+     "violet",
+     "lime"
     ],
     [
      "coral",
+     "teal",
+     "lime",
+     "lime",
+     "violet",
      "box:teal",
-     "?lime",
+     "coral"
+    ],
+    [
+     "teal",
+     "tunnel:teal,teal,amber,lime",
+     "amber",
+     "teal",
+     "?amber",
+     "coral",
+     "amber",
      "violet"
     ],
     [
      "teal",
+     "teal",
      "amber",
-     "coral",
-     "box:lime"
-    ],
-    [
-     "tunnel:amber,violet,coral,lime",
-     "?teal",
-     "coral",
-     "amber"
+     "?coral",
+     "?coral",
+     "violet"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
-     "at": 1,
+     "lane": 0,
+     "at": 0,
      "cars": [
-      "teal",
-      "amber"
+      "lime",
+      "teal"
      ]
     },
     {
-     "lane": 3,
+     "lane": 2,
      "at": 1,
      "cars": [
-      "amber",
-      "teal",
-      "teal"
+      "coral",
+      "violet",
+      "coral"
      ]
     }
    ]
@@ -1666,83 +1692,28 @@
    "blurb": "Everything together.",
    "lanes": [
     [
-     "teal",
-     "amber",
-     "box:violet",
-     "teal"
-    ],
-    [
-     "coral",
-     "tunnel:violet,violet,coral",
-     "lime",
-     "lime",
-     "?lime"
-    ],
-    [
-     "coral",
-     "box:amber",
-     "teal",
-     "?coral"
-    ],
-    [
-     "teal",
-     "?amber",
-     "coral",
-     "box:coral"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "amber",
-      "amber",
-      "teal"
-     ]
-    },
-    {
-     "lane": 0,
-     "at": 0,
-     "cars": [
-      "teal",
-      "amber"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-052",
-   "title": "Midtown Bay",
-   "blurb": "",
-   "lanes": [
-    [
      "coral",
      "box:teal",
-     "amber",
-     "coral",
-     "?amber"
-    ],
-    [
-     "coral",
-     "?teal",
-     "lime",
      "teal",
-     "violet"
-    ],
-    [
-     "tunnel:coral,teal",
-     "coral",
-     "lime",
-     "amber",
-     "lime",
-     "box:coral"
+     "lime"
     ],
     [
      "teal",
-     "box:amber",
+     "coral",
+     "box:coral",
+     "amber"
+    ],
+    [
+     "coral",
+     "?amber",
+     "box:teal",
+     "amber"
+    ],
+    [
+     "tunnel:teal,violet,lime",
+     "teal",
      "?violet",
-     "violet",
+     "?lime",
      "amber"
     ]
    ],
@@ -1751,7 +1722,61 @@
      "lane": 2,
      "at": 1,
      "cars": [
+      "violet",
+      "amber"
+     ]
+    },
+    {
+     "lane": 0,
+     "at": 1,
+     "cars": [
+      "coral",
+      "amber",
+      "coral"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-052",
+   "title": "Midtown Lane",
+   "blurb": "",
+   "lanes": [
+    [
+     "coral",
+     "lime",
+     "violet",
+     "?amber",
+     "amber"
+    ],
+    [
+     "teal",
+     "tunnel:coral,coral,teal",
+     "box:teal",
+     "box:lime",
+     "teal",
+     "amber"
+    ],
+    [
+     "teal",
+     "?amber",
+     "?lime",
+     "violet"
+    ],
+    [
+     "coral",
+     "amber",
+     "box:coral",
+     "coral"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 1,
+     "at": 1,
+     "cars": [
       "teal",
+      "violet",
       "amber"
      ]
     }
@@ -1759,44 +1784,46 @@
   },
   {
    "id": "lot-053",
-   "title": "Station Block",
+   "title": "Park Loop",
    "blurb": "",
    "lanes": [
     [
-     "teal",
-     "?violet",
-     "lime",
-     "box:lime",
-     "?coral"
-    ],
-    [
-     "teal",
      "coral",
      "amber",
-     "box:teal"
+     "violet",
+     "coral",
+     "teal"
     ],
     [
      "coral",
-     "amber",
-     "box:violet",
+     "tunnel:amber,amber",
+     "?lime",
+     "box:coral",
+     "?amber",
      "violet"
     ],
     [
-     "coral",
-     "tunnel:amber,coral,teal,amber",
      "amber",
      "teal",
-     "?lime"
+     "box:teal",
+     "teal",
+     "coral"
+    ],
+    [
+     "teal",
+     "box:lime",
+     "?lime",
+     "teal"
     ]
    ],
    "sides": [
     {
-     "lane": 2,
+     "lane": 3,
      "at": 1,
      "cars": [
-      "teal",
+      "amber",
       "coral",
-      "amber"
+      "violet"
      ]
     }
    ]
@@ -1900,83 +1927,40 @@
   },
   {
    "id": "lot-056",
-   "title": "Lantern Deck",
+   "title": "Corner Stop",
    "blurb": "",
    "lanes": [
     [
+     "coral",
+     "violet",
      "teal",
-     "?amber",
      "box:coral",
-     "coral",
-     "?teal"
+     "?amber",
+     "teal"
     ],
     [
      "coral",
-     "box:amber",
-     "violet",
-     "box:violet",
-     "coral"
-    ],
-    [
-     "coral",
-     "tunnel:teal,coral",
+     "lime",
      "amber",
-     "teal",
-     "lime",
-     "?teal"
+     "?amber",
+     "amber",
+     "amber"
     ],
     [
      "teal",
-     "lime",
-     "lime",
+     "?lime",
+     "?teal",
+     "violet",
+     "violet",
      "violet"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 0,
-     "at": 0,
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-057",
-   "title": "Station Drive",
-   "blurb": "",
-   "lanes": [
-    [
-     "amber",
-     "teal",
-     "teal",
-     "?violet",
-     "box:amber"
     ],
     [
      "coral",
+     "tunnel:lime,coral,violet,amber",
+     "box:teal",
      "teal",
-     "lime",
-     "violet",
-     "box:sky"
-    ],
-    [
-     "coral",
-     "amber",
-     "lime",
-     "coral",
-     "coral"
-    ],
-    [
-     "tunnel:teal,coral,teal,teal",
-     "?coral",
-     "amber",
-     "lime",
-     "box:sky",
-     "?violet"
+     "box:lime",
+     "lime"
     ]
    ],
    "sides": [
@@ -1984,111 +1968,167 @@
      "lane": 2,
      "at": 0,
      "cars": [
+      "violet",
       "lime",
-      "lime",
+      "coral"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-057",
+   "title": "Library Lot",
+   "blurb": "",
+   "lanes": [
+    [
+     "teal",
+     "tunnel:violet,amber",
+     "amber",
+     "coral",
+     "violet",
+     "violet",
+     "coral",
+     "amber"
+    ],
+    [
+     "coral",
+     "coral",
+     "?amber",
+     "box:amber",
+     "?lime",
+     "?teal",
+     "violet"
+    ],
+    [
+     "lime",
+     "box:lime",
+     "teal",
+     "coral",
+     "amber",
+     "sky"
+    ],
+    [
+     "teal",
+     "box:coral",
+     "teal",
+     "sky",
+     "violet",
+     "lime"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 3,
+     "at": 1,
+     "cars": [
+      "violet",
       "lime"
      ]
     },
     {
-     "lane": 1,
+     "lane": 0,
      "at": 1,
      "cars": [
-      "sky",
-      "amber",
-      "amber"
+      "teal",
+      "lime",
+      "sky"
      ]
     }
    ]
   },
   {
    "id": "lot-058",
-   "title": "Canal Circle",
+   "title": "Harbor Yard",
    "blurb": "",
    "lanes": [
     [
-     "teal",
-     "coral",
-     "teal",
-     "?lime",
-     "violet"
-    ],
-    [
-     "coral",
-     "tunnel:amber,teal",
      "amber",
      "lime",
-     "coral"
+     "sky",
+     "?lime",
+     "box:violet",
+     "lime"
     ],
     [
-     "tunnel:teal,amber,lime,teal",
-     "box:coral",
-     "amber",
-     "box:amber",
+     "coral",
+     "coral",
+     "coral",
+     "teal",
+     "box:teal",
      "coral"
     ],
     [
      "teal",
-     "?violet",
+     "tunnel:violet,lime",
+     "sky",
+     "coral",
      "violet",
-     "sky"
+     "teal"
     ],
     [
-     "sky",
-     "box:lime",
-     "sky",
-     "?coral"
+     "violet",
+     "amber",
+     "?teal",
+     "box:sky",
+     "teal"
+    ],
+    [
+     "lime",
+     "tunnel:amber,violet,sky,lime",
+     "?sky",
+     "?violet",
+     "amber",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
-     "at": 0,
+     "lane": 4,
+     "at": 1,
      "cars": [
-      "lime",
-      "amber",
-      "lime"
+      "sky",
+      "coral",
+      "amber"
      ]
     }
    ]
   },
   {
    "id": "lot-059",
-   "title": "Bakery Deck",
+   "title": "Cedar Block",
    "blurb": "",
    "lanes": [
     [
-     "coral",
+     "lime",
      "teal",
-     "amber",
-     "sky",
+     "?coral",
      "violet"
     ],
     [
-     "coral",
-     "lime",
-     "box:lime",
-     "sky",
-     "box:teal"
-    ],
-    [
-     "amber",
-     "tunnel:lime,amber,teal,teal",
-     "?coral",
-     "box:lime",
-     "?coral"
-    ],
-    [
-     "amber",
-     "?teal",
-     "violet",
-     "sky"
+     "tunnel:amber,lime,lime",
+     "box:coral",
+     "box:teal",
+     "?lime",
+     "violet"
     ],
     [
      "teal",
-     "tunnel:lime,amber",
-     "violet",
+     "?amber",
+     "teal",
+     "sky"
+    ],
+    [
+     "amber",
      "coral",
-     "coral"
+     "amber",
+     "amber"
+    ],
+    [
+     "tunnel:sky,teal,teal,violet",
+     "sky",
+     "coral",
+     "box:lime",
+     "amber"
     ]
    ],
    "sides": [
@@ -2096,7 +2136,8 @@
      "lane": 4,
      "at": 0,
      "cars": [
-      "amber",
+      "coral",
+      "coral",
       "lime"
      ]
     }
@@ -2171,103 +2212,99 @@
   },
   {
    "id": "lot-061",
-   "title": "Hilltop Drive",
+   "title": "Orchard Square",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "teal",
-     "amber",
+     "box:teal",
+     "sky",
      "lime",
-     "coral"
+     "teal"
     ],
     [
-     "coral",
-     "tunnel:amber,teal,violet",
-     "?lime",
-     "?coral",
      "amber",
+     "?amber",
+     "violet",
      "lime"
     ],
     [
-     "amber",
-     "coral",
-     "?violet",
-     "box:teal"
-    ],
-    [
-     "teal",
-     "tunnel:coral,lime",
-     "box:amber",
-     "sky",
-     "?amber"
-    ],
-    [
-     "teal",
+     "tunnel:sky,coral,lime",
+     "box:lime",
+     "?sky",
      "lime",
-     "violet",
-     "box:sky"
+     "amber"
+    ],
+    [
+     "tunnel:coral,amber,violet,teal",
+     "box:coral",
+     "teal",
+     "?teal",
+     "violet"
+    ],
+    [
+     "coral",
+     "?teal",
+     "coral",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
-     "at": 1,
+     "lane": 3,
+     "at": 0,
      "cars": [
-      "lime",
-      "teal",
-      "sky"
+      "amber",
+      "lime"
      ]
     }
    ]
   },
   {
    "id": "lot-062",
-   "title": "Pier Circle",
+   "title": "Rooftop Block",
    "blurb": "",
    "lanes": [
     [
-     "coral",
-     "?coral",
-     "?amber",
-     "box:sky",
-     "teal"
-    ],
-    [
-     "amber",
-     "tunnel:lime,coral",
+     "lime",
+     "tunnel:teal,sky",
      "teal",
-     "box:sky",
-     "box:lime",
-     "?amber"
-    ],
-    [
-     "coral",
-     "violet",
-     "lime",
-     "?sky",
+     "box:violet",
+     "sky",
      "teal"
     ],
     [
-     "tunnel:lime,amber",
-     "amber",
+     "teal",
      "lime",
-     "box:violet",
+     "?amber",
+     "lime"
+    ],
+    [
      "coral",
+     "box:teal",
+     "box:amber",
      "coral"
     ],
     [
-     "teal",
-     "violet",
-     "teal",
-     "teal"
+     "coral",
+     "?violet",
+     "?coral",
+     "violet"
+    ],
+    [
+     "coral",
+     "tunnel:amber,lime,teal,sky",
+     "box:amber",
+     "?coral",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 4,
-     "at": 0,
+     "lane": 2,
+     "at": 1,
      "cars": [
+      "lime",
       "lime",
       "amber"
      ]
@@ -2276,54 +2313,58 @@
   },
   {
    "id": "lot-063",
-   "title": "Lantern Drive",
+   "title": "Maple Row",
    "blurb": "",
    "lanes": [
     [
-     "coral",
      "lime",
-     "sky",
-     "lime"
-    ],
-    [
-     "amber",
-     "tunnel:sky,amber,teal,lime",
-     "box:amber",
-     "violet",
-     "?coral"
-    ],
-    [
-     "coral",
-     "tunnel:lime,amber,coral,amber",
      "box:coral",
      "?lime",
+     "box:sky",
+     "sky"
+    ],
+    [
+     "teal",
+     "tunnel:lime,sky",
+     "teal",
+     "lime",
+     "coral",
      "teal"
     ],
     [
-     "teal",
-     "box:violet",
-     "sky",
-     "?amber"
+     "violet",
+     "coral",
+     "?violet",
+     "?coral",
+     "lime"
     ],
     [
-     "teal",
      "coral",
-     "box:teal",
-     "?violet"
+     "?amber",
+     "box:amber",
+     "coral"
+    ],
+    [
+     "tunnel:teal,amber",
+     "teal",
+     "amber",
+     "box:violet",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
+     "lane": 4,
      "at": 1,
      "cars": [
       "violet",
-      "violet"
+      "violet",
+      "amber"
      ]
     },
     {
-     "lane": 2,
-     "at": 0,
+     "lane": 4,
+     "at": 1,
      "cars": [
       "violet",
       "teal",
@@ -2334,108 +2375,118 @@
   },
   {
    "id": "lot-064",
-   "title": "Hilltop Bay",
+   "title": "Library Deck",
    "blurb": "",
    "lanes": [
     [
-     "coral",
      "teal",
-     "box:violet",
-     "sky",
-     "?sky"
+     "?violet",
+     "coral",
+     "lime",
+     "violet"
     ],
     [
-     "tunnel:violet,coral",
-     "teal",
-     "?coral",
+     "coral",
+     "tunnel:lime,coral",
+     "coral",
+     "sky",
+     "violet",
+     "amber"
+    ],
+    [
      "amber",
-     "lime",
+     "box:sky",
+     "?amber",
+     "box:sky",
      "teal"
     ],
     [
-     "coral",
-     "tunnel:lime,lime,amber,teal",
+     "teal",
      "box:violet",
      "?lime",
-     "coral",
-     "lime"
-    ],
-    [
-     "amber",
-     "sky",
-     "amber",
-     "box:amber",
+     "?coral",
      "teal"
     ],
     [
+     "tunnel:amber,violet,coral,lime",
      "teal",
-     "box:lime",
-     "violet",
-     "?coral"
+     "lime",
+     "box:amber",
+     "teal",
+     "lime"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
-     "at": 1,
+     "lane": 4,
+     "at": 0,
      "cars": [
-      "violet",
-      "violet",
-      "amber"
+      "amber",
+      "violet"
      ]
     }
    ]
   },
   {
    "id": "lot-065",
-   "title": "Park Court",
+   "title": "Canal Court",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:lime,violet",
-     "amber",
      "teal",
-     "?lime",
-     "coral",
+     "tunnel:coral,teal,violet",
+     "amber",
+     "box:coral",
+     "teal",
+     "violet",
+     "amber",
+     "violet",
      "sky"
     ],
     [
-     "coral",
      "amber",
-     "violet",
-     "sky",
-     "?teal"
+     "teal",
+     "?sky",
+     "coral",
+     "teal",
+     "lime",
+     "sky"
     ],
     [
-     "tunnel:lime,amber,teal",
+     "teal",
      "?coral",
-     "box:violet",
-     "sky",
-     "lime",
-     "?amber"
-    ],
-    [
-     "coral",
+     "violet",
+     "?coral",
      "teal",
      "lime",
-     "box:lime",
-     "teal"
-    ],
-    [
-     "teal",
-     "amber",
-     "box:violet",
-     "box:coral",
      "coral"
+    ],
+    [
+     "lime",
+     "tunnel:coral,teal,teal,amber",
+     "box:lime",
+     "box:violet",
+     "box:sky",
+     "?lime",
+     "amber",
+     "violet"
+    ],
+    [
+     "amber",
+     "?coral",
+     "sky",
+     "coral",
+     "?amber",
+     "lime",
+     "sky"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
+     "lane": 4,
      "at": 0,
      "cars": [
-      "violet",
-      "violet",
+      "amber",
       "amber"
      ]
     }
@@ -2503,98 +2554,47 @@
   },
   {
    "id": "lot-067",
-   "title": "Garden Block",
+   "title": "Bakery Block",
    "blurb": "",
    "lanes": [
     [
+     "tunnel:coral,lime",
      "coral",
-     "tunnel:lime,amber,lime",
+     "violet",
      "teal",
-     "teal",
-     "?sky",
-     "coral"
+     "lime",
+     "?amber",
+     "violet"
     ],
     [
      "coral",
      "amber",
-     "lime",
-     "?sky",
+     "box:teal",
+     "sky",
+     "coral",
+     "amber"
+    ],
+    [
+     "coral",
+     "tunnel:sky,lime,teal,coral",
+     "?teal",
+     "?violet",
+     "sky",
      "teal"
     ],
     [
-     "coral",
-     "tunnel:amber,coral,violet",
-     "?violet",
-     "box:coral",
-     "sky",
-     "lime"
-    ],
-    [
-     "amber",
-     "amber",
-     "box:violet",
-     "teal",
-     "?teal"
-    ],
-    [
      "lime",
-     "lime",
-     "box:violet",
-     "box:teal"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "violet",
-      "violet",
-      "amber"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-068",
-   "title": "Cedar Strip",
-   "blurb": "",
-   "lanes": [
-    [
-     "teal",
-     "tunnel:lime,lime,amber",
-     "coral",
      "violet",
      "sky",
-     "?violet"
-    ],
-    [
-     "coral",
      "box:amber",
-     "lime",
-     "teal",
-     "box:coral"
+     "violet"
     ],
     [
-     "coral",
+     "amber",
      "?amber",
-     "box:amber",
-     "lime",
-     "?teal"
-    ],
-    [
-     "teal",
-     "violet",
-     "box:sky",
-     "?teal",
+     "box:lime",
+     "box:teal",
      "sky"
-    ],
-    [
-     "teal",
-     "tunnel:amber,coral,lime",
-     "lime",
-     "violet",
-     "coral"
     ]
    ],
    "sides": [
@@ -2602,7 +2602,61 @@
      "lane": 2,
      "at": 1,
      "cars": [
+      "sky",
       "violet",
+      "lime"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-068",
+   "title": "Harbor Strip",
+   "blurb": "",
+   "lanes": [
+    [
+     "tunnel:lime,teal,amber",
+     "coral",
+     "?teal",
+     "?sky",
+     "box:coral",
+     "coral"
+    ],
+    [
+     "lime",
+     "coral",
+     "amber",
+     "box:sky",
+     "sky"
+    ],
+    [
+     "tunnel:violet,violet,amber",
+     "?coral",
+     "?teal",
+     "violet",
+     "lime",
+     "lime"
+    ],
+    [
+     "teal",
+     "box:coral",
+     "violet",
+     "violet",
+     "teal"
+    ],
+    [
+     "lime",
+     "box:amber",
+     "amber",
+     "teal"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 2,
+     "at": 0,
+     "cars": [
+      "lime",
       "amber",
       "violet"
      ]
@@ -2611,294 +2665,43 @@
   },
   {
    "id": "lot-069",
-   "title": "Sunny Lot",
+   "title": "Festival Strip",
    "blurb": "",
    "lanes": [
     [
+     "tunnel:amber,violet,coral,violet",
      "coral",
-     "teal",
-     "?lime",
-     "amber",
-     "lime"
-    ],
-    [
-     "tunnel:lime,violet",
-     "?coral",
-     "box:sky",
      "sky",
-     "box:coral",
-     "?teal"
-    ],
-    [
-     "tunnel:coral,violet",
-     "coral",
-     "box:amber",
-     "violet",
-     "sky",
-     "teal"
-    ],
-    [
-     "amber",
-     "box:amber",
-     "violet",
-     "teal",
-     "?amber"
-    ],
-    [
-     "teal",
-     "teal",
-     "violet",
-     "lime"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "violet",
-      "amber"
-     ]
-    },
-    {
-     "lane": 2,
-     "at": 0,
-     "cars": [
-      "coral",
-      "lime",
-      "lime"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-070",
-   "title": "Sunny Loop",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "?amber",
-     "coral",
-     "coral",
-     "lime",
-     "lime"
-    ],
-    [
-     "coral",
-     "violet",
-     "box:coral",
-     "?sky",
-     "?amber",
-     "box:coral"
-    ],
-    [
-     "amber",
-     "violet",
-     "violet",
-     "?lime",
-     "teal",
-     "box:sky"
-    ],
-    [
-     "teal",
-     "tunnel:sky,coral,sky",
-     "amber",
-     "sky",
-     "amber",
-     "violet",
-     "violet"
-    ],
-    [
-     "tunnel:coral,teal,teal",
-     "box:teal",
-     "lime",
-     "lime",
-     "sky",
-     "amber"
-    ],
-    [
-     "teal",
-     "lime",
-     "coral",
-     "teal",
-     "teal"
-    ]
-   ],
-   "tier": "superhard",
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "teal",
-      "violet"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-071",
-   "title": "Cedar Yard",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "box:teal",
-     "sky"
-    ],
-    [
-     "coral",
-     "tunnel:violet,lime,violet,teal",
-     "lime",
-     "violet",
-     "violet",
-     "?coral"
-    ],
-    [
-     "amber",
-     "?amber",
-     "sky",
-     "box:sky",
-     "amber"
-    ],
-    [
-     "tunnel:amber,amber",
-     "teal",
-     "?teal",
-     "box:violet",
-     "?coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "?lime",
-     "box:lime",
-     "teal",
-     "lime"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 2,
-     "at": 0,
-     "cars": [
-      "violet",
-      "lime"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-072",
-   "title": "Garden Drive",
-   "blurb": "",
-   "lanes": [
-    [
-     "amber",
-     "tunnel:amber,coral",
-     "coral",
-     "box:lime",
-     "box:coral",
-     "?violet"
-    ],
-    [
-     "coral",
-     "box:violet",
-     "violet",
-     "?sky",
-     "teal"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:teal",
-     "?sky",
-     "amber"
-    ],
-    [
-     "tunnel:teal,amber",
-     "?amber",
-     "teal",
-     "lime",
-     "sky"
-    ],
-    [
-     "teal",
-     "lime",
-     "teal",
-     "violet"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "lime",
-      "violet",
-      "violet"
-     ]
-    },
-    {
-     "lane": 4,
-     "at": 1,
-     "cars": [
-      "lime",
-      "lime",
-      "coral"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-073",
-   "title": "Midtown Drive",
-   "blurb": "",
-   "lanes": [
-    [
-     "teal",
-     "amber",
-     "lime",
-     "violet",
-     "sky",
-     "lime"
-    ],
-    [
-     "coral",
-     "box:amber",
-     "box:lime",
-     "coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
      "?violet",
-     "box:amber",
-     "sky",
-     "sky",
+     "box:coral",
      "amber"
     ],
     [
-     "teal",
-     "tunnel:lime,violet,lime,teal",
-     "violet",
+     "tunnel:lime,teal",
+     "coral",
+     "?teal",
      "lime",
-     "?rose",
-     "?amber",
-     "box:violet"
+     "?sky",
+     "teal"
     ],
     [
-     "tunnel:sky,amber",
-     "?coral",
+     "coral",
+     "box:teal",
+     "lime",
+     "sky",
+     "teal"
+    ],
+    [
      "teal",
-     "?rose",
-     "rose",
-     "teal",
+     "?amber",
+     "box:amber",
      "coral"
+    ],
+    [
+     "amber",
+     "box:violet",
+     "lime",
+     "violet"
     ]
    ],
    "sides": [
@@ -2906,308 +2709,190 @@
      "lane": 1,
      "at": 0,
      "cars": [
-      "sky",
-      "violet",
-      "sky"
+      "lime",
+      "violet"
+     ]
+    },
+    {
+     "lane": 0,
+     "at": 1,
+     "cars": [
+      "lime",
+      "amber"
      ]
     }
    ]
   },
   {
-   "id": "lot-074",
-   "title": "Hilltop Court",
+   "id": "lot-070",
+   "title": "Canal Stop",
    "blurb": "",
    "lanes": [
     [
+     "coral",
      "amber",
-     "box:teal",
-     "amber",
-     "coral",
-     "rose",
-     "?amber",
-     "box:lime"
-    ],
-    [
-     "violet",
-     "tunnel:sky,sky",
-     "teal",
+     "box:violet",
      "lime",
-     "sky",
-     "?sky",
-     "teal"
-    ],
-    [
-     "tunnel:violet,sky,lime,amber",
-     "?teal",
-     "coral",
-     "lime",
-     "sky",
-     "coral",
+     "box:violet",
      "lime"
     ],
     [
      "coral",
-     "box:violet",
-     "rose",
-     "?rose",
-     "box:coral",
-     "?teal"
+     "?amber",
+     "sky",
+     "coral",
+     "amber",
+     "lime"
     ],
     [
      "coral",
+     "tunnel:teal,coral,sky,violet",
      "amber",
-     "box:lime",
-     "teal",
+     "lime",
      "violet",
+     "coral",
+     "teal"
+    ],
+    [
+     "teal",
+     "tunnel:coral,sky",
+     "sky",
+     "box:teal",
+     "?amber",
+     "teal",
+     "sky"
+    ],
+    [
+     "lime",
+     "coral",
+     "teal",
+     "box:sky",
      "amber"
+    ],
+    [
+     "teal",
+     "?teal",
+     "?violet",
+     "lime",
+     "violet"
     ]
    ],
+   "tier": "superhard",
    "sides": [
     {
-     "lane": 3,
+     "lane": 4,
      "at": 1,
      "cars": [
-      "violet",
-      "violet"
+      "coral",
+      "teal"
      ]
     }
    ]
   },
   {
-   "id": "lot-075",
-   "title": "Sunny Row",
+   "id": "lot-071",
+   "title": "Park Court",
    "blurb": "",
    "lanes": [
     [
-     "lime",
-     "?coral",
-     "lime",
+     "coral",
+     "?amber",
+     "box:amber",
+     "coral",
      "sky",
-     "rose",
-     "?teal"
+     "teal"
     ],
     [
-     "amber",
-     "tunnel:violet,lime",
-     "amber",
-     "?lime",
-     "box:sky",
-     "rose",
-     "box:teal"
-    ],
-    [
-     "tunnel:lime,sky,amber",
      "coral",
+     "lime",
+     "box:teal",
+     "?sky",
+     "box:coral",
+     "teal"
+    ],
+    [
      "amber",
+     "tunnel:violet,sky",
      "teal",
-     "sky",
+     "lime",
+     "?sky",
+     "box:teal",
+     "lime"
+    ],
+    [
+     "tunnel:sky,lime,violet",
+     "coral",
+     "teal",
      "?coral",
-     "amber"
+     "?amber",
+     "violet"
     ],
     [
-     "teal",
      "violet",
-     "box:violet",
-     "coral",
-     "coral",
+     "lime",
+     "violet",
+     "violet",
      "amber"
-    ],
-    [
-     "teal",
-     "violet",
-     "?coral",
-     "box:rose",
-     "box:teal"
     ]
    ],
    "sides": [
     {
      "lane": 4,
-     "at": 0,
-     "cars": [
-      "sky",
-      "sky",
-      "lime"
-     ]
-    },
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "violet",
-      "violet"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-076",
-   "title": "Canal Drive",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "tunnel:violet,lime",
-     "teal",
-     "violet",
-     "sky",
-     "coral",
-     "box:lime",
-     "lime"
-    ],
-    [
-     "coral",
-     "?teal",
-     "amber",
-     "?rose",
-     "coral",
-     "box:amber",
-     "box:teal"
-    ],
-    [
-     "coral",
-     "amber",
-     "violet",
-     "?rose",
-     "box:sky",
-     "teal"
-    ],
-    [
-     "lime",
-     "tunnel:sky,violet",
-     "amber",
-     "lime",
-     "?amber",
-     "?teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "violet",
-     "sky",
-     "amber",
-     "rose"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 2,
      "at": 1,
      "cars": [
       "sky",
-      "violet",
-      "sky"
+      "lime",
+      "amber"
      ]
     }
    ]
   },
   {
-   "id": "lot-077",
-   "title": "Garden Yard",
+   "id": "lot-072",
+   "title": "Midtown Square",
    "blurb": "",
    "lanes": [
     [
+     "tunnel:violet,teal,sky,amber",
+     "?amber",
      "coral",
-     "tunnel:lime,lime",
-     "box:lime",
-     "amber",
-     "?sky",
-     "?rose",
-     "coral",
-     "sky"
-    ],
-    [
-     "coral",
-     "amber",
      "lime",
-     "?sky",
-     "coral",
+     "sky",
+     "sky",
      "?teal",
      "lime"
     ],
     [
-     "amber",
      "teal",
-     "box:violet",
-     "sky",
+     "box:lime",
+     "box:sky",
      "amber",
+     "?violet",
+     "coral"
+    ],
+    [
+     "coral",
+     "tunnel:coral,amber,coral,sky",
+     "?violet",
+     "coral",
+     "amber",
+     "box:coral",
+     "lime"
+    ],
+    [
+     "teal",
+     "teal",
+     "?teal",
+     "violet",
+     "lime",
      "amber"
     ],
     [
      "coral",
      "box:lime",
      "violet",
-     "box:teal",
-     "rose",
-     "?amber"
-    ],
-    [
-     "teal",
-     "tunnel:violet,violet,violet",
-     "box:teal",
-     "violet",
-     "rose",
-     "coral",
-     "teal"
-    ]
-   ],
-   "sides": [
-    {
-     "lane": 3,
-     "at": 0,
-     "cars": [
-      "sky",
-      "sky"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "lot-078",
-   "title": "Arcade Strip",
-   "blurb": "",
-   "lanes": [
-    [
-     "tunnel:lime,violet,teal",
-     "box:coral",
-     "teal",
-     "amber",
-     "box:sky",
-     "coral",
-     "?coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "?lime",
-     "sky",
-     "coral",
-     "box:amber"
-    ],
-    [
-     "teal",
-     "?violet",
-     "violet",
-     "lime",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "lime",
-     "amber",
-     "rose",
-     "?rose",
-     "box:lime"
-    ],
-    [
-     "coral",
-     "tunnel:sky,amber,violet,amber",
-     "?sky",
-     "violet",
-     "box:rose",
-     "lime",
+     "?teal",
+     "?amber",
      "violet"
     ]
    ],
@@ -3216,17 +2901,409 @@
      "lane": 2,
      "at": 1,
      "cars": [
-      "rose",
-      "rose",
-      "rose"
+      "amber",
+      "coral",
+      "teal"
      ]
     },
+    {
+     "lane": 3,
+     "at": 1,
+     "cars": [
+      "teal",
+      "amber",
+      "sky"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-073",
+   "title": "Willow Stop",
+   "blurb": "",
+   "lanes": [
+    [
+     "coral",
+     "?violet",
+     "amber",
+     "rose",
+     "?lime",
+     "?rose",
+     "lime",
+     "violet"
+    ],
+    [
+     "coral",
+     "teal",
+     "sky",
+     "box:violet",
+     "teal",
+     "?teal",
+     "violet"
+    ],
+    [
+     "coral",
+     "amber",
+     "?lime",
+     "sky",
+     "amber",
+     "coral",
+     "violet"
+    ],
+    [
+     "amber",
+     "tunnel:coral,coral,sky,amber",
+     "box:teal",
+     "violet",
+     "coral",
+     "?teal",
+     "coral",
+     "lime"
+    ],
+    [
+     "tunnel:rose,sky,sky",
+     "teal",
+     "rose",
+     "box:lime",
+     "sky",
+     "box:amber",
+     "rose",
+     "lime"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 3,
+     "at": 1,
+     "cars": [
+      "rose",
+      "coral"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-074",
+   "title": "Harbor Square",
+   "blurb": "",
+   "lanes": [
+    [
+     "coral",
+     "amber",
+     "sky",
+     "box:violet",
+     "coral",
+     "box:coral",
+     "teal"
+    ],
+    [
+     "coral",
+     "teal",
+     "?teal",
+     "rose",
+     "box:teal",
+     "box:lime",
+     "lime"
+    ],
+    [
+     "tunnel:sky,violet,rose,amber",
+     "?coral",
+     "violet",
+     "?rose",
+     "lime",
+     "violet",
+     "teal",
+     "violet"
+    ],
+    [
+     "tunnel:sky,lime,rose",
+     "teal",
+     "amber",
+     "?sky",
+     "lime",
+     "coral",
+     "rose"
+    ],
+    [
+     "amber",
+     "lime",
+     "violet",
+     "?amber",
+     "box:sky",
+     "amber"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 0,
+     "at": 0,
+     "cars": [
+      "rose",
+      "sky"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-075",
+   "title": "Pier Loop",
+   "blurb": "",
+   "lanes": [
+    [
+     "coral",
+     "teal",
+     "?lime",
+     "sky",
+     "rose",
+     "lime"
+    ],
+    [
+     "coral",
+     "?amber",
+     "box:lime",
+     "rose",
+     "?teal",
+     "lime"
+    ],
+    [
+     "coral",
+     "?amber",
+     "box:amber",
+     "?sky",
+     "sky"
+    ],
+    [
+     "teal",
+     "tunnel:violet,violet,amber",
+     "violet",
+     "violet",
+     "teal",
+     "coral"
+    ],
+    [
+     "teal",
+     "tunnel:amber,coral,violet,amber",
+     "box:lime",
+     "box:coral",
+     "box:violet",
+     "teal"
+    ]
+   ],
+   "sides": [
     {
      "lane": 4,
      "at": 0,
      "cars": [
       "sky",
       "sky"
+     ]
+    },
+    {
+     "lane": 4,
+     "at": 1,
+     "cars": [
+      "sky",
+      "lime",
+      "rose"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-076",
+   "title": "Sunny Deck",
+   "blurb": "",
+   "lanes": [
+    [
+     "amber",
+     "?teal",
+     "?sky",
+     "violet",
+     "box:coral",
+     "coral",
+     "lime"
+    ],
+    [
+     "amber",
+     "box:coral",
+     "violet",
+     "rose",
+     "teal",
+     "teal",
+     "sky"
+    ],
+    [
+     "tunnel:teal,lime,violet,sky",
+     "coral",
+     "box:amber",
+     "box:teal",
+     "box:sky",
+     "?amber",
+     "coral"
+    ],
+    [
+     "tunnel:rose,rose,sky",
+     "teal",
+     "lime",
+     "violet",
+     "sky",
+     "rose",
+     "amber"
+    ],
+    [
+     "lime",
+     "?lime",
+     "rose",
+     "coral",
+     "?amber",
+     "violet"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 3,
+     "at": 1,
+     "cars": [
+      "lime",
+      "violet",
+      "rose"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-077",
+   "title": "River Row",
+   "blurb": "",
+   "lanes": [
+    [
+     "tunnel:violet,rose,teal,lime",
+     "amber",
+     "teal",
+     "coral",
+     "?sky",
+     "rose",
+     "sky",
+     "box:violet",
+     "rose"
+    ],
+    [
+     "amber",
+     "tunnel:teal,coral",
+     "box:sky",
+     "lime",
+     "?violet",
+     "amber",
+     "coral",
+     "box:sky",
+     "coral"
+    ],
+    [
+     "teal",
+     "lime",
+     "coral",
+     "rose",
+     "teal",
+     "?coral",
+     "lime",
+     "coral"
+    ],
+    [
+     "amber",
+     "coral",
+     "box:rose",
+     "violet",
+     "?teal",
+     "box:amber",
+     "lime",
+     "sky"
+    ],
+    [
+     "teal",
+     "lime",
+     "violet",
+     "?coral",
+     "?teal",
+     "amber",
+     "sky"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 1,
+     "at": 0,
+     "cars": [
+      "teal",
+      "violet",
+      "rose"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-078",
+   "title": "Pier Garage",
+   "blurb": "",
+   "lanes": [
+    [
+     "amber",
+     "tunnel:lime,teal,rose,violet",
+     "teal",
+     "lime",
+     "sky",
+     "box:rose",
+     "amber"
+    ],
+    [
+     "lime",
+     "?coral",
+     "amber",
+     "?sky",
+     "box:coral",
+     "coral"
+    ],
+    [
+     "coral",
+     "?violet",
+     "?violet",
+     "sky",
+     "amber",
+     "rose"
+    ],
+    [
+     "tunnel:rose,lime,amber",
+     "box:coral",
+     "amber",
+     "teal",
+     "box:rose",
+     "?teal",
+     "violet"
+    ],
+    [
+     "teal",
+     "box:lime",
+     "violet",
+     "coral",
+     "teal"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 0,
+     "at": 1,
+     "cars": [
+      "sky",
+      "rose",
+      "sky"
+     ]
+    },
+    {
+     "lane": 0,
+     "at": 1,
+     "cars": [
+      "sky",
+      "violet",
+      "lime"
      ]
     }
    ]
@@ -3297,73 +3374,81 @@
   },
   {
    "id": "lot-080",
-   "title": "Midtown Drive",
+   "title": "Lantern Stop",
    "blurb": "",
    "lanes": [
     [
      "teal",
-     "amber",
-     "sky",
-     "violet",
-     "violet",
-     "box:teal",
-     "sky"
-    ],
-    [
+     "teal",
      "lime",
-     "tunnel:amber,teal,coral",
      "teal",
-     "sky",
-     "rose",
-     "?teal",
      "amber",
-     "amber"
-    ],
-    [
-     "tunnel:teal,teal",
-     "box:coral",
-     "box:violet",
-     "lime",
-     "rose",
-     "violet",
-     "?violet",
-     "sky"
-    ],
-    [
-     "teal",
-     "?lime",
-     "rose",
-     "coral",
-     "teal",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "tunnel:lime,coral,sky,rose",
-     "box:amber",
-     "?amber",
-     "coral",
+     "box:lime",
      "?rose",
-     "violet"
+     "sky"
     ],
     [
      "coral",
+     "lime",
      "amber",
+     "amber",
+     "violet",
+     "box:coral",
+     "coral",
+     "rose"
+    ],
+    [
+     "amber",
+     "?coral",
+     "teal",
+     "rose",
+     "teal",
+     "violet",
+     "violet",
+     "sky"
+    ],
+    [
+     "tunnel:violet,lime,lime",
+     "box:lime",
+     "?violet",
      "sky",
+     "teal",
+     "coral",
+     "sky",
+     "coral",
+     "lime"
+    ],
+    [
+     "violet",
+     "tunnel:sky,amber,violet,amber",
+     "coral",
+     "amber",
+     "rose",
+     "coral",
      "lime",
-     "lime",
-     "box:rose"
+     "?coral",
+     "teal"
+    ],
+    [
+     "tunnel:sky,teal,teal",
+     "amber",
+     "?rose",
+     "box:sky",
+     "?sky",
+     "violet",
+     "box:lime",
+     "rose",
+     "amber"
     ]
    ],
    "tier": "superhard",
    "sides": [
     {
-     "lane": 3,
+     "lane": 4,
      "at": 1,
      "cars": [
-      "amber",
-      "coral"
+      "sky",
+      "violet"
      ]
     }
    ]
@@ -3374,392 +3459,427 @@
    "blurb": "",
    "lanes": [
     [
-     "tunnel:teal,lime",
-     "teal",
-     "amber",
-     "sky",
-     "violet",
-     "box:sky"
-    ],
-    [
      "coral",
-     "tunnel:violet,lime",
-     "coral",
-     "box:violet",
-     "?rose",
-     "lime"
-    ],
-    [
-     "amber",
+     "tunnel:amber,coral",
      "?amber",
-     "lime",
-     "rose",
-     "?coral"
-    ],
-    [
+     "sky",
+     "box:coral",
      "teal",
-     "?lime",
-     "?rose",
-     "?teal",
-     "amber"
+     "?sky",
+     "sky"
     ],
     [
+     "amber",
+     "?teal",
+     "sky",
+     "?rose",
      "coral",
-     "lime",
-     "coral",
-     "box:violet",
+     "box:teal",
      "teal"
     ],
     [
-     "tunnel:amber,violet,sky,amber",
-     "box:teal",
+     "teal",
      "violet",
-     "box:sky",
-     "coral"
+     "violet",
+     "?coral",
+     "box:amber",
+     "sky"
+    ],
+    [
+     "coral",
+     "lime",
+     "?rose",
+     "amber",
+     "rose",
+     "lime"
+    ],
+    [
+     "coral",
+     "tunnel:violet,violet",
+     "box:lime",
+     "?sky",
+     "amber",
+     "lime",
+     "violet"
+    ],
+    [
+     "teal",
+     "tunnel:teal,coral,teal,rose",
+     "lime",
+     "violet",
+     "amber",
+     "box:lime",
+     "rose"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
+     "lane": 5,
      "at": 1,
      "cars": [
-      "rose",
+      "amber",
+      "coral",
       "rose"
      ]
     },
     {
      "lane": 2,
-     "at": 0,
+     "at": 1,
      "cars": [
-      "sky",
-      "sky",
-      "rose"
+      "teal",
+      "amber"
      ]
     }
    ]
   },
   {
    "id": "lot-082",
-   "title": "Plaza Drive",
+   "title": "Seaside Row",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:lime,amber,teal,amber",
-     "coral",
-     "teal",
-     "box:amber",
-     "?sky",
-     "?lime",
-     "violet"
+     "tunnel:violet,amber,violet,lime",
+     "amber",
+     "box:coral",
+     "?violet",
+     "box:lime",
+     "box:rose",
+     "rose"
     ],
     [
      "coral",
-     "?violet",
-     "box:violet",
-     "coral",
+     "teal",
+     "rose",
+     "?coral",
+     "amber"
+    ],
+    [
+     "teal",
+     "lime",
+     "amber",
+     "?teal",
+     "sky"
+    ],
+    [
+     "tunnel:sky,coral,rose",
+     "?coral",
+     "violet",
+     "box:rose",
+     "?sky",
      "teal"
     ],
     [
+     "tunnel:lime,lime,violet,rose",
      "teal",
-     "lime",
-     "violet",
-     "teal",
-     "coral"
-    ],
-    [
-     "amber",
-     "tunnel:violet,sky",
-     "amber",
-     "box:sky",
-     "rose",
-     "lime"
-    ],
-    [
-     "tunnel:rose,rose,sky",
-     "teal",
-     "lime",
-     "rose",
-     "?coral",
-     "box:violet"
-    ],
-    [
      "coral",
-     "?lime",
-     "?rose",
-     "box:sky",
+     "violet",
+     "sky",
+     "teal"
+    ],
+    [
+     "amber",
+     "box:lime",
+     "sky",
+     "?coral",
      "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 2,
+     "lane": 5,
      "at": 1,
      "cars": [
-      "sky",
-      "rose"
+      "coral",
+      "coral",
+      "sky"
      ]
     }
    ]
   },
   {
    "id": "lot-083",
-   "title": "Hilltop Court",
+   "title": "Hilltop Lane",
    "blurb": "",
    "lanes": [
     [
-     "amber",
-     "?teal",
-     "violet",
-     "?sky",
-     "box:teal",
-     "lime"
-    ],
-    [
-     "lime",
-     "tunnel:rose,sky",
      "coral",
+     "tunnel:coral,sky,lime",
      "?lime",
-     "sky",
-     "coral",
-     "lime"
-    ],
-    [
-     "amber",
-     "?teal",
+     "box:coral",
+     "lime",
      "rose",
-     "rose",
-     "teal",
+     "lime",
      "sky"
     ],
     [
-     "coral",
-     "sky",
-     "box:amber",
-     "coral",
-     "box:amber",
-     "box:violet"
-    ],
-    [
      "violet",
-     "tunnel:sky,rose",
-     "coral",
-     "?violet",
-     "box:rose",
-     "amber"
+     "box:amber",
+     "sky",
+     "rose",
+     "amber",
+     "amber",
+     "violet"
     ],
     [
-     "tunnel:amber,violet",
-     "teal",
-     "lime",
      "coral",
+     "teal",
+     "?lime",
+     "rose",
+     "teal",
+     "box:teal",
+     "coral"
+    ],
+    [
+     "teal",
+     "box:amber",
+     "lime",
+     "?sky",
      "?teal",
-     "violet"
+     "?violet",
+     "sky"
+    ],
+    [
+     "teal",
+     "tunnel:rose,lime,rose",
+     "violet",
+     "sky",
+     "amber",
+     "box:lime",
+     "?rose",
+     "teal"
+    ],
+    [
+     "tunnel:teal,amber,amber,amber",
+     "?coral",
+     "violet",
+     "?amber",
+     "coral",
+     "violet",
+     "coral",
+     "coral"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
-     "at": 0,
+     "lane": 5,
+     "at": 1,
      "cars": [
       "lime",
-      "rose"
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-084",
-   "title": "Maple Court",
+   "title": "Canal Circle",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "amber",
-     "box:sky",
-     "?violet",
-     "?teal"
-    ],
-    [
-     "coral",
-     "tunnel:rose,violet",
      "box:teal",
-     "box:sky",
      "teal",
-     "rose"
-    ],
-    [
-     "coral",
-     "violet",
-     "violet",
      "?rose",
-     "coral"
-    ],
-    [
-     "tunnel:amber,lime",
-     "box:amber",
-     "?lime",
-     "box:amber",
-     "sky",
-     "?amber"
-    ],
-    [
-     "teal",
-     "lime",
-     "teal",
-     "?coral",
      "lime"
     ],
     [
-     "teal",
-     "tunnel:sky,sky,amber,violet",
-     "lime",
-     "rose",
+     "tunnel:rose,coral",
+     "?teal",
+     "amber",
+     "?sky",
+     "box:violet",
+     "lime"
+    ],
+    [
      "coral",
+     "teal",
+     "box:rose",
+     "coral",
+     "teal"
+    ],
+    [
+     "coral",
+     "box:lime",
+     "sky",
+     "sky",
+     "amber"
+    ],
+    [
+     "amber",
+     "tunnel:sky,sky,coral,teal",
+     "?lime",
+     "box:violet",
+     "?rose",
      "violet"
+    ],
+    [
+     "amber",
+     "tunnel:violet,amber,violet,lime",
+     "?violet",
+     "lime",
+     "coral",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
+     "lane": 5,
      "at": 0,
      "cars": [
-      "lime",
+      "coral",
+      "rose",
       "rose"
      ]
     },
     {
-     "lane": 0,
-     "at": 0,
+     "lane": 5,
+     "at": 1,
      "cars": [
-      "sky",
-      "rose"
+      "coral",
+      "sky"
      ]
     }
    ]
   },
   {
    "id": "lot-085",
-   "title": "Harbor Stop",
+   "title": "River Garage",
    "blurb": "",
    "lanes": [
     [
      "amber",
-     "tunnel:sky,rose",
-     "box:rose",
-     "box:lime",
+     "tunnel:teal,coral",
+     "coral",
      "violet",
      "rose",
-     "lime"
-    ],
-    [
-     "coral",
-     "coral",
-     "box:sky",
      "violet",
-     "?teal",
-     "box:amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "rose",
-     "box:violet",
-     "?teal",
-     "lime"
-    ],
-    [
-     "teal",
-     "tunnel:rose,violet,sky",
-     "lime",
-     "lime",
-     "?teal",
+     "?lime",
      "sky"
     ],
     [
-     "amber",
-     "?sky",
      "coral",
-     "coral",
-     "?amber"
+     "?teal",
+     "box:rose",
+     "box:coral",
+     "box:violet",
+     "amber"
     ],
     [
-     "teal",
-     "tunnel:violet,violet",
-     "amber",
-     "sky",
+     "lime",
+     "lime",
      "coral",
-     "?amber"
+     "sky",
+     "teal",
+     "coral"
+    ],
+    [
+     "amber",
+     "?teal",
+     "?sky",
+     "?sky",
+     "lime",
+     "rose"
+    ],
+    [
+     "coral",
+     "tunnel:violet,coral,rose",
+     "?lime",
+     "?rose",
+     "teal",
+     "teal",
+     "lime"
+    ],
+    [
+     "tunnel:teal,rose,sky",
+     "amber",
+     "box:teal",
+     "violet",
+     "box:sky",
+     "violet",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 3,
+     "lane": 4,
      "at": 1,
      "cars": [
-      "lime",
-      "rose"
+      "amber",
+      "coral",
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-086",
-   "title": "Harbor Circle",
+   "title": "Meadow Garage",
    "blurb": "",
    "lanes": [
     [
-     "coral",
-     "tunnel:sky,violet,violet,rose",
-     "box:teal",
      "violet",
-     "coral",
-     "?amber"
-    ],
-    [
-     "tunnel:violet,coral,lime",
-     "?coral",
-     "lime",
-     "violet",
-     "box:teal",
-     "?teal"
-    ],
-    [
+     "amber",
+     "?violet",
+     "?sky",
+     "amber",
      "teal",
-     "?amber",
-     "sky",
-     "violet",
-     "box:rose"
+     "sky"
     ],
     [
-     "coral",
+     "tunnel:coral,amber",
+     "teal",
+     "rose",
      "amber",
      "rose",
+     "?amber",
+     "lime",
+     "lime"
+    ],
+    [
+     "coral",
+     "coral",
      "rose",
-     "?lime"
+     "sky",
+     "coral",
+     "sky",
+     "rose"
     ],
     [
      "teal",
-     "tunnel:lime,amber",
+     "?lime",
      "lime",
-     "sky",
-     "coral",
-     "teal"
+     "box:coral",
+     "?violet",
+     "box:amber",
+     "rose"
     ],
     [
-     "lime",
-     "box:amber",
+     "tunnel:teal,coral,coral,teal",
+     "?lime",
+     "coral",
+     "box:teal",
+     "amber",
+     "?violet",
+     "box:violet",
+     "lime"
+    ],
+    [
+     "tunnel:amber,lime,lime,amber",
+     "box:teal",
+     "violet",
      "sky",
-     "box:amber",
-     "?sky"
+     "coral",
+     "?teal",
+     "teal"
     ]
    ],
    "sides": [
     {
-     "lane": 2,
+     "lane": 4,
      "at": 1,
      "cars": [
+      "lime",
       "sky",
-      "rose",
       "rose"
      ]
     }
@@ -3767,196 +3887,204 @@
   },
   {
    "id": "lot-087",
-   "title": "Library Square",
+   "title": "Cedar Stop",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:sky,violet,sky",
      "coral",
-     "amber",
-     "violet",
-     "box:rose",
-     "lime",
-     "?lime"
-    ],
-    [
-     "teal",
-     "coral",
-     "teal",
-     "?lime",
-     "coral"
-    ],
-    [
-     "tunnel:violet,teal",
-     "?amber",
-     "?sky",
-     "box:rose",
-     "violet",
-     "coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "box:rose",
-     "coral",
+     "tunnel:teal,violet,sky",
+     "sky",
+     "box:violet",
+     "?violet",
      "amber"
     ],
     [
-     "sky",
+     "tunnel:violet,rose,sky",
+     "coral",
+     "?amber",
      "?lime",
-     "violet",
-     "box:amber",
-     "?teal"
+     "rose",
+     "lime"
     ],
     [
-     "tunnel:rose,lime",
+     "tunnel:lime,coral,amber,lime",
+     "coral",
+     "box:amber",
+     "?violet",
+     "?sky",
+     "coral"
+    ],
+    [
      "teal",
      "box:lime",
-     "sky",
+     "box:rose",
+     "coral"
+    ],
+    [
      "teal",
+     "teal",
+     "rose",
+     "teal"
+    ],
+    [
+     "amber",
+     "box:lime",
+     "?sky",
      "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
+     "lane": 2,
      "at": 0,
      "cars": [
-      "violet",
+      "teal",
+      "sky",
       "rose"
      ]
     },
     {
-     "lane": 5,
+     "lane": 3,
      "at": 1,
      "cars": [
-      "rose",
-      "sky"
+      "violet",
+      "rose"
      ]
     }
    ]
   },
   {
    "id": "lot-088",
-   "title": "Meadow Row",
+   "title": "Meadow Court",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "box:amber",
+     "box:lime",
      "violet",
      "rose",
-     "amber",
-     "?rose"
+     "box:teal",
+     "coral",
+     "violet"
     ],
     [
-     "tunnel:rose,sky",
+     "tunnel:sky,sky",
      "?coral",
-     "teal",
-     "box:sky",
-     "box:rose",
-     "lime",
-     "teal"
-    ],
-    [
-     "amber",
-     "amber",
+     "?rose",
+     "?amber",
      "?lime",
-     "sky",
-     "box:coral"
-    ],
-    [
-     "teal",
-     "violet",
-     "?violet",
-     "?coral",
-     "?teal"
-    ],
-    [
-     "teal",
-     "tunnel:violet,sky,amber",
-     "lime",
-     "sky",
      "coral",
-     "amber"
+     "amber",
+     "lime"
     ],
     [
      "coral",
-     "tunnel:lime,sky",
-     "lime",
+     "?lime",
+     "amber",
      "rose",
      "teal",
-     "box:lime"
+     "box:lime",
+     "sky"
+    ],
+    [
+     "teal",
+     "sky",
+     "?sky",
+     "coral",
+     "?violet",
+     "rose",
+     "lime"
+    ],
+    [
+     "teal",
+     "tunnel:teal,teal,coral,rose",
+     "amber",
+     "?teal",
+     "violet",
+     "violet",
+     "box:amber",
+     "coral"
+    ],
+    [
+     "tunnel:teal,amber,lime,rose",
+     "violet",
+     "box:sky",
+     "coral",
+     "teal",
+     "lime",
+     "amber"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
-     "at": 0,
+     "lane": 2,
+     "at": 1,
      "cars": [
-      "violet",
-      "violet",
-      "rose"
+      "amber",
+      "amber",
+      "lime"
      ]
     }
    ]
   },
   {
    "id": "lot-089",
-   "title": "Seaside Bay",
+   "title": "Harbor Lane",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:coral,coral,rose,rose",
-     "teal",
-     "amber",
-     "box:violet",
-     "sky",
-     "rose",
-     "teal",
-     "violet"
-    ],
-    [
      "coral",
-     "tunnel:gold,sky,sky",
-     "coral",
-     "violet",
-     "box:rose",
      "amber",
-     "amber",
-     "?violet"
-    ],
-    [
-     "lime",
-     "?amber",
-     "box:violet",
-     "box:gold",
-     "coral",
-     "box:amber",
-     "lime"
-    ],
-    [
-     "teal",
-     "lime",
-     "sky",
      "?rose",
+     "rose",
      "coral",
+     "amber",
+     "sky"
+    ],
+    [
+     "coral",
+     "tunnel:coral,sky,gold,violet",
+     "?amber",
+     "violet",
+     "sky",
+     "teal",
+     "amber",
      "violet"
     ],
     [
-     "amber",
-     "tunnel:rose,gold",
      "coral",
-     "lime",
+     "box:teal",
+     "sky",
+     "gold",
      "?coral",
-     "teal",
-     "?lime"
+     "amber",
+     "violet"
     ],
     [
      "teal",
-     "sky",
-     "?gold",
+     "tunnel:gold,coral",
+     "lime",
+     "violet",
+     "box:teal",
      "gold",
+     "lime",
+     "gold"
+    ],
+    [
+     "amber",
+     "tunnel:rose,rose",
+     "box:teal",
+     "lime",
+     "?rose",
+     "box:coral",
+     "box:lime",
+     "rose"
+    ],
+    [
+     "lime",
+     "?violet",
+     "?gold",
+     "sky",
      "teal",
      "lime"
     ]
@@ -3966,9 +4094,8 @@
      "lane": 5,
      "at": 1,
      "cars": [
-      "gold",
-      "sky",
-      "coral"
+      "coral",
+      "sky"
      ]
     }
    ]
@@ -4066,144 +4193,154 @@
   },
   {
    "id": "lot-091",
-   "title": "Lantern Square",
+   "title": "Cedar Court",
    "blurb": "",
    "lanes": [
     [
-     "coral",
-     "tunnel:gold,sky,sky,lime",
-     "?amber",
-     "?violet",
-     "gold",
-     "coral",
-     "coral",
-     "?amber"
-    ],
-    [
-     "lime",
-     "tunnel:coral,gold,gold,rose",
+     "tunnel:coral,gold,amber",
      "amber",
-     "box:violet",
-     "rose",
      "coral",
-     "lime",
-     "violet"
-    ],
-    [
-     "teal",
-     "box:coral",
+     "?violet",
      "sky",
-     "rose",
+     "box:teal",
+     "?teal",
      "violet",
-     "?sky",
      "rose"
     ],
     [
-     "tunnel:rose,coral",
-     "?lime",
+     "tunnel:rose,amber,coral,amber",
+     "?coral",
+     "lime",
+     "?sky",
+     "?coral",
+     "rose",
      "amber",
      "box:violet",
-     "?sky",
-     "box:amber",
-     "lime"
+     "sky"
     ],
     [
-     "coral",
-     "box:teal",
-     "sky",
-     "gold",
      "teal",
+     "amber",
+     "lime",
+     "?rose",
+     "coral",
+     "box:amber",
+     "violet",
      "teal"
     ],
     [
      "teal",
-     "lime",
-     "rose",
+     "tunnel:lime,lime,coral,rose",
+     "coral",
+     "sky",
      "gold",
+     "amber",
+     "lime",
+     "sky",
+     "gold"
+    ],
+    [
      "teal",
-     "amber"
+     "box:amber",
+     "rose",
+     "violet",
+     "coral",
+     "lime",
+     "gold",
+     "teal"
+    ],
+    [
+     "lime",
+     "violet",
+     "gold",
+     "?gold",
+     "box:teal",
+     "lime",
+     "sky"
     ]
    ],
    "sides": [
     {
      "lane": 0,
-     "at": 0,
+     "at": 1,
      "cars": [
-      "coral",
-      "violet"
+      "lime",
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-092",
-   "title": "Meadow Square",
+   "title": "River Stop",
    "blurb": "",
    "lanes": [
     [
-     "lime",
-     "amber",
-     "violet",
-     "rose",
-     "box:coral",
      "coral",
-     "?violet"
-    ],
-    [
-     "tunnel:sky,coral,gold",
+     "tunnel:teal,teal,coral,amber",
      "coral",
-     "?amber",
-     "violet",
      "sky",
-     "amber",
-     "?teal",
-     "?rose"
-    ],
-    [
-     "coral",
-     "tunnel:violet,sky",
-     "amber",
+     "gold",
+     "box:coral",
      "violet",
-     "rose",
-     "coral",
      "lime",
      "rose"
     ],
     [
      "teal",
-     "tunnel:coral,rose,sky",
-     "?lime",
-     "box:lime",
-     "rose",
-     "teal",
+     "tunnel:gold,gold,rose,sky",
      "amber",
-     "gold"
+     "?violet",
+     "amber",
+     "?coral",
+     "?teal",
+     "amber"
     ],
     [
      "teal",
-     "sky",
-     "?sky",
-     "gold",
+     "rose",
+     "rose",
+     "violet",
      "amber",
+     "amber",
+     "violet"
+    ],
+    [
+     "amber",
+     "lime",
+     "sky",
+     "box:lime",
+     "?teal",
+     "coral",
+     "violet"
+    ],
+    [
+     "coral",
+     "box:sky",
+     "violet",
+     "?gold",
+     "lime",
+     "?sky",
      "lime"
     ],
     [
+     "tunnel:amber,coral,gold,coral",
      "teal",
-     "coral",
-     "box:gold",
-     "box:gold",
+     "box:lime",
+     "box:rose",
+     "?gold",
      "teal",
-     "box:violet"
+     "rose",
+     "sky"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
-     "at": 1,
+     "lane": 2,
+     "at": 0,
      "cars": [
-      "gold",
-      "lime",
-      "coral"
+      "teal",
+      "amber"
      ]
     }
    ]
@@ -4289,536 +4426,583 @@
   },
   {
    "id": "lot-094",
-   "title": "Market Court",
+   "title": "Canal Court",
    "blurb": "",
    "lanes": [
     [
-     "teal",
-     "tunnel:rose,sky",
      "coral",
-     "violet",
-     "?sky",
-     "box:amber",
-     "?teal",
-     "?violet"
-    ],
-    [
-     "lime",
-     "box:lime",
-     "violet",
-     "sky",
-     "?teal",
-     "?amber",
-     "violet"
-    ],
-    [
      "teal",
      "amber",
-     "violet",
-     "?gold",
-     "coral",
-     "box:lime",
-     "lime"
-    ],
-    [
-     "coral",
-     "lime",
-     "sky",
-     "gold",
      "teal",
-     "amber",
-     "gold"
-    ],
-    [
-     "teal",
-     "tunnel:coral,coral,rose,rose",
-     "amber",
-     "coral",
-     "gold",
      "rose",
-     "lime",
+     "gold",
+     "amber",
+     "rose"
+    ],
+    [
+     "coral",
+     "?coral",
+     "amber",
+     "box:coral",
+     "?amber",
+     "?lime",
      "sky"
     ],
     [
-     "tunnel:coral,gold",
-     "box:coral",
-     "box:amber",
+     "sky",
+     "lime",
+     "violet",
      "rose",
+     "violet",
+     "box:gold",
+     "lime"
+    ],
+    [
+     "tunnel:rose,coral,teal",
+     "amber",
+     "?lime",
+     "box:sky",
+     "?coral",
+     "teal",
+     "box:violet",
+     "sky"
+    ],
+    [
+     "teal",
+     "tunnel:gold,coral,rose",
+     "violet",
+     "lime",
      "rose",
+     "box:teal",
+     "amber",
+     "lime"
+    ],
+    [
+     "teal",
+     "tunnel:gold,teal",
+     "?violet",
+     "sky",
+     "gold",
      "coral",
-     "violet"
+     "violet",
+     "sky"
     ]
    ],
    "sides": [
     {
-     "lane": 0,
+     "lane": 2,
      "at": 1,
      "cars": [
+      "teal",
       "gold",
-      "sky"
+      "coral"
      ]
     }
    ]
   },
   {
    "id": "lot-095",
-   "title": "Lantern Bay",
+   "title": "Harbor Yard",
    "blurb": "",
    "lanes": [
     [
-     "amber",
-     "amber",
-     "box:violet",
-     "?rose",
      "coral",
-     "teal",
-     "box:sky"
-    ],
-    [
-     "tunnel:teal,sky,violet,rose",
-     "coral",
-     "teal",
+     "lime",
+     "?gold",
+     "rose",
+     "?teal",
      "violet",
-     "box:rose",
-     "coral",
-     "?lime",
+     "amber",
      "rose"
     ],
     [
-     "coral",
-     "tunnel:violet,sky",
+     "teal",
      "amber",
      "lime",
-     "box:rose",
+     "box:coral",
      "coral",
      "lime",
-     "rose"
+     "rose",
+     "sky"
     ],
     [
      "coral",
-     "tunnel:gold,gold,coral",
-     "violet",
-     "gold",
+     "amber",
+     "rose",
      "sky",
-     "lime",
-     "?teal"
-    ],
-    [
-     "teal",
      "box:lime",
-     "sky",
-     "?gold",
-     "amber",
+     "teal",
      "amber"
     ],
     [
+     "coral",
+     "tunnel:teal,coral",
      "teal",
-     "lime",
      "sky",
-     "?gold",
-     "?violet",
-     "amber"
+     "gold",
+     "box:gold",
+     "box:sky",
+     "gold"
+    ],
+    [
+     "tunnel:coral,gold",
+     "?teal",
+     "?lime",
+     "violet",
+     "violet",
+     "coral",
+     "violet",
+     "lime"
+    ],
+    [
+     "tunnel:violet,rose,coral,gold",
+     "?amber",
+     "violet",
+     "sky",
+     "rose",
+     "?teal",
+     "box:amber",
+     "sky"
     ]
    ],
    "sides": [
     {
-     "lane": 5,
+     "lane": 0,
      "at": 1,
      "cars": [
-      "coral",
-      "gold",
-      "coral"
+      "teal",
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-096",
-   "title": "Maple Bay",
+   "title": "Rooftop Deck",
    "blurb": "",
    "lanes": [
     [
+     "tunnel:lime,teal",
+     "?teal",
      "amber",
+     "amber",
+     "?sky",
      "teal",
      "violet",
-     "rose",
-     "box:coral",
-     "box:amber",
-     "violet"
-    ],
-    [
-     "coral",
-     "amber",
-     "rose",
-     "rose",
-     "amber",
-     "coral",
-     "?sky"
-    ],
-    [
-     "tunnel:gold,rose",
-     "box:lime",
-     "?amber",
-     "violet",
-     "sky",
-     "coral",
-     "amber",
+     "box:teal",
+     "gold",
      "rose"
     ],
     [
+     "coral",
+     "?lime",
      "teal",
-     "?coral",
-     "sky",
-     "?gold",
-     "lime",
-     "box:teal"
-    ],
-    [
-     "teal",
-     "tunnel:sky,rose,gold,sky",
-     "violet",
-     "sky",
      "gold",
-     "teal",
-     "lime"
+     "box:violet",
+     "amber",
+     "violet",
+     "coral"
     ],
     [
      "coral",
-     "tunnel:gold,violet",
-     "?lime",
      "lime",
-     "box:gold",
-     "teal",
-     "?lime"
+     "rose",
+     "box:teal",
+     "coral",
+     "amber",
+     "violet",
+     "gold"
+    ],
+    [
+     "tunnel:teal,rose,coral",
+     "lime",
+     "sky",
+     "?rose",
+     "?coral",
+     "gold",
+     "lime",
+     "box:sky",
+     "coral"
+    ],
+    [
+     "coral",
+     "amber",
+     "box:violet",
+     "gold",
+     "amber",
+     "lime",
+     "?sky",
+     "rose"
+    ],
+    [
+     "tunnel:amber,violet,amber,lime",
+     "?teal",
+     "violet",
+     "rose",
+     "coral",
+     "?sky",
+     "lime",
+     "sky",
+     "gold"
     ]
    ],
    "sides": [
     {
-     "lane": 1,
+     "lane": 4,
      "at": 1,
      "cars": [
-      "coral",
-      "violet"
+      "violet",
+      "lime"
      ]
     },
     {
-     "lane": 2,
-     "at": 1,
+     "lane": 0,
+     "at": 0,
      "cars": [
-      "coral",
-      "coral"
+      "violet",
+      "teal",
+      "amber"
      ]
     }
    ]
   },
   {
    "id": "lot-097",
-   "title": "Bakery Yard",
+   "title": "Library Block",
    "blurb": "",
    "lanes": [
     [
-     "tunnel:coral,gold",
-     "?coral",
+     "coral",
      "amber",
-     "sky",
+     "?lime",
      "rose",
+     "?coral",
+     "rose",
+     "violet",
+     "rose",
+     "gold"
+    ],
+    [
+     "coral",
      "amber",
-     "teal",
+     "violet",
+     "gold",
+     "sky",
+     "box:violet",
+     "sky",
      "rose"
     ],
     [
      "coral",
-     "?lime",
+     "tunnel:amber,rose,lime,teal",
      "violet",
-     "gold",
-     "coral",
-     "box:coral",
-     "sky"
-    ],
-    [
-     "tunnel:rose,violet,rose",
-     "box:coral",
+     "?violet",
      "teal",
-     "violet",
-     "coral",
-     "rose",
-     "lime",
-     "violet"
-    ],
-    [
-     "teal",
-     "lime",
-     "sky",
-     "gold",
-     "teal",
-     "?lime",
-     "lime"
-    ],
-    [
-     "tunnel:coral,sky",
-     "box:amber",
-     "?lime",
-     "violet",
-     "?rose",
-     "teal",
-     "?amber",
-     "sky"
-    ],
-    [
      "teal",
      "amber",
      "sky",
+     "coral"
+    ],
+    [
+     "teal",
+     "box:lime",
+     "?amber",
      "box:gold",
      "box:amber",
-     "violet"
+     "coral",
+     "lime",
+     "gold"
+    ],
+    [
+     "teal",
+     "tunnel:coral,teal,coral",
+     "rose",
+     "sky",
+     "?teal",
+     "?lime",
+     "?sky",
+     "?sky",
+     "teal"
+    ],
+    [
+     "tunnel:violet,lime,amber,lime",
+     "teal",
+     "lime",
+     "gold",
+     "amber",
+     "box:coral",
+     "lime",
+     "violet",
+     "gold"
     ]
    ],
    "sides": [
     {
      "lane": 2,
-     "at": 0,
+     "at": 1,
      "cars": [
-      "gold",
-      "gold",
-      "coral"
+      "violet",
+      "violet",
+      "amber"
      ]
     }
    ]
   },
   {
    "id": "lot-098",
-   "title": "Canal Court",
+   "title": "Orchard Court",
    "blurb": "",
    "lanes": [
     [
      "teal",
      "amber",
-     "?violet",
-     "rose",
-     "rose",
-     "?amber",
-     "lime"
-    ],
-    [
+     "box:violet",
+     "?rose",
+     "gold",
      "coral",
-     "tunnel:gold,coral,rose",
-     "amber",
-     "amber",
-     "box:coral",
-     "sky",
+     "box:violet",
      "amber"
     ],
     [
-     "coral",
-     "tunnel:rose,sky,coral,sky",
-     "violet",
-     "sky",
-     "box:coral",
-     "box:amber",
-     "violet"
-    ],
-    [
-     "lime",
-     "?sky",
+     "teal",
+     "?coral",
      "lime",
      "?rose",
-     "?teal",
+     "gold",
+     "box:lime",
+     "sky"
+    ],
+    [
+     "tunnel:gold,coral",
+     "coral",
+     "amber",
+     "?violet",
+     "rose",
+     "coral",
+     "violet",
      "lime"
+    ],
+    [
+     "teal",
+     "box:lime",
+     "sky",
+     "coral",
+     "box:amber",
+     "violet",
+     "sky"
     ],
     [
      "coral",
-     "box:lime",
-     "violet",
-     "box:gold",
-     "teal",
-     "?violet"
+     "tunnel:rose,rose",
+     "lime",
+     "gold",
+     "?sky",
+     "?teal",
+     "amber",
+     "gold"
     ],
     [
+     "violet",
+     "tunnel:teal,lime,sky,gold",
+     "amber",
      "teal",
-     "tunnel:gold,sky,gold,coral",
+     "sky",
      "teal",
-     "gold",
-     "gold",
-     "teal",
-     "lime"
+     "rose",
+     "coral"
     ]
    ],
    "sides": [
     {
-     "lane": 4,
-     "at": 0,
+     "lane": 0,
+     "at": 1,
      "cars": [
-      "rose",
+      "teal",
       "coral",
-      "violet"
+      "teal"
      ]
     }
    ]
   },
   {
    "id": "lot-099",
-   "title": "Canal Deck",
+   "title": "Garden Yard",
    "blurb": "",
    "lanes": [
     [
      "coral",
-     "amber",
-     "lime",
+     "?violet",
+     "violet",
      "rose",
+     "?gold",
      "coral",
-     "box:amber",
-     "violet"
+     "?violet",
+     "rose",
+     "gold"
+    ],
+    [
+     "amber",
+     "tunnel:coral,teal,teal",
+     "sky",
+     "?sky",
+     "lime",
+     "box:coral",
+     "box:teal",
+     "violet",
+     "sky",
+     "amber"
     ],
     [
      "coral",
      "amber",
-     "rose",
-     "violet",
+     "lime",
+     "coral",
+     "?teal",
+     "gold",
+     "box:rose",
+     "sky",
+     "coral"
+    ],
+    [
+     "tunnel:violet,amber",
      "?coral",
      "amber",
-     "box:rose"
-    ],
-    [
-     "tunnel:rose,violet",
-     "box:coral",
-     "teal",
-     "gold",
      "?rose",
-     "coral",
-     "teal",
-     "violet"
-    ],
-    [
-     "teal",
-     "tunnel:gold,gold,sky",
-     "violet",
-     "box:sky",
+     "box:teal",
+     "rose",
+     "amber",
      "gold",
-     "lime",
-     "box:gold"
+     "rose",
+     "amber"
     ],
     [
      "teal",
+     "teal",
      "lime",
-     "?violet",
-     "teal",
-     "teal",
-     "lime"
+     "amber",
+     "lime",
+     "lime",
+     "violet",
+     "teal"
     ],
     [
-     "tunnel:gold,amber,rose,sky",
+     "tunnel:lime,violet,coral,lime",
+     "box:teal",
+     "sky",
+     "violet",
+     "gold",
      "amber",
      "?lime",
-     "?sky",
      "sky",
-     "lime",
-     "?sky"
+     "gold"
     ]
    ],
    "sides": [
     {
-     "lane": 5,
-     "at": 1,
+     "lane": 3,
+     "at": 0,
      "cars": [
-      "coral",
-      "teal",
-      "teal"
+      "sky",
+      "lime"
      ]
     },
     {
-     "lane": 2,
+     "lane": 0,
      "at": 1,
      "cars": [
-      "coral",
-      "teal",
-      "coral"
+      "sky",
+      "violet",
+      "sky"
      ]
     }
    ]
   },
   {
    "id": "lot-100",
-   "title": "Library Circle",
+   "title": "Midtown Square",
    "blurb": "",
    "lanes": [
     [
-     "amber",
-     "tunnel:amber,teal,teal,sky",
-     "amber",
+     "violet",
+     "lime",
+     "violet",
      "coral",
-     "coral",
-     "coral",
-     "amber",
-     "amber",
+     "teal",
+     "?lime",
+     "lime",
      "?rose",
      "coral",
-     "amber"
+     "coral"
     ],
     [
      "coral",
-     "tunnel:violet,violet,sky",
-     "coral",
+     "amber",
      "rose",
-     "?sky",
-     "rose",
-     "violet",
      "lime",
      "sky",
-     "amber"
-    ],
-    [
-     "lime",
+     "?amber",
      "violet",
      "sky",
-     "sky",
-     "coral",
-     "lime",
-     "box:rose",
-     "coral",
-     "lime"
-    ],
-    [
-     "tunnel:sky,lime",
      "teal",
+     "amber"
+    ],
+    [
+     "tunnel:rose,lime,violet,gold",
+     "coral",
      "amber",
-     "box:gold",
-     "lime",
+     "rose",
+     "sky",
      "gold",
-     "amber",
-     "?sky",
-     "gold",
+     "teal",
+     "box:amber",
+     "coral",
+     "box:rose",
      "teal"
     ],
     [
-     "teal",
+     "lime",
+     "box:amber",
      "box:teal",
-     "box:violet",
-     "rose",
-     "?teal",
-     "violet",
-     "?lime",
+     "coral",
      "gold",
-     "violet"
+     "gold",
+     "violet",
+     "?sky",
+     "amber"
     ],
     [
-     "lime",
-     "teal",
-     "violet",
-     "?gold",
-     "teal",
-     "violet",
-     "gold",
+     "tunnel:lime,sky,lime",
      "coral",
-     "box:rose"
+     "?sky",
+     "gold",
+     "rose",
+     "teal",
+     "violet",
+     "?rose",
+     "box:amber",
+     "gold"
+    ],
+    [
+     "tunnel:violet,rose",
+     "teal",
+     "teal",
+     "violet",
+     "coral",
+     "lime",
+     "amber",
+     "sky",
+     "teal",
+     "violet"
     ]
    ],
    "tier": "superhard",
    "sides": [
     {
-     "lane": 0,
-     "at": 0,
+     "lane": 3,
+     "at": 1,
      "cars": [
-      "lime",
+      "sky",
+      "rose",
       "sky"
      ]
     }
