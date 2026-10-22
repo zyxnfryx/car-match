@@ -1237,8 +1237,11 @@ namespace CarMatch
         }
 
         // A matched set: copies of the three cars glow white, burst into light, and vanish.
+        CarColor _lastClearColor = CarColor.Coral;
+
         IEnumerator PopSet(List<Vector2> spots, CarColor color)
         {
+            _lastClearColor = color;
             AudioManager.Play(Sfx.MatchClear);
 #if !UNITY_WEBGL
             Haptics.Success();
@@ -2060,7 +2063,8 @@ namespace CarMatch
                 OnNext = OnNext,
                 OnHome = OnHome,
                 Hud = () => { Hud(0f); return _coinText; },
-                Shake = _shake
+                Shake = _shake,
+                HeroColor = _lastClearColor
             });
         }
 
