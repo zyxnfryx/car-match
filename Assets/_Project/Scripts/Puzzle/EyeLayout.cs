@@ -14,7 +14,7 @@ namespace CarMatch
         static readonly EyeLayout[] Table =
         {
             new EyeLayout { Valid = true, MidX = -0.31f, MidY = -6.81f, TravelX = 4.80f, TravelY = 2.80f },
-            new EyeLayout { Valid = true, MidX = 7.38f, MidY = -5.53f, TravelX = 4.40f, TravelY = 3.20f },
+            new EyeLayout { Valid = true, MidX = 7.38f, MidY = -5.52f, TravelX = 4.40f, TravelY = 3.20f },
             new EyeLayout { Valid = true, MidX = 13.91f, MidY = -1.84f, TravelX = 3.60f, TravelY = 4.00f },
             new EyeLayout { Valid = true, MidX = 18.28f, MidY = 3.70f, TravelX = 1.60f, TravelY = 4.40f },
             new EyeLayout { Valid = true, MidX = 19.84f, MidY = 10.24f, TravelX = 0.80f, TravelY = 4.40f },
@@ -27,8 +27,8 @@ namespace CarMatch
             new EyeLayout { Valid = true, MidX = -18.93f, MidY = 16.81f, TravelX = 1.60f, TravelY = 4.40f },
             new EyeLayout { Valid = true, MidX = -20.47f, MidY = 10.22f, TravelX = 0.80f, TravelY = 4.40f },
             new EyeLayout { Valid = true, MidX = -18.91f, MidY = 3.70f, TravelX = 2.00f, TravelY = 4.80f },
-            new EyeLayout { Valid = true, MidX = -14.54f, MidY = -1.84f, TravelX = 3.20f, TravelY = 4.00f },
-            new EyeLayout { Valid = true, MidX = -8.01f, MidY = -5.53f, TravelX = 4.40f, TravelY = 3.20f },
+            new EyeLayout { Valid = true, MidX = -14.53f, MidY = -1.84f, TravelX = 3.20f, TravelY = 4.00f },
+            new EyeLayout { Valid = true, MidX = -8.02f, MidY = -5.52f, TravelX = 4.40f, TravelY = 3.20f },
         };
 
         public static EyeLayout For(int heading) { return Table[((heading % 16) + 16) % 16]; }
