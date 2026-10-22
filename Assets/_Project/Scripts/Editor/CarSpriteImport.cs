@@ -16,7 +16,6 @@ namespace CarMatch.Editor
             "Assets/_Project/Resources/UI/",
             "Assets/_Project/Resources/Cars16/",
             "Assets/_Project/Resources/CarEyes/",
-            "Assets/_Project/Art/CarEyes/",
             "Assets/_Project/Resources/CarLayers/",
             "Assets/_Project/Resources/FX/"
         };
