@@ -10,7 +10,7 @@ namespace CarMatch
     public sealed class StudioTruck : MonoBehaviour
     {
         const float LapStart = 0.10f, LapEnd = 2.35f, BlinkAt = 2.62f, BeepAt = 3.00f, TapGap = 0.19f;
-        const CarColor Color0 = CarColor.Red;
+        const CarColor Color0 = CarColor.Coral;
         const int TrailN = 22;
 
         RectTransform _logo, _truck;
