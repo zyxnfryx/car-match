@@ -400,6 +400,25 @@ namespace CarMatch
             rt.gameObject.AddComponent<Pulse>();
         }
 
+        System.Action<RectTransform> _idlePuff;
+
+        // One small, soft tailpipe puff from an idling truck (tailpipe at the back = top of the sprite).
+        void IdlePuff(RectTransform car)
+        {
+            if (car == null || _phase != Phase.Play) return;
+            var art = UiArt.Get("dust") ?? UiArt.Get("glow");
+            var pos = car.anchoredPosition + new Vector2(car.sizeDelta.x * 0.18f, car.sizeDelta.y * 0.44f);
+            var rt = Place(_screen, "IdlePuff", pos, new Vector2(22f, 22f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = art ?? SpriteKit.Round;
+            img.color = new Color(1f, 1f, 1f, 0.45f);
+            img.raycastTarget = false;
+            var puff = rt.gameObject.AddComponent<Puff>();
+            puff.Velocity = new Vector2(Random.Range(-14f, 14f), Random.Range(36f, 60f));
+            puff.Life = Random.Range(0.55f, 0.8f);
+            puff.Grow = 2f;
+        }
+
         void Exhaust(Vector2 pos, int count)
         {
             for (int i = 0; i < count; i++)
@@ -821,13 +840,28 @@ namespace CarMatch
             {
                 CountChip(rt, new Vector2(size.x * 0.34f, size.y * 0.34f), queueCount);
             }
-            if (open && !car.Hidden)
+            if (!car.Hidden)
             {
                 var idle = rt.gameObject.AddComponent<CarIdle>();
-                idle.Open = image.sprite;
-                idle.Blink = CarFrames.Eye(car.Color, 1);
-                idle.LookLeft = CarFrames.Heading(car.Color, 15);
-                idle.LookRight = CarFrames.Heading(car.Color, 1);
+                idle.Awake = open;
+                if (open)
+                {
+                    idle.Open = image.sprite;
+                    idle.Blink = CarFrames.Eye(car.Color, 1);
+                    idle.Squint = CarFrames.Eye(car.Color, 2);
+                    idle.Wide = CarFrames.Eye(car.Color, 3);
+                    idle.LookLeft = CarFrames.Heading(car.Color, 15);
+                    idle.LookLeftFar = idle.LookLeft;   // h14/h02 turn the whole body too far for a glance
+                    idle.LookRight = CarFrames.Heading(car.Color, 1);
+                    idle.LookRightFar = idle.LookRight;
+                    idle.Puff = _idlePuff ?? (_idlePuff = IdlePuff);
+                    idle.Heading = 0;   // parked trucks face the player
+                    idle.Body = CarFrames.Body(car.Color, 0);
+                    idle.Whites = CarFrames.Whites(0);
+                    idle.Pupil = CarFrames.Pupil(0);
+                    idle.LidClosed = CarFrames.Lid(car.Color, 0, 0);
+                    idle.LidSquint = CarFrames.Lid(car.Color, 1, 0);
+                }
             }
             if (open) Hook(rt, tap);
             else BlockedHook(rt);

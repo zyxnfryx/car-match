@@ -397,6 +397,92 @@ namespace CarMatch
             Expect(!Economy.TrySpend(ref wallet, 999999), "the purse cannot go negative");
         }
 
+        // Alive idle: awake trucks look around, blink, bounce and puff; blocked ones only breathe.
+        // The loop is pure view state: ticking it never changes legality, and a tap is accepted
+        // on the very same frame (no lock, no wait for an idle beat to finish).
+        public static void IdleLoopNeverBlocksInput()
+        {
+            var board = Tiny("[[\"teal\",\"teal\",\"coral\"],[\"amber\",\"coral\",\"amber\"]]");
+            var legal = new LegalMoves();
+            legal.Rebuild(board);
+            var idles = new AliveIdle[6];
+            for (int l = 0, k = 0; l < 2; l++)
+                for (int c = 0; c < 3; c++, k++)
+                    idles[k] = AliveIdle.Create((uint)(k + 1), legal.IsLegal(new Tap(TapKind.Lane, l, c)));
+            int puffs = 0, calmPuffs = 0, blinks = 0, squints = 0, wide = 0;
+            var seen = new bool[5];
+            float maxCalm = 0f, maxAwake = 0f;
+            var prev = new IdleEyes[6];
+            for (int f = 0; f < 60 * 30; f++)
+            {
+                for (int k = 0; k < idles.Length; k++)
+                {
+                    idles[k].Tick(1f / 60f);
+                    var a = idles[k];
+                    float dev = System.Math.Abs(a.ScaleY - 1f);
+                    if (a.Awake)
+                    {
+                        if (a.PuffNow) puffs++;
+                        if (dev > maxAwake) maxAwake = dev;
+                        seen[(int)AliveIdle.Classify(a.Look, a.LookUp, a.LookDown)] = true;
+                        if (a.Eyes == IdleEyes.Squint && prev[k] != IdleEyes.Squint) squints++;
+                        if (a.Eyes == IdleEyes.Wide) wide++;
+                    }
+                    else
+                    {
+                        if (a.PuffNow) calmPuffs++;
+                        if (dev > maxCalm) maxCalm = dev;
+                        Expect(a.Look == 0f && a.LookUp == 0f && a.LookDown == 0f, "blocked trucks keep still eyes");
+                    }
+                    if (a.Eyes == IdleEyes.Blink && prev[k] != IdleEyes.Blink) blinks++;
+                    prev[k] = a.Eyes;
+                }
+                // Legality is untouched by the idle loop, every frame.
+                if (f % 97 == 0)
+                    for (int l = 0; l < 2; l++)
+                        for (int c = 0; c < 3; c++)
+                        {
+                            var t = new Tap(TapKind.Lane, l, c);
+                            Expect(legal.IsLegal(t) == ExitPath.IsLegal(board, t), "idle never changes legality");
+                        }
+            }
+            Expect(puffs >= 4 * 30 / 3 - 4, "awake trucks puff every 1.5-3 s (" + puffs + ")");
+            Expect(calmPuffs == 0, "blocked trucks never puff");
+            Expect(seen[0] && seen[1] && seen[2] && seen[3] && seen[4], "looks ahead, left, right, at the player and at the bar");
+            Expect(blinks >= 6 * 30 / 5, "blinks every 2-5 s (" + blinks + ")");
+            Expect(squints > 0 && wide > 0, "happy squints and wide eye contact happen");
+            Expect(maxAwake > 0.03f && maxAwake < 0.06f, "awake bounce is about 3-4% (" + maxAwake + ")");
+            Expect(maxCalm > 0f && maxCalm < 0.02f, "blocked trucks only breathe (" + maxCalm + ")");
+            var a0 = AliveIdle.Create(1, true); var a1 = AliveIdle.Create(2, true);
+            a0.Tick(0.016f); a1.Tick(0.016f);
+            Expect(System.Math.Abs(a0.ScaleY - a1.ScaleY) > 1e-4f, "trucks are desynced by a random phase");
+            // A tap mid-idle (mid-blink, mid-look) is accepted immediately.
+            var back = new Tap(TapKind.Lane, 0, 2);
+            Expect(legal.IsLegal(back), "the back coral is tappable while idling");
+            var move = BoardRules.Play(board, null, back);
+            Expect(move.Accepted && board.Bar.Count == 1, "the tap lands on the same frame");
+            legal.Rebuild(board);
+            Expect(legal.IsLegal(new Tap(TapKind.Lane, 0, 1)), "the next car is tappable right away");
+            idles[4].SetAwake(true);
+            idles[4].Tick(1f / 60f);
+            Expect(idles[4].Awake, "a newly unblocked truck wakes into the alive loop");
+            // Live-eye layers: pupils never leave the travel ellipse; faced-away headings use baked frames.
+            for (int h = 0; h < 16; h++)
+            {
+                var lay = EyeLayout.For(h);
+                Expect(lay.Valid == (h < 6 || h > 10), "eye layers exist except h06-h10 (h" + h + ")");
+                if (!lay.Valid) continue;
+                for (int k = 0; k < 64; k++)
+                {
+                    float ang = k * 0.0982f, mag = 0.5f + (k % 4) * 0.5f;
+                    float ox, oy;
+                    lay.PupilOffset((float)System.Math.Cos(ang) * mag, (float)System.Math.Sin(ang) * mag, out ox, out oy);
+                    float e = (ox * ox) / (lay.TravelX * lay.TravelX) + (oy * oy) / (lay.TravelY * lay.TravelY);
+                    Expect(e <= 1.0001f, "pupil stays inside the travel ellipse");
+                }
+            }
+        }
+
         // Car Match rule: a car may leave out either end of its lane. The back car of a
         // stacked lane is awake and tappable (rear exit onto the ring road); middle cars are not.
         public static void BackOfLaneCanExit()
@@ -590,6 +676,7 @@ namespace CarMatch
             RapidMultiTap();
             GarageRefillsWhenSpotsClear();
             BackOfLaneCanExit();
+            IdleLoopNeverBlocksInput();
             ReservedSlotsMatchInOrder();
             ReservedSlotsCountTowardFail();
             MagnetPullsASetOfThree();
