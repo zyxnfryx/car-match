@@ -8,6 +8,8 @@ namespace CarMatch
         public static int Sweep(Board board)
         {
             if (board == null) return 0;
+            // Open any garage hatch whose spots just emptied; the arrivals come up hidden.
+            UndergroundGarage.Refill(board);
             int n = 0;
             for (int l = 0; l < board.Lanes.Count; l++)
             {

@@ -93,6 +93,32 @@ namespace CarMatch
                     board.Sides.Add(side);
                 }
             }
+            if (row.ContainsKey("garages") && row["garages"] != null)
+            {
+                var garages = row["garages"] as List<object>;
+                if (garages == null)
+                    throw new System.FormatException("Level " + number + " garages must be an array.");
+                for (int gi = 0; gi < garages.Count; gi++)
+                {
+                    var gr = garages[gi] as Dictionary<string, object>;
+                    if (gr == null)
+                        throw new System.FormatException("Level " + number + " garage " + gi + " is not an object.");
+                    var g = new Garage { Lane = AsInt(gr["lane"]) };
+                    var cells = gr["cells"] as List<object>;
+                    var cars = gr["cars"] as List<object>;
+                    if (cells == null || cells.Count == 0 || cars == null || cars.Count == 0)
+                        throw new System.FormatException("Level " + number + " garage " + gi + " needs cells and cars.");
+                    for (int c = 0; c < cells.Count; c++) g.Cells.Add(AsInt(cells[c]));
+                    for (int c = 0; c < cars.Count; c++) g.Queue.Add(ParseCar(AsString(cars[c]), number));
+                    if ((uint)g.Lane >= (uint)board.Lanes.Count)
+                        throw new System.FormatException("Level " + number + " garage " + gi + " is off the lot.");
+                    var laneCells = board.Lanes[g.Lane].Cells;
+                    for (int c = 0; c < g.Cells.Count; c++)
+                        if ((uint)g.Cells[c] >= (uint)laneCells.Count || laneCells[g.Cells[c]].Tunnel)
+                            throw new System.FormatException("Level " + number + " garage " + gi + " sits off its lane or on a tunnel.");
+                    board.Garages.Add(g);
+                }
+            }
             return board;
         }
 

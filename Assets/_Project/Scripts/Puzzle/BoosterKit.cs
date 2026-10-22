@@ -82,7 +82,7 @@ namespace CarMatch
         public static bool Magnet(Board board, List<int[]> pulled, List<int[]> moves)
         {
             if (board == null || board.Won || board.Failed) return false;
-            var hist = BoardQuery.Histogram(board);
+            var hist = BoardQuery.SurfaceHistogram(board);
             int best = 2;
             int pick = -1;
             for (int i = 0; i < hist.Length; i++)
