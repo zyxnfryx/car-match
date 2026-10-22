@@ -332,7 +332,7 @@ namespace CarMatch
             }
         }
 
-        internal static IEnumerator CarFinale(Transform screen)
+        static IEnumerator CarFinale(Transform screen)
         {
             _skip = false;
             // Full-screen invisible catcher: a tap skips to the fanfare.
