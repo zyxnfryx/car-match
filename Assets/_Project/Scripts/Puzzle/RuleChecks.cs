@@ -466,6 +466,21 @@ namespace CarMatch
             idles[4].SetAwake(true);
             idles[4].Tick(1f / 60f);
             Expect(idles[4].Awake, "a newly unblocked truck wakes into the alive loop");
+            // Live-eye layers: pupils never leave the travel ellipse; faced-away headings use baked frames.
+            for (int h = 0; h < 16; h++)
+            {
+                var lay = EyeLayout.For(h);
+                Expect(lay.Valid == (h < 6 || h > 10), "eye layers exist except h06-h10 (h" + h + ")");
+                if (!lay.Valid) continue;
+                for (int k = 0; k < 64; k++)
+                {
+                    float ang = k * 0.0982f, mag = 0.5f + (k % 4) * 0.5f;
+                    float ox, oy;
+                    lay.PupilOffset((float)System.Math.Cos(ang) * mag, (float)System.Math.Sin(ang) * mag, out ox, out oy);
+                    float e = (ox * ox) / (lay.TravelX * lay.TravelX) + (oy * oy) / (lay.TravelY * lay.TravelY);
+                    Expect(e <= 1.0001f, "pupil stays inside the travel ellipse");
+                }
+            }
         }
 
         // Car Match rule: a car may leave out either end of its lane. The back car of a

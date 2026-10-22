@@ -855,6 +855,12 @@ namespace CarMatch
                     idle.LookRight = CarFrames.Heading(car.Color, 1);
                     idle.LookRightFar = idle.LookRight;
                     idle.Puff = _idlePuff ?? (_idlePuff = IdlePuff);
+                    idle.Heading = 0;   // parked trucks face the player
+                    idle.Body = CarFrames.Body(car.Color, 0);
+                    idle.Whites = CarFrames.Whites(0);
+                    idle.Pupil = CarFrames.Pupil(0);
+                    idle.LidClosed = CarFrames.Lid(car.Color, 0, 0);
+                    idle.LidSquint = CarFrames.Lid(car.Color, 1, 0);
                 }
             }
             if (open) Hook(rt, tap);

@@ -57,9 +57,14 @@ namespace CarMatch
     public sealed class CarIdle : MonoBehaviour
     {
         public Sprite Open, Blink, Squint, Wide, LookLeft, LookLeftFar, LookRight, LookRightFar;
+        // Live-eye layers: body with empty glass, whites (also the pupil mask), pupils, lids.
+        public Sprite Body, Whites, Pupil, LidClosed, LidSquint;
+        public int Heading;
         public System.Action<RectTransform> Puff;
         public bool Awake;
         AliveIdle _idle; Image _img; RectTransform _rt; EyeAnim _wake; Vector3 _rest; bool _live;
+        bool _layered, _waking; EyeLayout _lay; float _px, _wide = 1f;
+        RectTransform _root, _whitesRt, _pupilRt; Image _lid;
         static uint _seed = 1;
 
         void Start()
@@ -69,7 +74,57 @@ namespace CarMatch
             _rest = _rt.localScale;
             _idle = AliveIdle.Create(_seed++ * 7919u + (uint)GetInstanceID(), Awake);
             TryGetComponent(out _wake);
+            _waking = _wake != null;
+            _lay = EyeLayout.For(Heading);
+            if (Awake && _lay.Valid && Body != null && Whites != null && Pupil != null && LidClosed != null) BuildLayers();
             _live = true;
+        }
+
+        static RectTransform Child(Transform parent, string name)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            return (RectTransform)go.transform;
+        }
+
+        static Image Layer(RectTransform rt, Sprite s)
+        {
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = s; img.raycastTarget = false; img.preserveAspect = true;
+            return img;
+        }
+
+        static void Fill(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+        }
+
+        // body (base image) + whites (Mask) > pupils + lids, all on the 192 px canvas.
+        void BuildLayers()
+        {
+            float side = Mathf.Min(_rt.rect.width, _rt.rect.height);
+            if (side <= 0f) side = Mathf.Min(_rt.sizeDelta.x, _rt.sizeDelta.y);
+            _px = side / EyeLayout.Canvas;
+            _root = Child(_rt, "Eyes");
+            _root.sizeDelta = new Vector2(side, side);
+            _whitesRt = Child(_root, "Whites");
+            _whitesRt.sizeDelta = new Vector2(side, side);
+            // Pivot at the midpoint of the two eyes so "wide" scales about the eyes.
+            _whitesRt.pivot = new Vector2(0.5f + _lay.MidX / EyeLayout.Canvas, 0.5f + _lay.MidY / EyeLayout.Canvas);
+            _whitesRt.anchoredPosition = new Vector2(_lay.MidX * _px, _lay.MidY * _px);
+            Layer(_whitesRt, Whites);
+            _whitesRt.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+            _pupilRt = Child(_whitesRt, "Pupils");
+            Fill(_pupilRt);
+            Layer(_pupilRt, Pupil);
+            var lid = Child(_root, "Lids");
+            Fill(lid);
+            _lid = Layer(lid, LidClosed);
+            _lid.enabled = false;
+            _layered = true;
+            _root.gameObject.SetActive(!_waking);
+            if (!_waking) _img.sprite = Body;
         }
 
         void OnDisable() { if (_live && _rt != null) { _rt.localScale = _rest; _rt.localRotation = Quaternion.identity; } }
@@ -77,15 +132,23 @@ namespace CarMatch
         void Update()
         {
             if (_img == null) return;
-            if (_wake != null) return;              // let the wake-up / doze-off play first
-            _idle.Tick(Time.unscaledDeltaTime);
+            if (_wake != null) return;              // let the wake-up / doze-off play first (baked frames)
+            if (_waking)
+            {
+                _waking = false;
+                if (_layered) { _img.sprite = Body; _root.gameObject.SetActive(true); }
+            }
+            float dt = Time.unscaledDeltaTime;
+            _idle.Tick(dt);
             float up = Awake ? _idle.LookUp : 0f, down = Awake ? _idle.LookDown : 0f;
             float sy = _idle.ScaleY + 0.02f * up - 0.025f * down;
             float sx = _idle.ScaleX - 0.01f * up + 0.012f * down;
             _rt.localScale = new Vector3(_rest.x * sx, _rest.y * sy, 1f);
             if (!Awake) return;
-            _rt.localRotation = Quaternion.Euler(0f, 0f, -_idle.Look * 1.6f);
             if (_idle.PuffNow && Puff != null) Puff(_rt);
+            if (_layered) { UpdateLayers(dt); return; }
+            // Baked fallback (headings without layers): slight-heading frames and a tiny tilt.
+            _rt.localRotation = Quaternion.Euler(0f, 0f, -_idle.Look * 1.6f);
             Sprite pick;
             switch (_idle.Eyes)
             {
@@ -99,6 +162,21 @@ namespace CarMatch
             }
             if (pick == null) pick = Open;
             if (_img.sprite != pick) _img.sprite = pick;
+        }
+
+        void UpdateLayers(float dt)
+        {
+            // Pupils slide (eased by AliveIdle) inside the travel ellipse; the whites mask them.
+            float dx, dy;
+            _lay.PupilOffset(_idle.Look, _idle.LookDown, out dx, out dy);
+            _pupilRt.anchoredPosition = new Vector2(dx * _px, -dy * _px);
+            var eyes = _idle.Eyes;
+            float target = eyes == IdleEyes.Wide ? EyeLayout.WideScale : 1f;
+            _wide += (target - _wide) * Mathf.Min(1f, dt * 14f);
+            _whitesRt.localScale = new Vector3(_wide, _wide, 1f);
+            Sprite lid = eyes == IdleEyes.Blink ? LidClosed : eyes == IdleEyes.Squint ? LidSquint : null;
+            if (lid == null) { if (_lid.enabled) _lid.enabled = false; }
+            else { if (_lid.sprite != lid) _lid.sprite = lid; if (!_lid.enabled) _lid.enabled = true; }
         }
     }
 
@@ -281,6 +359,12 @@ namespace CarMatch
         }
 
         // frame 0 = closed, 1-2 lids lifting, 3 wide overshoot, 4 open.
+        // Live-eye layers (h00 shipped; other headings fall back to the baked frames).
+        public static Sprite Body(CarColor color, int heading) { return Load("CarLayers/truck_" + EyeState.Token(color) + "_h" + heading.ToString("00")); }
+        public static Sprite Whites(int heading) { return Load("CarLayers/eyewhite_h" + heading.ToString("00")); }
+        public static Sprite Pupil(int heading) { return Load("CarLayers/pupil_h" + heading.ToString("00")); }
+        public static Sprite Lid(CarColor color, int frame, int heading) { return Load("CarLayers/lid_" + EyeState.Token(color) + "_blink" + frame + "_h" + heading.ToString("00")); }
+
         public static Sprite Eye(CarColor color, int frame)
         {
             return Load("CarEyes/car_" + EyeState.Token(color) + "_eye" + frame + "_h00");
