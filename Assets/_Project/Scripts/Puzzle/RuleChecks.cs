@@ -218,6 +218,104 @@ namespace CarMatch
             }
         }
 
+        // Rapid taps: each tap applies to the board at once (the car leaves its spot at tap time),
+        // so the car behind it is tappable on the very next tap, with no waiting on a drive.
+        public static void RapidMultiTap()
+        {
+            var board = Tiny("[[\"coral\",\"teal\",\"amber\"],[\"coral\",\"teal\"],[\"coral\",\"amber\"],[\"teal\"]]");
+            var history = new List<Board>();
+            var legal = new LegalMoves();
+            var bar = new BarReservations();
+            bar.Reset(board.Bar);
+            var flying = new List<BarEntry>();
+            Tap[] taps =
+            {
+                new Tap(TapKind.Lane, 0, 0), new Tap(TapKind.Lane, 0, 1), new Tap(TapKind.Lane, 1, 0),
+                new Tap(TapKind.Lane, 2, 0), new Tap(TapKind.Lane, 1, 1), new Tap(TapKind.Lane, 3, 0),
+            };
+            for (int i = 0; i < taps.Length; i++)
+            {
+                legal.Rebuild(board);
+                Expect(legal.IsLegal(taps[i]), "tap " + i + " is legal immediately (no landing needed)");
+                Expect(legal.IsLegal(taps[i]) == ExitPath.IsLegal(board, taps[i]), "cache agrees with ExitPath");
+                var color = ExitPath.ColorOf(board, taps[i]);
+                var move = BoardRules.Play(board, history, taps[i]);
+                Expect(move.Accepted, "tap " + i + " accepted");
+                flying.Add(bar.Reserve(color, move.Matched));
+            }
+            Expect(bar.InFlight == 6, "six cars in flight at once");
+            Expect(history.Count == 6, "every tap is undoable");
+            // Blocked taps are simply refused and do not disturb anything.
+            legal.Rebuild(board);
+            Expect(!legal.IsLegal(new Tap(TapKind.Lane, 2, 1)) || ExitPath.IsLegal(board, new Tap(TapKind.Lane, 2, 1)), "cache matches rules for blocked cars");
+            // Two sets were made (coral x3, teal x3); the lot's cars are all gone except amber x2.
+            Expect(BoardQuery.Count(board, CarColor.Coral) == 0 && BoardQuery.Count(board, CarColor.Teal) == 0, "coral and teal cleared logically");
+            for (int i = flying.Count - 1; i >= 0; i--) bar.Land(flying[i]);
+            Expect(bar.Settled, "everything landed and popped");
+            ExpectSame(bar.Remaining(), board.Bar, "view bar equals board bar after rapid taps");
+        }
+
+        // Reserved slots: a set pops only when all three of its cars have parked, sets pop in
+        // the order they were made, and arrivals out of order never break color grouping.
+        public static void ReservedSlotsMatchInOrder()
+        {
+            var bar = new BarReservations();
+            bar.Reset(new List<CarColor> { CarColor.Amber });
+            var c1 = bar.Reserve(CarColor.Coral, false);
+            var t1 = bar.Reserve(CarColor.Teal, false);
+            var c2 = bar.Reserve(CarColor.Coral, false);
+            Expect(bar.IndexOf(c2) == bar.IndexOf(c1) + 1, "second coral parks next to the first");
+            var t2 = bar.Reserve(CarColor.Teal, false);
+            var c3 = bar.Reserve(CarColor.Coral, true);   // coral set (group 0)
+            var t3 = bar.Reserve(CarColor.Teal, true);    // teal set (group 1)
+            Expect(c3.Group == 0 && c1.Group == 0 && c2.Group == 0, "three corals share set 0");
+            Expect(t3.Group == 1 && t1.Group == 1 && t2.Group == 1, "three teals share set 1");
+            var c4 = bar.Reserve(CarColor.Coral, false);
+            Expect(c4.Group < 0, "a fourth coral starts a new group");
+            Expect(bar.IndexOf(c4) == bar.Entries.Count - 1, "a coral after a promised set goes to the end");
+            // Teal lands completely first, but must wait for the coral set (made first).
+            Expect(bar.Land(t3).Count == 0, "teal 3 landed");
+            Expect(bar.Land(t1).Count == 0, "teal 1 landed");
+            Expect(bar.Land(t2).Count == 0, "teal set complete but waits for the coral set");
+            Expect(bar.Land(c3).Count == 0, "coral 3 landed first, out of order");
+            Expect(bar.Land(c1).Count == 0, "coral 1 landed");
+            var popped = bar.Land(c2);
+            Expect(popped.Count == 2, "coral set then teal set pop together, in order");
+            Expect(popped[0][0].Color == CarColor.Coral && popped[1][0].Color == CarColor.Teal, "sets pop in the order they were made");
+            Expect(!bar.Settled, "coral 4 still driving");
+            bar.Land(c4);
+            Expect(bar.Settled, "settled");
+            ExpectSame(bar.Remaining(), new List<CarColor> { CarColor.Amber, CarColor.Coral }, "amber and the last coral remain");
+        }
+
+        // Fail check counts reserved slots: seven different colors tapped in a burst fail the lot
+        // at the seventh tap, before any of them has parked, and further taps are refused.
+        public static void ReservedSlotsCountTowardFail()
+        {
+            var board = Tiny("[[\"coral\"],[\"rose\"],[\"amber\"],[\"gold\"],[\"lime\"],[\"teal\"],[\"sky\"],[\"violet\"]]");
+            var history = new List<Board>();
+            var bar = new BarReservations();
+            bar.Reset(board.Bar);
+            for (int i = 0; i < 7; i++)
+            {
+                var tap = new Tap(TapKind.Lane, i, 0);
+                var move = BoardRules.Play(board, history, tap);
+                Expect(move.Accepted, "burst tap " + i + " accepted");
+                bar.Reserve(board.Bar[board.Bar.Count - 1], move.Matched);
+                Expect(move.Failed == (i == 6), "only the seventh reserved slot fails the lot");
+            }
+            Expect(bar.InFlight == 7, "all seven still driving");
+            Expect(board.Failed, "the lot failed on reserved slots");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 7, 0)), "no taps after the bar is full");
+        }
+
+        static void ExpectSame(IList<CarColor> a, IList<CarColor> b, string what)
+        {
+            bool same = a.Count == b.Count;
+            for (int i = 0; same && i < a.Count; i++) same = a[i] == b[i];
+            Expect(same, what);
+        }
+
         public static void MagnetPullsASetOfThree()
         {
             var board = Tiny("[[\"coral\",\"teal\"],[\"coral\"],[\"coral\",\"amber\"]]");
@@ -423,6 +521,9 @@ namespace CarMatch
             ContinueUndoesAFullBar();
             ShuffleKeepsColorCounts();
             ShuffleRefusesWhenNothingCanChange();
+            RapidMultiTap();
+            ReservedSlotsMatchInOrder();
+            ReservedSlotsCountTowardFail();
             MagnetPullsASetOfThree();
             OpenEyesOnlyOnAClearExit();
             HeadingUsesTheNearestDirection();

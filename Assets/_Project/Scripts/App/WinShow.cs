@@ -101,15 +101,29 @@ namespace CarMatch
             Img(plate, "Coin", UiArt.Get("icon_coin") ?? SpriteKit.Coin, new Vector2(-130f, 4f), new Vector2(110f, 110f), Color.white);
             var plus = Txt(plate, "+0", s.Font, 96, new Vector2(40f, 6f), new Vector2(300f, 120f), new Color(1f, 0.88f, 0.32f), new Color(0.35f, 0.18f, 0.02f));
             plate.gameObject.SetActive(false); // shown when the coin count-up starts (no '+0' during confetti)
+            // Bottom buttons stack up from the safe bottom edge, so both fit on iPad (4:3) and every iPhone.
+            float halfH = 960f;
+            var srt0 = screen as RectTransform;
+            if (srt0 != null && srt0.rect.height > 10f) halfH = srt0.rect.height * 0.5f;
+            float bottom = -halfH + AspectFit.BottomInset(halfH * 2f) + 24f;
+            const float homeH = 170f, gap = 16f, plateBottom = -420f - 68f;
+            float homeY = Mathf.Max(s.More ? -890f : -800f, bottom + homeH * 0.5f);
+            float nextH = 270f;
+            float nextY = Mathf.Max(-650f, homeY + homeH * 0.5f + gap + nextH * 0.5f);
+            if (nextY + nextH * 0.5f > plateBottom - 8f)
+            {
+                nextH = Mathf.Max(190f, plateBottom - 8f - (homeY + homeH * 0.5f + gap));
+                nextY = homeY + homeH * 0.5f + gap + nextH * 0.5f;
+            }
             Button next = null;
             if (s.More)
             {
-                next = s.MakeButton(new Vector2(0f, -650f), new Vector2(780f, 270f), "Next", 96, /* thumb-sized: >=64pt tall on a 390pt-wide phone */ "btn_green", s.OnNext);
+                next = s.MakeButton(new Vector2(0f, nextY), new Vector2(780f, nextH), "Next", 96, /* thumb-sized: >=64pt tall on a 390pt-wide phone */ "btn_green", s.OnNext);
                 next.gameObject.AddComponent<Pulse>();
             }
             else
                 Txt(screen, "You cleared every lot!", s.Font, 52, new Vector2(0f, -600f), new Vector2(900f, 80f), Color.white, new Color(0.1f, 0.1f, 0.3f));
-            var home = s.MakeButton(new Vector2(0f, s.More ? -890f : -800f), new Vector2(470f, 170f), "Home", 64, "btn_blue", s.OnHome);
+            var home = s.MakeButton(new Vector2(0f, homeY), new Vector2(470f, homeH), "Home", 64, "btn_blue", s.OnHome);
             if (next != null) next.gameObject.SetActive(false);
             home.gameObject.SetActive(false);
             host.StartCoroutine(Run(host, screen, s, rays, glow, mascot, ribbon, title, piggy, plus, coinText, next, home));

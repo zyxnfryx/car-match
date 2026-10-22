@@ -38,7 +38,17 @@ namespace CarMatch
         int _index;
         Phase _phase;
         bool _busy;
-        bool _driving;
+        // Cars in flight never lock input: the board changes at tap time and the view catches up.
+        bool _driving => !_barView.Settled;
+        readonly LegalMoves _legal = new LegalMoves();
+        readonly BarReservations _barView = new BarReservations();
+        readonly Dictionary<BarEntry, float> _barX = new Dictionary<BarEntry, float>();
+        RectTransform _flyLayer;
+        FlyHost _fly;
+        RectTransform _tray;
+
+        // Runs drives and set-pops on their own object so a board redraw (ClearScreen) never stops them.
+        sealed class FlyHost : MonoBehaviour { }
         bool _settled;
         bool _failPaid;
         bool _lastMatch;
@@ -159,6 +169,16 @@ namespace CarMatch
             rt.offsetMax = Vector2.zero;
             _screen = screen.transform;
             _shake = screen.AddComponent<UiShake>();
+
+            var fly = new GameObject("Flights", typeof(RectTransform));
+            fly.transform.SetParent(canvasGo.transform, false);
+            _flyLayer = fly.GetComponent<RectTransform>();
+            _flyLayer.anchorMin = Vector2.zero;
+            _flyLayer.anchorMax = Vector2.one;
+            _flyLayer.offsetMin = Vector2.zero;
+            _flyLayer.offsetMax = Vector2.zero;
+            _fly = fly.AddComponent<FlyHost>();
+            canvasGo.AddComponent<AspectFit>().Scaler = scaler;
         }
 
         void ClearScreen()
@@ -177,6 +197,7 @@ namespace CarMatch
         {
             _phase = Phase.Home;
             _busy = false;
+            KillFlights();
             ClearScreen();
             Backdrop(true);
             Clouds();
@@ -244,13 +265,24 @@ namespace CarMatch
             _failPaid = false;
             _lastMatch = false;
             _busy = false;
-            _driving = false;
+            KillFlights();
+        }
+
+        void KillFlights()
+        {
+            if (_fly != null) _fly.StopAllCoroutines();
+            if (_flyLayer != null)
+                for (int i = _flyLayer.childCount - 1; i >= 0; i--) Destroy(_flyLayer.GetChild(i).gameObject);
+            _barView.Reset(_board != null ? _board.Bar : null);
+            _barX.Clear();
         }
 
         void ShowPlay()
         {
             _phase = Phase.Play;
             ClearScreen();
+            if (_barView.Settled && _board != null) _barView.Reset(_board.Bar);
+            _legal.Rebuild(_board);
             AudioManager.Music(AudioManager.GameMusic);
             Backdrop();
             var safe = HudPlay();
@@ -425,7 +457,7 @@ namespace CarMatch
                     var slot = cells[cell];
                     if (slot.Empty) continue;
                     var tap = new Tap(TapKind.Lane, lane, cell);
-                    DrawPiece(LaneAnchor(lane, cell), piece, slot, EyeState.IsOpen(_board, tap), tap);
+                    DrawPiece(LaneAnchor(lane, cell), piece, slot, _legal.IsLegal(tap), tap);
                 }
             }
             for (int s = 0; s < _board.Sides.Count; s++)
@@ -434,7 +466,7 @@ namespace CarMatch
                 if (side.Queue.Count == 0) continue;
                 if ((uint)side.Lane >= (uint)lanes) continue;
                 var tap = new Tap(TapKind.Side, s, side.Cell);
-                DrawCar(SideAnchor(side), piece, side.Queue[0], EyeState.IsOpen(_board, tap), tap, side.Queue.Count);
+                DrawCar(SideAnchor(side), piece, side.Queue[0], _legal.IsLegal(tap), tap, side.Queue.Count);
             }
         }
 
@@ -502,73 +534,14 @@ namespace CarMatch
             return new Vector2(x, _metrics.BaseY + side.Cell * _metrics.CellH);
         }
 
-        // Eased slide of every bar car at or after 'from' by 'by' slots (+1 opens a gap).
-        IEnumerator SlideBar(int from, int by, float seconds)
+        // Slot centers for 'count' cars: the usual seven, squeezed a little when matched sets
+        // are briefly still parked alongside newer reservations.
+        static Vector2 BarSlotCenter(int index, int count)
         {
-            var moving = new List<RectTransform>();
-            var start = new List<float>();
-            for (int i = from; i < _barCars.Count; i++)
-            {
-                if (_barCars[i] == null) continue;
-                moving.Add(_barCars[i]);
-                start.Add(_barCars[i].anchoredPosition.x);
-            }
-            float t = 0f;
-            float dx = by * (BarSlotWidth + BarGap);
-            while (t < seconds)
-            {
-                t += Time.unscaledDeltaTime;
-                float u = Mathf.Clamp01(t / seconds);
-                float k = 1f - (1f - u) * (1f - u) * (1f - u);
-                for (int i = 0; i < moving.Count; i++)
-                    if (moving[i] != null)
-                        moving[i].anchoredPosition = new Vector2(start[i] + dx * k, moving[i].anchoredPosition.y);
-                yield return null;
-            }
-        }
-
-        IEnumerator ClearSet(int from)
-        {
-            var set = new List<RectTransform>();
-            for (int i = from; i < from + MatchClear.Set && i < _barCars.Count; i++) set.Add(_barCars[i]);
-            // The three glow white and shrink a little, then burst into light with a pop.
-            var glows = new List<Image>();
-            for (int i = 0; i < set.Count; i++)
-            {
-                if (set[i] == null) continue;
-                var g = Place(set[i], "WhiteGlow", Vector2.zero, set[i].sizeDelta * 1.5f);
-                var gi = g.gameObject.AddComponent<Image>();
-                gi.sprite = UiArt.Get("glow") ?? SpriteKit.Round;
-                gi.color = new Color(1f, 1f, 1f, 0f);
-                gi.raycastTarget = false;
-                glows.Add(gi);
-            }
-            float t = 0f;
-            while (t < 0.2f)
-            {
-                t += Time.unscaledDeltaTime;
-                float u = Mathf.Clamp01(t / 0.2f);
-                float k = 1f - 0.15f * u;
-                for (int i = 0; i < set.Count; i++)
-                {
-                    if (set[i] == null) continue;
-                    set[i].localScale = new Vector3(k, k, 1f);
-                    var img = set[i].GetComponent<Image>();
-                    if (img != null) img.color = Color.Lerp(Color.white, new Color(1.6f, 1.6f, 1.6f, 1f), u);
-                }
-                for (int i = 0; i < glows.Count; i++) glows[i].color = new Color(1f, 1f, 1f, 0.95f * u);
-                yield return null;
-            }
-            AudioManager.Play(Sfx.SlotArrive, 1.1f);
-            for (int i = 0; i < set.Count; i++)
-            {
-                if (set[i] == null) continue;
-                var world = _screen.InverseTransformPoint(set[i].position);
-                LightBurst(new Vector2(world.x, world.y));
-                set[i].gameObject.SetActive(false);
-            }
-            _barCars.RemoveRange(from, Mathf.Min(MatchClear.Set, _barCars.Count - from));
-            yield return SlideBar(from, -MatchClear.Set, 0.24f);
+            if (count <= MatchClear.BarCap) return BarSlotCenter(index);
+            float span = (MatchClear.BarCap - 1) * (BarSlotWidth + BarGap);
+            float step = span / (count - 1);
+            return new Vector2(-span * 0.5f + index * step, BarY);
         }
 
         static Vector2 BarSlotCenter(int index)
@@ -699,7 +672,7 @@ namespace CarMatch
             var piece = rt;
             button.onClick.AddListener(delegate
             {
-                if (_busy || _driving) return;
+                if (_busy) return;
                 AudioManager.PlayPitched(Sfx.Blocked, 1f, 0.82f);
                 Exhaust(piece.anchoredPosition + new Vector2(0f, piece.sizeDelta.y * 0.42f), 3);
 #if !UNITY_WEBGL
@@ -776,37 +749,33 @@ namespace CarMatch
             button.onClick.AddListener(delegate { OnTap(captured, piece); });
         }
 
+        void RedrawBar()
+        {
+            if (_tray != null) Destroy(_tray.gameObject);
+            DrawBar();
+        }
+
+        // Seven wells, then one car per landed bar entry. Reserved slots (car still driving) stay empty.
+        // Cars ease from where they were last drawn, so inserts and pops slide instead of snapping.
         void DrawBar()
         {
             _barCars.Clear();
             var trayArt = UiArt.Get("tray");
             var tray = Place(_screen, "Bar", new Vector2(0f, BarY - 6f), trayArt != null ? new Vector2(1060f, 210f) : new Vector2(980f, 130f));
+            _tray = tray;
             var trayImage = tray.gameObject.AddComponent<Image>();
             trayImage.sprite = trayArt != null ? trayArt : SpriteKit.Round;
             trayImage.type = trayArt != null ? Image.Type.Simple : Image.Type.Sliced;
             trayImage.color = trayArt != null ? Color.white : Wood;
             trayImage.raycastTarget = false;
             var slotArt = UiArt.Get("slot");
+            float y = trayArt != null ? 6f : 0f;
             for (int i = 0; i < MatchClear.BarCap; i++)
             {
-                var center = BarSlotCenter(i);
-                var cell = Place(tray, "Slot", new Vector2(center.x, trayArt != null ? 6f : 0f), new Vector2(BarSlotWidth - 8f, BarCarH));
-                if (slotArt != null)
-                {
-                    var well = cell.gameObject.AddComponent<Image>();
-                    well.sprite = slotArt;
-                    well.raycastTarget = false;
-                    cell = Place(cell, "Car", Vector2.zero, new Vector2(BarSlotWidth + 4f, BarCarH + 8f));
-                }
+                var cell = Place(tray, "Slot", new Vector2(BarSlotCenter(i).x, y), new Vector2(BarSlotWidth - 8f, BarCarH));
                 var image = cell.gameObject.AddComponent<Image>();
                 image.raycastTarget = false;
-                if (_board != null && i < _board.Bar.Count)
-                {
-                    image.sprite = CarArt.For(_board.Bar[i], true);
-                    _barCars.Add(cell);
-                    image.preserveAspect = true;
-                    image.color = Color.white;
-                }
+                if (slotArt != null) image.sprite = slotArt;
                 else
                 {
                     image.sprite = SpriteKit.Round;
@@ -814,11 +783,53 @@ namespace CarMatch
                     image.color = Slot;
                 }
             }
+            int n = _barView.Entries.Count;
+            var seen = new HashSet<BarEntry>();
+            for (int i = 0; i < n; i++)
+            {
+                var e = _barView.Entries[i];
+                seen.Add(e);
+                if (!e.Landed) { _barCars.Add(null); continue; }
+                float x = BarSlotCenter(i, n).x;
+                var size = slotArt != null ? new Vector2(BarSlotWidth + 4f, BarCarH + 8f) : new Vector2(BarSlotWidth - 8f, BarCarH);
+                float from;
+                if (!_barX.TryGetValue(e, out from)) from = x;
+                var car = Place(tray, "Car", new Vector2(from, y), size);
+                var img = car.gameObject.AddComponent<Image>();
+                img.raycastTarget = false;
+                img.sprite = CarArt.For(e.Color, true);
+                img.preserveAspect = true;
+                if (Mathf.Abs(from - x) > 0.5f) car.gameObject.AddComponent<SlideX>().Init(x, 0.2f);
+                _barX[e] = x;
+                _barCars.Add(car);
+            }
+            var stale = new List<BarEntry>();
+            foreach (var k in _barX.Keys) if (!seen.Contains(k)) stale.Add(k);
+            for (int i = 0; i < stale.Count; i++) _barX.Remove(stale[i]);
+        }
+
+        sealed class SlideX : MonoBehaviour
+        {
+            float _from, _to, _dur, _t;
+            public void Init(float to, float dur) { _from = ((RectTransform)transform).anchoredPosition.x; _to = to; _dur = dur; }
+            void Update()
+            {
+                _t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(_t / _dur);
+                float k = 1f - (1f - u) * (1f - u) * (1f - u);
+                var rt = (RectTransform)transform;
+                rt.anchoredPosition = new Vector2(Mathf.Lerp(_from, _to, k), rt.anchoredPosition.y);
+                if (u >= 1f) Destroy(this);
+            }
         }
 
         void DrawBoosters()
         {
-            float y = -820f;
+            // Keep the row above the home indicator on short/wide screens (iPad).
+            float half = 960f;
+            var srt = _screen as RectTransform;
+            if (srt != null && srt.rect.height > 10f) half = srt.rect.height * 0.5f;
+            float y = Mathf.Max(-820f, -half + AspectFit.BottomInset(half * 2f) + 24f + 100f);
             Booster("Undo", Economy.UndoCost, -390f, y, _history.Count > 0, OnUndo);
             Booster("Shuffle", Economy.ShuffleCost, -130f, y, BoosterKit.CanShuffle(_board), OnShuffle);
             Booster("Super", Economy.SuperUndoCost, 130f, y, CanSuper(), OnSuper);
@@ -875,33 +886,33 @@ namespace CarMatch
             return false;
         }
 
+        // Taps never wait: the move is applied to the board right now (the car leaves its spot,
+        // its bar slot is reserved, matches and the fail check are decided), the board redraws,
+        // and the drive plays on the flight layer. Any number of cars can be in flight at once.
         void OnTap(Tap tap, RectTransform piece)
         {
-            if (_busy || _driving || _phase != Phase.Play || _board == null) return;
-            if (!EyeState.IsOpen(_board, tap) || _metrics.Lanes <= 0) return;
-            if (_board.Bar.Count >= MatchClear.BarCap) return;
-            // Grouped bar: the car goes right after its color; cars to the right slide over.
-            int slot = MatchClear.InsertIndex(_board.Bar, ExitPath.ColorOf(_board, tap));
-            StartCoroutine(SlideBar(slot, 1, 0.22f));
-            var points = BuildDrivePath(tap, slot);
-            if (piece != null)
-            {
-                points[0] = piece.anchoredPosition;
-                var button = piece.GetComponent<Button>();
-                if (button != null) button.interactable = false;
-            }
-            bool hidden = PieceHidden(tap);
+            if (_busy || _phase != Phase.Play || _board == null || _board.Won || _board.Failed) return;
+            if (_metrics.Lanes <= 0 || !_legal.IsLegal(tap)) return;
             var color = ExitPath.ColorOf(_board, tap);
+            bool hidden = PieceHidden(tap);
+            var points = BuildDrivePath(tap, _barView.InsertIndex(color));
+            if (piece != null) points[0] = piece.anchoredPosition;
             var size = piece != null ? piece.sizeDelta : _metrics.Piece;
-            HidePiece(piece);
+            var boxesBefore = BoxCells(_board);
+            var move = BoardRules.Play(_board, _history, tap);
+            if (!move.Accepted) return;
+            foreach (var bc in boxesBefore)
+                if (!_board.Lanes[bc[0]].Cells[bc[1]].Box) _pendingBoxBreaks.Add(bc);
+            _lastMatch = move.Matched;
+            var entry = _barView.Reserve(color, move.Matched);
             var flyer = SpawnFlyer(color, hidden, points[0], size);
             AudioManager.CarTap();
             AudioManager.Play(Sfx.DriveOut);
 #if !UNITY_WEBGL
             Haptics.Tap();
 #endif
-            LockInput();
-            StartCoroutine(Drive(flyer, points, tap, color, hidden));
+            _fly.StartCoroutine(Drive(flyer, points, entry, color, hidden));
+            ShowPlay();
         }
 
         bool PieceHidden(Tap tap)
@@ -956,7 +967,7 @@ namespace CarMatch
 
         RectTransform SpawnFlyer(CarColor color, bool hidden, Vector2 pos, Vector2 size)
         {
-            var rt = Place(_screen, "Flyer", pos, size);
+            var rt = Place(_flyLayer, "Flyer", pos, size);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = hidden ? HiddenSprite() : CarArt.For(color, true);
             image.preserveAspect = true;
@@ -981,18 +992,12 @@ namespace CarMatch
             }
         }
 
-        void LockInput()
-        {
-            _driving = true;
-            var buttons = _screen.GetComponentsInChildren<Button>(true);
-            for (int i = 0; i < buttons.Length; i++)
-                buttons[i].interactable = false;
-        }
-
-        IEnumerator Drive(RectTransform flyer, List<Vector2> points, Tap tap, CarColor color, bool hidden)
+        IEnumerator Drive(RectTransform flyer, List<Vector2> points, BarEntry entry, CarColor color, bool hidden)
         {
             // Round the lane corners so the car carves a curve instead of snapping at waypoints.
             points = Smooth(points, 3);
+            // The reserved slot can shift while we drive (later taps insert before it); steer to where it is now.
+            var plannedEnd = points[points.Count - 1];
             var startSize = flyer.sizeDelta;
             var endSize = new Vector2(BarSlotWidth - 8f, BarCarH);
             var image = flyer.GetComponent<Image>();
@@ -1024,7 +1029,7 @@ namespace CarMatch
                 // Quick ease-in, then a brisk steady speed all the way to the slot (Car Match feel).
                 const float accel = 0.15f;
                 float eased = (u < accel ? u * u / (2f * accel) : u - accel * 0.5f) / (1f - accel * 0.5f);
-                var pos = Along(points, eased, out facing);
+                var pos = Along(points, eased, out facing) + (SlotOf(entry) - plannedEnd) * eased;
                 trailClock += dt;
                 if (trailClock > 0.035f)
                 {
@@ -1048,7 +1053,7 @@ namespace CarMatch
                 Steer(flyer, image, color, hidden, heading, lean, 1f - stretch * 0.5f, 1f + stretch);
                 yield return null;
             }
-            flyer.anchoredPosition = points[points.Count - 1];
+            flyer.anchoredPosition = SlotOf(entry);
             flyer.sizeDelta = endSize;
             Steer(flyer, image, color, hidden, 0f, 0f, 1f, 1f);
             // Squash-stretch on the stop.
@@ -1061,35 +1066,88 @@ namespace CarMatch
                 yield return null;
             }
             flyer.localScale = Vector3.one;
-            var boxesBefore = BoxCells(_board);
-            var move = BoardRules.Play(_board, _history, tap);
-            _pendingBoxBreaks.Clear();
-            foreach (var bc in boxesBefore)
-                if (!_board.Lanes[bc[0]].Cells[bc[1]].Box) _pendingBoxBreaks.Add(bc);
-            _driving = false;
-            _lastMatch = move.Matched;
+            // Parked: remember where every slot was, then let any completed sets pop in order.
+            var where = new Dictionary<BarEntry, Vector2>();
+            for (int i = 0; i < _barView.Entries.Count; i++) where[_barView.Entries[i]] = BarSlotCenter(i, _barView.Entries.Count);
+            var ready = _barView.Land(entry);
+            Destroy(flyer.gameObject);
             AudioManager.Play(Sfx.SlotArrive);
-            if (move.Matched && move.ClearedFrom >= 0)
+            if (_phase == Phase.Play) RedrawBar();
+            for (int k = 0; k < ready.Count; k++)
             {
-                // The three pop out, then everything to their right slides left to close the gap.
-                _barCars.Insert(Mathf.Clamp(move.BarIndex, 0, _barCars.Count), flyer);
-                yield return ClearSet(move.ClearedFrom);
+                var spots = new List<Vector2>();
+                for (int i = 0; i < ready[k].Count; i++)
+                {
+                    Vector2 at;
+                    if (where.TryGetValue(ready[k][i], out at)) spots.Add(at);
+                }
+                _fly.StartCoroutine(PopSet(spots, ready[k][0].Color));
             }
-            if (move.Matched)
-            {
-                AudioManager.Play(Sfx.MatchClear);
+            if (_barView.Settled) _fly.StartCoroutine(AfterSettle(ready.Count > 0 ? 0.32f : 0f));
+        }
+
+        Vector2 SlotOf(BarEntry entry)
+        {
+            int i = _barView.IndexOf(entry);
+            return BarSlotCenter(i < 0 ? 0 : i, _barView.Entries.Count);
+        }
+
+        // A matched set: copies of the three cars glow white, burst into light, and vanish.
+        IEnumerator PopSet(List<Vector2> spots, CarColor color)
+        {
+            AudioManager.Play(Sfx.MatchClear);
 #if !UNITY_WEBGL
-                Haptics.Success();
+            Haptics.Success();
 #endif
-                if (_shake != null) _shake.Punch(0.22f, 9f, 0.6f);
-            }
-            if (!move.Accepted)
+            if (_shake != null) _shake.Punch(0.22f, 9f, 0.6f);
+            var set = new List<RectTransform>();
+            for (int i = 0; i < spots.Count; i++)
             {
-                ShowPlay();
-                yield break;
+                var rt = Place(_flyLayer, "Pop", spots[i], new Vector2(BarSlotWidth - 8f, BarCarH));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = CarArt.For(color, true);
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                var g = Place(rt, "WhiteGlow", Vector2.zero, rt.sizeDelta * 1.5f);
+                var gi = g.gameObject.AddComponent<Image>();
+                gi.sprite = UiArt.Get("glow") ?? SpriteKit.Round;
+                gi.color = new Color(1f, 1f, 1f, 0f);
+                gi.raycastTarget = false;
+                set.Add(rt);
             }
-            if (move.Won) EnterWin();
-            else if (move.Failed) ShowFail(null);
+            float t = 0f;
+            while (t < 0.2f)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.2f);
+                for (int i = 0; i < set.Count; i++)
+                {
+                    if (set[i] == null) continue;
+                    float k = 1f - 0.15f * u;
+                    set[i].localScale = new Vector3(k, k, 1f);
+                    var img = set[i].GetComponent<Image>();
+                    img.color = Color.Lerp(Color.white, new Color(1.6f, 1.6f, 1.6f, 1f), u);
+                    var gi = set[i].GetChild(0).GetComponent<Image>();
+                    gi.color = new Color(1f, 1f, 1f, 0.95f * u);
+                }
+                yield return null;
+            }
+            AudioManager.Play(Sfx.SlotArrive, 1.1f);
+            for (int i = 0; i < set.Count; i++)
+            {
+                if (set[i] == null) continue;
+                if (_phase == Phase.Play) LightBurst(set[i].anchoredPosition);
+                Destroy(set[i].gameObject);
+            }
+        }
+
+        // Once nothing is driving and no set is waiting: win, fail, or refresh boosters/HUD.
+        IEnumerator AfterSettle(float delay)
+        {
+            if (delay > 0f) yield return new WaitForSecondsRealtime(delay);
+            if (!_barView.Settled || _phase != Phase.Play || _board == null) yield break;
+            if (_board.Won) EnterWin();
+            else if (_board.Failed) ShowFail(null);
             else ShowPlay();
         }
 
