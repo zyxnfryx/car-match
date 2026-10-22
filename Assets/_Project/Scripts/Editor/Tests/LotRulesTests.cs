@@ -90,6 +90,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Lanes_BackOfLaneCanExit()
+        {
+            RuleChecks.BackOfLaneCanExit();
+        }
+
+        [Test]
         public void Taps_RapidMultiTap()
         {
             RuleChecks.RapidMultiTap();
