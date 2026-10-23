@@ -51,9 +51,10 @@ namespace CarMatch
 
     // Parked trucks feel alive. Awake (movable) trucks look around with eased glances
     // (left, right, eye contact with the player, a peek at the bar), blink every 2-5 s with
-    // occasional double-blinks and happy squints, bounce with a 3-4% squash/stretch on a
-    // random phase, and puff from the tailpipe every 1.5-3 s. Blocked or sleeping trucks only
-    // breathe. Pure view state: no raycasts, no input gating, no per-frame allocations.
+    // occasional double-blinks and happy squints, sputter in place like a running motor
+    // (small irregular hops while the eyes are open), and puff from the tailpipe every 1.5-3 s.
+    // Blocked or sleeping trucks sit still. The hop moves the pivot, so whatever owns
+    // anchoredPosition is never fought. Pure view state: no raycasts, no input gating, no per-frame allocations.
     public sealed class CarIdle : MonoBehaviour
     {
         public Sprite Open, Blink, Squint, Wide, LookLeft, LookLeftFar, LookRight, LookRightFar;
@@ -127,7 +128,8 @@ namespace CarMatch
             if (!_waking) _img.sprite = Body;
         }
 
-        void OnDisable() { if (_live && _rt != null) { _rt.localScale = _rest; _rt.localRotation = Quaternion.identity; } }
+        void OnDisable() { if (_live && _rt != null) { _rt.localScale = _rest; _rt.localRotation = Quaternion.identity; _rt.pivot = new Vector2(0.5f, 0.5f); } }
+        void OnDestroy() { OnDisable(); }
 
         void Update()
         {
@@ -144,6 +146,8 @@ namespace CarMatch
             float sy = _idle.ScaleY + 0.02f * up - 0.025f * down;
             float sx = _idle.ScaleX - 0.01f * up + 0.012f * down;
             _rt.localScale = new Vector3(_rest.x * sx, _rest.y * sy, 1f);
+            // Pivot shift = visual offset of (hop * size) without touching anchoredPosition.
+            _rt.pivot = new Vector2(0.5f - _idle.JitterX, 0.5f - _idle.HopY);
             if (!Awake) return;
             if (_idle.PuffNow && Puff != null) Puff(_rt);
             if (_layered) { UpdateLayers(dt); return; }

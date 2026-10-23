@@ -579,8 +579,8 @@ namespace CarMatch
                 Bar("Dash", new Vector2(x, roadY - roadH * 0.32f), new Vector2(60f, 8f), new Color(0.98f, 0.82f, 0.22f, 0.8f));
         }
 
-        // The loop: a rounded-rectangle road around the lot with a dashed centre line, plus
-        // the two loop-de-loop on-ramps the level intro uses at the top corners.
+        // The loop: a rounded-rectangle road around the lot with a dashed centre line, (the intro's
+        // loop-de-loop arrivals fly their loop without a drawn track).
         void DrawRing()
         {
             var road = new Color(0.20f, 0.21f, 0.24f, 1f);
@@ -596,16 +596,7 @@ namespace CarMatch
                 Segment("Ring", pts[i], pts[(i + 1) % pts.Count], _metrics.RoadW, road);
             for (int i = 0; i < pts.Count; i += 2)
                 Segment("RingDash", pts[i], Vector2.Lerp(pts[i], pts[(i + 1) % pts.Count], 0.6f), 5f, new Color(0.98f, 0.82f, 0.22f, 0.85f));
-            for (int side = -1; side <= 1; side += 2)
-            {
-                var loop = LoopCircle(side);
-                for (int i = 0; i < 36; i++)
-                {
-                    float a0 = i / 36f * Mathf.PI * 2f, a1 = (i + 1) / 36f * Mathf.PI * 2f;
-                    Segment("LoopTrack", loop.center + new Vector2(Mathf.Cos(a0), Mathf.Sin(a0)) * loop.radius,
-                        loop.center + new Vector2(Mathf.Cos(a1), Mathf.Sin(a1)) * loop.radius, 12f, new Color(0.85f, 0.30f, 0.25f, 0.9f));
-                }
-            }
+            // The intro's loop-de-loop arrivals still use LoopCircle; the red ring is no longer drawn.
         }
 
         // Loop-de-loop track at the top-left (side -1) or top-right (+1) corner of the ring.

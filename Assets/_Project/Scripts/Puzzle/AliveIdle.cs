@@ -14,25 +14,28 @@ namespace CarMatch
         public float LookUp;    // 0..1 toward player (wide eyes, small stretch)
         public float LookDown;  // 0..1 glance at the bar (small dip)
         public float ScaleX, ScaleY;
+        public float HopY;      // engine-sputter hop, fraction of truck height (0 while eyes are not open)
+        public float JitterX;   // tiny sideways shake that rides each hop, fraction of truck width
         public IdleEyes Eyes;
         public bool PuffNow;    // true for exactly one tick when a tailpipe puff is due
 
         uint _rng;
-        float _phase, _period, _t;
+        float _t;
         float _lookFrom, _lookTo, _lookT, _lookDur, _nextLook;
         float _upTo, _downTo, _upFrom, _downFrom;
         float _nextBlink, _eyesUntil; int _doubleLeft; IdleEyes _held;
         float _nextPuff;
+        float _hopT, _hopDur, _hopH, _hopJ, _nextHop; int _burst;
 
-        public const float AwakeAmp = 0.035f, CalmAmp = 0.012f;
+        // Sputter: hops of 0.5-1.6% of the truck height in bursts of 2-4, irregular gaps.
+        public const float HopMin = 0.005f, HopMax = 0.016f, LandSquash = 0.35f;
 
         public static AliveIdle Create(uint seed, bool awake)
         {
             var a = new AliveIdle();
             a._rng = seed * 2654435761u + 0x9E3779B9u; if (a._rng == 0) a._rng = 1;
             a.Awake = awake;
-            a._period = awake ? a.Range(1.2f, 1.6f) : a.Range(3.2f, 4.2f);
-            a._phase = a.Range(0f, 1f);
+            a._nextHop = a.Range(0.05f, 0.4f);
             a._nextLook = a.Range(0.4f, 1.6f);
             a._nextBlink = a.Range(0.8f, 3f);
             a._nextPuff = a.Range(0.5f, 2.5f);
@@ -45,7 +48,7 @@ namespace CarMatch
         {
             if (awake == Awake) return;
             Awake = awake;
-            _period = awake ? Range(1.2f, 1.6f) : Range(3.2f, 4.2f);
+            _hopT = _hopDur = 0f; HopY = JitterX = 0f;
             if (!awake) { _lookFrom = Look; _lookTo = 0f; _upFrom = LookUp; _downFrom = LookDown; _upTo = _downTo = 0f; _lookT = 0f; _lookDur = 0.3f; }
         }
 
@@ -56,14 +59,6 @@ namespace CarMatch
             _t += dt;
             PuffNow = false;
 
-            // Body: bouncy squash/stretch (awake) or slow breathing (calm), random phase per truck.
-            float amp = Awake ? AwakeAmp : CalmAmp;
-            float w = (_t / _period + _phase) * 6.2831853f;
-            float s = Sin(w);
-            // Sharper bounce at the bottom when awake: a little extra squash on the down beat.
-            float sq = Awake && s < 0f ? s * (1f + 0.35f * -s) : s;
-            ScaleY = 1f + amp * sq;
-            ScaleX = 1f - amp * 0.8f * sq;
 
             // Eased look travel.
             _lookT += dt / _lookDur;
@@ -98,6 +93,42 @@ namespace CarMatch
                 Eyes = _held;
             }
             if (_eyesUntil == 0f) Eyes = Awake && LookUp > 0.5f ? IdleEyes.Wide : IdleEyes.Open;
+            Sputter(dt);
+        }
+
+        // Engine sputter: small, quick, irregular hops in place while the eyes are open. Each hop
+        // is a half-sine (up and down in 55-95 ms) with a sideways jitter and a tiny squash on
+        // landing. Hops come in bursts of 2-4 with short gaps, then a longer irregular pause.
+        // Asleep, blinking or squinting: no hop at all (an in-flight hop is dropped).
+        void Sputter(float dt)
+        {
+            bool eyesOpen = Awake && (Eyes == IdleEyes.Open || Eyes == IdleEyes.Wide);
+            ScaleX = ScaleY = 1f;
+            if (!eyesOpen) { HopY = JitterX = 0f; _hopDur = 0f; if (_nextHop < _t + 0.06f) _nextHop = _t + Range(0.06f, 0.2f); return; }
+            if (_hopDur > 0f)
+            {
+                _hopT += dt;
+                if (_hopT >= _hopDur) { _hopDur = 0f; HopY = JitterX = 0f; }
+                else
+                {
+                    float u = _hopT / _hopDur;
+                    float y = Sin(u * 3.14159265f);
+                    HopY = _hopH * y;
+                    JitterX = _hopJ * y;
+                    // Squash just as it lands (last 25% of the hop).
+                    if (u > 0.75f) { float q = (u - 0.75f) * 4f * LandSquash * _hopH * 4f; ScaleY = 1f - q; ScaleX = 1f + q * 0.8f; }
+                }
+                return;
+            }
+            HopY = JitterX = 0f;
+            if (_t < _nextHop) return;
+            _hopT = 0f;
+            _hopDur = Range(0.055f, 0.095f);
+            _hopH = Range(HopMin, HopMax);
+            _hopJ = Range(-0.004f, 0.004f);
+            if (_burst <= 0) _burst = 1 + (int)(Next01() * 3.99f);
+            _burst--;
+            _nextHop = _t + _hopDur + (_burst > 0 ? Range(0.02f, 0.09f) : Range(0.14f, 0.5f));
         }
 
         void PickLook()
