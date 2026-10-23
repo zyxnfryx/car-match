@@ -186,9 +186,15 @@ namespace CarMatch.Tests
         }
 
         [Test]
-        public void Economy_WinsAndFailsPayTheSame()
+        public void Economy_OnlyWinsPay()
         {
-            RuleChecks.WinAndFailPayTheSame();
+            RuleChecks.OnlyWinsPay();
+        }
+
+        [Test]
+        public void Economy_LoseGivesNoCoins()
+        {
+            RuleChecks.LoseGivesNoCoins();
         }
 
         [Test]
