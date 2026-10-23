@@ -2476,14 +2476,14 @@ namespace CarMatch
         string LivesLine()
         {
             var wallet = Purse.Wallet;
-            if (wallet.Lives >= Economy.MaxLives) return wallet.Lives + "   Full";
+            if (wallet.Lives >= Economy.MaxLives) return wallet.Lives.ToString(); // full: no countdown
             return wallet.Lives + "   " + Clock(Economy.SecondsUntilLife(wallet, Purse.Now()));
         }
 
         static string Clock(int seconds)
         {
             if (seconds < 0) seconds = 0;
-            return (seconds / 60) + ":" + (seconds % 60).ToString("00");
+            return (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00");
         }
 
         void Backdrop(bool home = false)
@@ -2691,7 +2691,7 @@ namespace CarMatch
             text.rectTransform.offsetMin = new Vector2(70f, 0f);
             text.rectTransform.offsetMax = new Vector2(-60f, 0f);
             Outlined(text, new Color(0.05f, 0.06f, 0.15f, 0.9f), 2f);
-            // '+' affordance: coins open the coin popup; hearts show when the next heart comes back (no lives shop exists yet).
+            // '+' affordance: coins open the coin popup; hearts just click (no lives shop yet; the pill shows the refill countdown).
             var plusArt = UiArt.Get("plus");
             if (plusArt != null)
             {
@@ -2710,10 +2710,7 @@ namespace CarMatch
 
         void OnPlus()
         {
-            AudioManager.Play(Sfx.Click);
-            var wallet = Purse.Wallet;
-            if (wallet.Lives >= Economy.MaxLives) Toast("Hearts are full");
-            else Toast("Next heart in " + Clock(Economy.SecondsUntilLife(wallet, Purse.Now())));
+            AudioManager.Play(Sfx.Click); // no lives shop yet; the countdown lives in the heart pill
         }
 
         // ---- Coin feedback: shake + toast + a small "how to earn coins" popup (no prices changed). ----
