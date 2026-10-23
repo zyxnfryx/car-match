@@ -1217,6 +1217,40 @@ namespace CarMatch
         }
 
         // Catmull-Rom spline through the control points (centripetal-ish via uniform with clamped ends).
+        // Level-intro arrival, built from exact geometry so it is one clean loop: a straight run
+        // in along the loop's bottom tangent, one full constant-radius circle, a straight run on,
+        // a single quarter arc turning down into the lane, then straight to the spot. Every join
+        // is tangent (no Catmull-Rom wobble, no kink or extra bump at the top).
+        static List<Vector2> LoopArrival(int side, float edgeX, Vector2 c, float r, Vector2 target)
+        {
+            const float Step = 6f;
+            var o = new List<Vector2>(256);
+            float yb = c.y - r;
+            float dir = -side;                       // left loop drives +x, right loop drives -x
+            void Line(Vector2 a, Vector2 b)
+            {
+                int n = Mathf.Max(1, Mathf.CeilToInt((b - a).magnitude / Step));
+                for (int i = o.Count == 0 ? 0 : 1; i <= n; i++) o.Add(Vector2.Lerp(a, b, i / (float)n));
+            }
+            void Arc(Vector2 centre, float rad, float a0, float a1)
+            {
+                int n = Mathf.Max(2, Mathf.CeilToInt(Mathf.Abs(a1 - a0) * rad / Step));
+                for (int i = 1; i <= n; i++) { float a = Mathf.Lerp(a0, a1, i / (float)n); o.Add(centre + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * rad); }
+            }
+            var bottom = new Vector2(c.x, yb);
+            Line(new Vector2(edgeX, yb), bottom);
+            // Full loop starting/ending at the bottom, turning so it leaves heading 'dir'.
+            float start = -Mathf.PI * 0.5f;
+            Arc(c, r, start, start + dir * Mathf.PI * 2f);
+            // Quarter turn down into the lane.
+            float R = Mathf.Min(60f, Mathf.Abs(target.x - c.x) * 0.8f, Mathf.Max(8f, yb - target.y));
+            var turnC = new Vector2(target.x - dir * R, yb - R);
+            Line(bottom, new Vector2(turnC.x, yb));
+            Arc(turnC, R, Mathf.PI * 0.5f, Mathf.PI * 0.5f - dir * Mathf.PI * 0.5f);
+            Line(o[o.Count - 1], target);
+            return o;
+        }
+
         static List<Vector2> CatmullRom(List<Vector2> p, int perSeg)
         {
             if (p == null || p.Count < 3) return p;
@@ -2291,18 +2325,9 @@ namespace CarMatch
                 int side = i % 2 == 0 ? -1 : 1;
                 var loop = LoopCircle(side);
                 float edgeX = side * 640f;
-                var pts = new List<Vector2> { new Vector2(edgeX, loop.center.y - loop.radius) };
-                // Full vertical loop (drawn as a circle): enter at the bottom, go all the way round.
-                for (int k = 0; k <= 16; k++)
-                {
-                    float a = -Mathf.PI * 0.5f - side * k / 16f * Mathf.PI * 2f;
-                    pts.Add(loop.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * loop.radius);
-                }
                 var target = piece.anchoredPosition;
-                pts.Add(new Vector2(Mathf.Lerp(loop.center.x, target.x, 0.5f), _metrics.RingTop));
-                pts.Add(new Vector2(target.x, _metrics.RingTop - 10f));
-                pts.Add(target);
-                paths.Add(CatmullRom(pts, 6));
+                var pts = LoopArrival(side, edgeX, loop.center, loop.radius, target);
+                paths.Add(pts);
                 var gh = Place(_flyLayer, "IntroCar", pts[0], piece.sizeDelta);
                 var img = gh.gameObject.AddComponent<Image>();
                 img.preserveAspect = true;
