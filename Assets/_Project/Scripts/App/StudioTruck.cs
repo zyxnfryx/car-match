@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace CarMatch
 {
     // Lot Loop's take on Flock Five's birds halo: three trucks (coral, teal, sky) follow each other
-    // nose-to-tail around the ZFX logo, with a loop-de-loop at the top and a sparkly tyre trail,
+    // nose-to-tail around the ZFX logo on one clean elliptical loop with a sparkly tyre trail,
     // then park in a row under the logo, turn to face the player, blink, and give a soft two-tap
     // "beep beep" with flashing headlights right as the jingle ends (3.0 s).
     // Smooth by construction: the lap is sampled once into an arc-length table, so speed along the
@@ -87,22 +87,13 @@ namespace CarMatch
             _audio.clip = Resources.Load<AudioClip>("Audio/beep_beep");
         }
 
-        // Logo-centred lap: ellipse just outside the logo, plus one vertical loop at the top.
-        // The loop is blended in with a smooth (C1) bump so the tangent never kinks.
+        // Logo-centred lap: one clean ellipse just outside the logo (constant shape, no bump or
+        // mini-loop at the top), closed and tangent-continuous where it meets the parking straight.
         Vector2 Lap(float u)
         {
             float rx = _lw * 0.60f, ry = _lh * 0.5f + _lw * 0.15f;
             float th = Mathf.PI * 2f * u;
-            var p = new Vector2(rx * Mathf.Sin(th), -ry * Mathf.Cos(th) - _lh * 0.02f);
-            const float d = 0.42f;
-            float k = Mathf.Clamp01((th - (Mathf.PI - d)) / (2f * d));
-            if (k > 0f && k < 1f)
-            {
-                float psi = Mathf.PI * 2f * (k * k * (3f - 2f * k));
-                float rl = _lw * 0.09f;
-                p += new Vector2(rl * Mathf.Sin(psi), rl * (1f - Mathf.Cos(psi)));
-            }
-            return p;
+            return new Vector2(rx * Mathf.Sin(th), -ry * Mathf.Cos(th) - _lh * 0.02f);
         }
 
         void BuildPath()
