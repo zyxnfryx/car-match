@@ -413,13 +413,18 @@ namespace CarMatch
             var seen = new bool[5];
             float maxCalm = 0f, maxAwake = 0f;
             var prev = new IdleEyes[6];
+            var prevHop = new float[6]; int hops = 0;
             for (int f = 0; f < 60 * 30; f++)
             {
                 for (int k = 0; k < idles.Length; k++)
                 {
                     idles[k].Tick(1f / 60f);
                     var a = idles[k];
-                    float dev = System.Math.Abs(a.ScaleY - 1f);
+                    float dev = a.HopY;
+                    Expect(a.HopY >= 0f && System.Math.Abs(a.ScaleY - 1f) < 0.03f, "sputter stays subtle");
+                    if (a.Eyes == IdleEyes.Blink || a.Eyes == IdleEyes.Squint) Expect(a.HopY == 0f && a.JitterX == 0f, "no hop while the eyes blink or squint");
+                    if (a.Awake && a.HopY > 0f && prevHop[k] == 0f) hops++;
+                    prevHop[k] = a.HopY;
                     if (a.Awake)
                     {
                         if (a.PuffNow) puffs++;
@@ -451,11 +456,13 @@ namespace CarMatch
             Expect(seen[0] && seen[1] && seen[2] && seen[3] && seen[4], "looks ahead, left, right, at the player and at the bar");
             Expect(blinks >= 6 * 30 / 5, "blinks every 2-5 s (" + blinks + ")");
             Expect(squints > 0 && wide > 0, "happy squints and wide eye contact happen");
-            Expect(maxAwake > 0.03f && maxAwake < 0.06f, "awake bounce is about 3-4% (" + maxAwake + ")");
-            Expect(maxCalm > 0f && maxCalm < 0.02f, "blocked trucks only breathe (" + maxCalm + ")");
+            Expect(maxAwake > 0.008f && maxAwake <= AliveIdle.HopMax + 1e-4f, "awake sputter hops are small (" + maxAwake + ")");
+            Expect(maxCalm == 0f, "sleeping trucks never hop (" + maxCalm + ")");
+            Expect(hops > 4 * 30 * 2, "awake trucks sputter often (" + hops + " hops)");
             var a0 = AliveIdle.Create(1, true); var a1 = AliveIdle.Create(2, true);
-            a0.Tick(0.016f); a1.Tick(0.016f);
-            Expect(System.Math.Abs(a0.ScaleY - a1.ScaleY) > 1e-4f, "trucks are desynced by a random phase");
+            bool diff = false;
+            for (int f = 0; f < 60; f++) { a0.Tick(1f / 60f); a1.Tick(1f / 60f); if (System.Math.Abs(a0.HopY - a1.HopY) > 1e-4f) diff = true; }
+            Expect(diff, "trucks sputter out of sync");
             // A tap mid-idle (mid-blink, mid-look) is accepted immediately.
             var back = new Tap(TapKind.Lane, 0, 2);
             Expect(legal.IsLegal(back), "the back coral is tappable while idling");
