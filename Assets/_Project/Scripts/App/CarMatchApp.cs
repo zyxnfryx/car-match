@@ -55,7 +55,6 @@ namespace CarMatch
         float _tick;
         Text _coinText;
         Text _livesText;
-        Text _failLivesText;
         Button _retryButton;
         Button _playButton;
         UiShake _shake;
@@ -161,7 +160,6 @@ namespace CarMatch
             }
             if (_coinText != null && _phase != Phase.Win) _coinText.text = Purse.Wallet.Coins.ToString();
             if (_livesText != null) _livesText.text = LivesLine();
-            if (_failLivesText != null && _phase == Phase.Fail) _failLivesText.text = FailLivesLine();
             if (_phase == Phase.Fail && _retryButton != null)
                 _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
         }
@@ -224,7 +222,6 @@ namespace CarMatch
             StopAllCoroutines();
             _coinText = null;
             _livesText = null;
-            _failLivesText = null;
             _retryButton = null;
             _pieceAt.Clear();
             _busy = false;
@@ -2403,14 +2400,14 @@ namespace CarMatch
             dimImage.color = new Color(0.10f, 0.06f, 0.18f, 0.55f);
 
             // 9-slice card (insets 84/84/84, bottom 96 for the 3D lip).
-            var card = Place(_screen, "FailCard", new Vector2(0f, -40f), new Vector2(920f, 1260f));
+            var card = Place(_screen, "FailCard", new Vector2(0f, -40f), new Vector2(920f, 1100f));
             var cardImage = card.gameObject.AddComponent<Image>();
             cardImage.sprite = UiArt.Get("lose_panel") ?? SpriteKit.Round;
             cardImage.type = Image.Type.Sliced;
             cardImage.raycastTarget = false;
 
             // Word-art title overlapping the card's top edge.
-            var title = Place(_screen, "FailTitle", new Vector2(0f, 630f), new Vector2(940f, 254f));
+            var title = Place(_screen, "FailTitle", new Vector2(0f, 550f), new Vector2(940f, 254f));
             var titleArt = UiArt.Get("lose_title");
             if (titleArt != null)
             {
@@ -2426,45 +2423,35 @@ namespace CarMatch
                 Outlined(tt, ink, 5f);
             }
 
-            var hero = Place(card, "FailHero", new Vector2(56f, 340f), new Vector2(590f, 432f));
+            var hero = Place(card, "FailHero", new Vector2(56f, 260f), new Vector2(590f, 432f));
             var heroImage = hero.gameObject.AddComponent<Image>();
             heroImage.sprite = UiArt.Get("lose_hero");
             heroImage.preserveAspect = true;
             heroImage.raycastTarget = false;
             if (heroImage.sprite == null) heroImage.enabled = false;
 
-            string headline = string.IsNullOrEmpty(status) ? "No open slot left!" : status;
-            var head = Place(card, "FailHead", new Vector2(0f, 90f), new Vector2(820f, 80f));
-            var headText = AddText(head, headline, 54, ink, TextAnchor.MiddleCenter);
-            headText.font = font;
-
-            // Heart + rule, then the live lives/timer line (refreshed in Update).
-            var rule = Place(card, "FailRule", new Vector2(0f, 15f), new Vector2(820f, 56f));
-            var ruleText = AddText(rule, "Retry or Home uses a life", 38, ink, TextAnchor.MiddleCenter);
-            ruleText.font = font;
-            float ruleW = ruleText.preferredWidth;
-            var heart = Place(rule, "Heart", new Vector2(-ruleW * 0.5f - 34f, 2f), new Vector2(52f, 52f));
-            var heartImage = heart.gameObject.AddComponent<Image>();
-            heartImage.sprite = UiArt.Get("lose_heart") ?? UiArt.Get("icon_heart") ?? SpriteKit.Heart;
-            heartImage.preserveAspect = true;
-            heartImage.raycastTarget = false;
-            var lives = Place(card, "FailLives", new Vector2(0f, -38f), new Vector2(820f, 50f));
-            _failLivesText = AddText(lives, FailLivesLine(), 34, new Color(0.85f, 0.30f, 0.22f, 1f), TextAnchor.MiddleCenter);
-            _failLivesText.font = font;
-
-            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -165f), 780f, 150f, "Park 3 Cars", 64, OnContinue, true);
+            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -80f), 780f, 150f, "Park 3 Cars", 64, OnContinue, false);
             cont.interactable = !_busy;
-            _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -335f), 780f, 150f, "Retry", 68, OnRetry, false);
+            _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -250f), 780f, 150f, "Retry", 68, OnRetry, false);
+            RetryLifeBadge(_retryButton);
             _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
-            LoseButton(card, "lose_btn_home", new Vector2(0f, -495f), 480f, 124f, "Home", 54, OnHome, false);
+            LoseButton(card, "lose_btn_home", new Vector2(0f, -410f), 480f, 124f, "Home", 54, OnHome, false);
         }
 
-        // Lives line on the lose card: "Lives 4  ·  next life in 17:48", or "Lives 5" when full.
-        string FailLivesLine()
+        // Small "-1" heart beside the Retry label: Retry costs a life.
+        void RetryLifeBadge(Button retry)
         {
-            var wallet = Purse.Wallet;
-            if (wallet.Lives >= Economy.MaxLives) return "Lives " + wallet.Lives;
-            return "Lives " + wallet.Lives + "  \u00B7  next life in " + Clock(Economy.SecondsUntilLife(wallet, Purse.Now()));
+            var sprite = UiArt.Get("lose_heart_minus1");
+            if (sprite == null) return;
+            var rt = (RectTransform)retry.transform;
+            float h = rt.sizeDelta.y;
+            var label = retry.GetComponentInChildren<Text>();
+            float lw = label != null ? label.preferredWidth : 160f;
+            var badge = Place(rt, "LifeCost", new Vector2(lw * 0.5f + h * 0.40f, h * 0.06f), new Vector2(h * 0.58f, h * 0.58f));
+            var bi = badge.gameObject.AddComponent<Image>();
+            bi.sprite = sprite;
+            bi.preserveAspect = true;
+            bi.raycastTarget = false;
         }
 
         // 3-slice pill button from the lose-popup art: caps scale with the height, the middle stretches.
