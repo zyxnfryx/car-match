@@ -2394,8 +2394,8 @@ namespace CarMatch
             Haptics.Thud();
 #endif
             Label(new Vector2(0f, 360f), new Vector2(900f, 90f), "Bar's full", 68, Cream, TextAnchor.MiddleCenter);
-            string body = "There's no open slot left. Retry uses a life, starts this lot over, and adds " +
-                          Economy.FailPay + " coins. Home does the same and leaves. Continue plays a rewarded ad and puts the last three cars back.";
+            string body = "There's no open slot left. Retry uses a life and starts this lot over. " +
+                          "Home uses a life and goes back to the menu. Continue plays a rewarded ad and puts the last three cars back.";
             if (!string.IsNullOrEmpty(status)) body = status;
             Label(new Vector2(0f, 140f), new Vector2(860f, 220f), body, 32, Cream, TextAnchor.MiddleCenter);
             _livesText = Label(new Vector2(0f, -40f), new Vector2(700f, 50f), LivesLine(), 32, Gold, TextAnchor.MiddleCenter);
@@ -2424,8 +2424,7 @@ namespace CarMatch
         {
             if (_failPaid) return;
             _failPaid = true;
-            Purse.TrySpendLife();
-            Purse.Grant(Economy.Pay(false));
+            Purse.TrySpendLife(); // a fail costs a heart and pays no coins
         }
 
         void OnContinue()
@@ -2692,7 +2691,7 @@ namespace CarMatch
             text.rectTransform.offsetMin = new Vector2(70f, 0f);
             text.rectTransform.offsetMax = new Vector2(-60f, 0f);
             Outlined(text, new Color(0.05f, 0.06f, 0.15f, 0.9f), 2f);
-            // '+' affordance: coins open the (future) shop, hearts the refill. Today it just answers the tap.
+            // '+' affordance: coins open the coin popup; hearts show when the next heart comes back (no lives shop exists yet).
             var plusArt = UiArt.Get("plus");
             if (plusArt != null)
             {
@@ -2712,6 +2711,9 @@ namespace CarMatch
         void OnPlus()
         {
             AudioManager.Play(Sfx.Click);
+            var wallet = Purse.Wallet;
+            if (wallet.Lives >= Economy.MaxLives) Toast("Hearts are full");
+            else Toast("Next heart in " + Clock(Economy.SecondsUntilLife(wallet, Purse.Now())));
         }
 
         // ---- Coin feedback: shake + toast + a small "how to earn coins" popup (no prices changed). ----
@@ -2791,7 +2793,7 @@ namespace CarMatch
             var titleText = AddText(title, "Need more coins?", 60, Cream, TextAnchor.MiddleCenter);
             titleText.font = ChunkyFont();
             var body = Place(panel, "Body", new Vector2(0f, 30f), new Vector2(760f, 150f));
-            AddText(body, "Earn " + Economy.WinPay + " coins for every lot you play.\nWatch a short video for bonus coins.", 38, Cream, TextAnchor.MiddleCenter);
+            AddText(body, "Earn " + Economy.WinPay + " coins for every lot you win.\nWatch a short video for bonus coins.", 38, Cream, TextAnchor.MiddleCenter);
             MakeButton(new Vector2(0f, -130f), new Vector2(620f, 150f), new Color(0.2f, 0.7f, 0.3f, 1f), "Watch ad  +" + Economy.AdCoinReward, 46, OnAdCoins, "btn_green", panel);
             MakeButton(new Vector2(0f, -290f), new Vector2(360f, 110f), new Color(0.2f, 0.4f, 0.8f, 1f), "Close", 42, CloseCoinPopup, "btn_blue", panel);
         }

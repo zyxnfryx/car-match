@@ -366,18 +366,30 @@ namespace CarMatch
             Expect(BoardQuery.Key(shortBoard) == key, "a refused magnet changes nothing");
         }
 
-        public static void WinAndFailPayTheSame()
+        public static void OnlyWinsPay()
         {
-            Expect(Economy.Pay(true) == 20 && Economy.Pay(false) == 20, "wins and fails both pay 20");
+            Expect(Economy.Pay(true) == 20 && Economy.WinPayFor(false) == 20, "a win pays 20");
+            Expect(Economy.Pay(false) == 0 && Economy.FailPay == 0, "a fail pays 0 coins");
             Expect(Economy.UndoCost == 300 && Economy.ShuffleCost == 300, "undo and shuffle cost 300");
             Expect(Economy.SuperUndoCost == 900 && Economy.MagnetCost == 600, "super undo is 900 and magnet is 600");
             var wallet = Economy.NewWallet();
             Expect(wallet.Coins == Economy.StartCoins && wallet.Lives == Economy.MaxLives, "a new purse is full");
             Expect(Economy.TrySpend(ref wallet, Economy.UndoCost), "undo is affordable at the start");
             Expect(wallet.Coins == Economy.StartCoins - Economy.UndoCost, "coins dropped by the undo price");
+            int coins = wallet.Coins;
             Economy.Grant(ref wallet, Economy.Pay(true));
+            Expect(wallet.Coins == coins + 20, "a win still adds 20");
+        }
+
+        public static void LoseGivesNoCoins()
+        {
+            var wallet = Economy.NewWallet();
+            int coins = wallet.Coins, lives = wallet.Lives;
+            Expect(Economy.SettleFail(ref wallet, 1000), "a fail with lives left is accepted");
+            Expect(wallet.Coins == coins, "losing gives 0 coins");
+            Expect(wallet.Lives == lives - 1, "losing still costs one heart");
             Economy.Grant(ref wallet, Economy.Pay(false));
-            Expect(wallet.Coins == Economy.StartCoins - Economy.UndoCost + 40, "both pays landed");
+            Expect(wallet.Coins == coins, "the fail pay grants nothing");
         }
 
         public static void LivesSpendAndRegen()
@@ -693,7 +705,8 @@ namespace CarMatch
             MagnetPullsASetOfThree();
             OpenEyesOnlyOnAClearExit();
             HeadingUsesTheNearestDirection();
-            WinAndFailPayTheSame();
+            OnlyWinsPay();
+            LoseGivesNoCoins();
             LivesSpendAndRegen();
             AllLevelsSolvable(json);
             BoostersOnEveryLevel(json);

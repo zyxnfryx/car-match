@@ -1,7 +1,7 @@
 namespace CarMatch
 {
     // Shared by the purse (saved coins and lives) and the tests.
-    // Wins and fails pay the same. A life is spent only when a fail is accepted.
+    // Only wins pay coins. A fail pays nothing; it costs a life when the fail is accepted.
     public struct Wallet
     {
         public int Coins;
@@ -12,7 +12,7 @@ namespace CarMatch
     public static class Economy
     {
         public const int WinPay = 20;
-        public const int FailPay = 20;
+        public const int FailPay = 0;
         public const int UndoCost = 300;
         public const int ShuffleCost = 300;
         public const int SuperUndoCost = 900;
@@ -26,6 +26,12 @@ namespace CarMatch
         public const int SuperHardPay = 100;
         public static int Pay(bool won) => won ? WinPay : FailPay;
         public static int WinPayFor(bool superHard) => superHard ? SuperHardPay : WinPay;
+
+        // Accepting a fail (Retry or Home on the Bar's-full popup): spends one life, pays no coins.
+        public static bool SettleFail(ref Wallet wallet, long nowUnix)
+        {
+            return TrySpendLife(ref wallet, nowUnix);
+        }
 
         public static Wallet NewWallet()
         {
