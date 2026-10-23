@@ -2426,7 +2426,7 @@ namespace CarMatch
                 Outlined(tt, ink, 5f);
             }
 
-            var hero = Place(card, "FailHero", new Vector2(0f, 370f), new Vector2(640f, 470f));
+            var hero = Place(card, "FailHero", new Vector2(56f, 340f), new Vector2(590f, 432f));
             var heroImage = hero.gameObject.AddComponent<Image>();
             heroImage.sprite = UiArt.Get("lose_hero");
             heroImage.preserveAspect = true;
