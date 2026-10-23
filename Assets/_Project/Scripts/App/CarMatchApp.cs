@@ -2452,10 +2452,10 @@ namespace CarMatch
             _failLivesText = AddText(lives, FailLivesLine(), 34, new Color(0.85f, 0.30f, 0.22f, 1f), TextAnchor.MiddleCenter);
             _failLivesText.font = font;
 
-            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -200f), 780f, 150f, "Continue", 64, OnContinue, true);
+            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -200f), 780f, 150f, "Park 3 Cars", 64, OnContinue, true);
             cont.interactable = !_busy;
             var cap = Place(card, "FailAdNote", new Vector2(0f, -305f), new Vector2(820f, 44f));
-            var capText = AddText(cap, "Watch a short video: last 3 cars go back", 30, new Color(0.40f, 0.30f, 0.45f, 1f), TextAnchor.MiddleCenter);
+            var capText = AddText(cap, "Free with a short video", 30, new Color(0.40f, 0.30f, 0.45f, 1f), TextAnchor.MiddleCenter);
             capText.font = font;
             _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -420f), 780f, 150f, "Retry", 68, OnRetry, false);
             _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
@@ -2498,6 +2498,10 @@ namespace CarMatch
             button.colors = colors;
             var label = AddText(rt, value, fontSize, Color.white, TextAnchor.MiddleCenter);
             label.font = ChunkyFont();
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = Mathf.Max(24, fontSize * 2 / 3);
+            label.resizeTextMaxSize = fontSize;
             // The face sits above the baked lip (bottom ~25% of the art).
             label.rectTransform.offsetMin = new Vector2(adBadge ? height * 0.55f : 0f, height * 0.16f);
             label.rectTransform.offsetMax = new Vector2(0f, -height * 0.04f);
