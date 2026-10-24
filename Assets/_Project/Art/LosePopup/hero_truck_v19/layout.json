@@ -1,0 +1,231 @@
+{
+ "canvas_px": [
+  560,
+  378
+ ],
+ "origin": "top-left",
+ "y_down": true,
+ "version": 19,
+ "scale_vs_v12_affine": 1.08,
+ "fatness": "v19 = v18 + FF hub lean flip only. NF/NR unchanged. Into-body thick wall kept (64/56/46). \u00d71.08 + WIDTH_NUDGE 0.96. | LOCKED stills 2026-10-24 \u2014 spin cancelled (pt181u).",
+ "extrusion_depth_px": {
+  "tire_near_front": 64,
+  "tire_near_rear": 56,
+  "tire_far_front": 46
+ },
+ "extrusion_dir_screen_ydown": {
+  "tire_near_front": [
+   0.9824685626706456,
+   -0.18642833305019835
+  ],
+  "tire_near_rear": [
+   0.9824685626706456,
+   -0.18642833305019835
+  ],
+  "tire_far_front": [
+   -0.9824685626706456,
+   0.18642833305019835
+  ]
+ },
+ "draw_order": [
+  "shadow",
+  "tire_far_front",
+  "tire_near_rear",
+  "tire_near_front",
+  "body"
+ ],
+ "notes": "LOCK 2026-10-24 (Brandon / pt181u): stills Keep locked for next build; wheel spin removed from pack. v19 Brandon/Inspector: only tire_far_front tip was wrong direction. Action: flip FF face shear (M[1,0] negated) + tip-left screen rot +30.0\u00b0 so END tip is LEFT toward body (~-24\u00b0), matching NF/NR lean sense (top tucked under fender). v18 FF measured tip -7.3\u00b0 (LEFT); v19 FF tip -23.7\u00b0 (LEFT). NF/NR PNGs byte-identical to v18. Stills Keep + spin pass: tire_spin.gif (24f) alongside unchanged stills.",
+ "wire_up": {
+  "body": {
+   "file": "body.png",
+   "position_px_topleft": [
+    0,
+    0
+   ],
+   "note": "from v12"
+  },
+  "shadow": {
+   "file": "shadow.png",
+   "position_px_topleft": [
+    0,
+    0
+   ],
+   "note": "from v12"
+  },
+  "tire_near_front": {
+   "file": "tire_near_front.png",
+   "position_px_topleft": [
+    0,
+    0
+   ],
+   "spin_pivot_px_topleft": [
+    227.7,
+    302.0
+   ],
+   "extrusion_depth_px": 64,
+   "baked": true,
+   "diameter_scale_vs_v12": 1.08
+  },
+  "tire_near_rear": {
+   "file": "tire_near_rear.png",
+   "position_px_topleft": [
+    0,
+    0
+   ],
+   "spin_pivot_px_topleft": [
+    116.3,
+    207.0
+   ],
+   "extrusion_depth_px": 56,
+   "baked": true,
+   "diameter_scale_vs_v12": 1.08
+  },
+  "tire_far_front": {
+   "file": "tire_far_front.png",
+   "position_px_topleft": [
+    0,
+    0
+   ],
+   "spin_pivot_px_topleft": [
+    452.2,
+    259.4
+   ],
+   "extrusion_depth_px": 46,
+   "baked": true,
+   "diameter_scale_vs_v12": 1.08,
+   "lean_note": "hub tip -23.7\u00b0 LEFT toward body (was wrong way on v18)"
+  }
+ },
+ "hub_centers_px_topleft": {
+  "tire_near_front": [
+   227.7,
+   302.0
+  ],
+  "tire_near_rear": [
+   116.3,
+   207.0
+  ],
+  "tire_far_front": [
+   452.2,
+   259.4
+  ]
+ },
+ "style": {
+  "rubber": "matte soft charcoal cartoon toy + solid rounded axle/tread wall",
+  "hub": "simple recessed warm-grey plastic disc \u2014 hub not the star",
+  "vs_v14": "near diameter (\u00d71.08 + slight WIDTH_NUDGE); axle-depth wall; FF hub tilt matches v14",
+  "vs_v16": "v16 wall too thin + wrong dir (down-right footprint smear). into-body wall kept from v17",
+  "vs_v17": "v17 Keep-reject: FF hub read face-on + side a touch wide. v18 uses v12-base\u00d71.08 (no double-scale) + WIDTH_NUDGE; thickness win kept.",
+  "vs_v15": "v15 larger diameter (\u00d71.22) rejected \u2014 v15 untouched",
+  "vs_v13": "cartoon solid prism wall (no photoreal spokes / no slice smear patches)",
+  "vs_v18": "FF hub lean flipped to LEFT (toward body); NF/NR byte-identical; thickness/width unchanged"
+ },
+ "spin_note": "SPIN REMOVED / NOT SHIPPED. Brandon locked v19 stills for next build. Spin assets archived. No putter-bounce-from-spin until he asks again.",
+ "v12_affine_reference_applied_to_face": {
+  "scale": 1.08,
+  "width_nudge": 0.96,
+  "note": "v12 base affines \u00d7 SCALE, then row0 *= WIDTH_NUDGE for slight side slim. Wall along axle. Do NOT re-apply affine to baked PNGs. v17 bug was double-scaling v14-pre-scaled matrices.",
+  "tire_near_front": {
+   "center_px_topleft": [
+    227.7,
+    302.0
+   ],
+   "affine_image_coords_y_down_v12_base": [
+    [
+     0.5,
+     0.0
+    ],
+    [
+     0.426437,
+     0.592496
+    ]
+   ]
+  },
+  "tire_near_rear": {
+   "center_px_topleft": [
+    116.3,
+    207.0
+   ],
+   "affine_image_coords_y_down_v12_base": [
+    [
+     0.46,
+     0.0
+    ],
+    [
+     0.392322,
+     0.579727
+    ]
+   ]
+  },
+  "tire_far_front": {
+   "center_px_topleft": [
+    452.2,
+    259.4
+   ],
+   "affine_image_coords_y_down_v12_base": [
+    [
+     0.228258,
+     0.0
+    ],
+    [
+     0.194675,
+     0.64
+    ]
+   ],
+   "tilt_note": "Strong 3/4 squash (v12/v14 FF nested) \u2014 hub ellipse not face-on"
+  }
+ },
+ "face_on_masters": "/workspace/lotloop_wheels_ref/_work_v19/face_spinready_near_168.png (and _far_)",
+ "width_nudge": 0.96,
+ "ff_lean_fix": {
+  "v18_tip_deg_pca": -7.348409003184213,
+  "v19_tip_deg_pca": -23.651623231340487,
+  "inspector_v18_claim": "+12\u00b0 RIGHT",
+  "convention": "+ = top RIGHT; need LEFT (negative) toward body",
+  "method": "flip shear M10 sign + tip-left rot 30\u00b0 y-down",
+  "affine": [
+   [
+    0.10033972661702843,
+    0.31999999999999995
+   ],
+   [
+    -0.28272249548173556,
+    0.5542562584220407
+   ]
+  ]
+ },
+ "spin": {
+  "status": "REMOVED",
+  "shipped": false,
+  "archived_to": "_archive_spin_20261024/hero_truck_v19_spin/",
+  "reason": "Brandon 2026-10-24: remove wheel spin; lock stills for next build",
+  "authorized_by": "pt181u"
+ },
+ "wire_caveats": [
+  "Place still tire_*.png / body / shadow at [0,0] \u2014 already full-canvas baked.",
+  "Do NOT parent-rotate baked still sprites for spin (ellipse tumbles).",
+  "Idle spin: use tire_spin.gif for popup preview OR cycle spin/tire_*_XX.png (full canvas) with same draw order.",
+  "Wall mass is baked per frame \u2014 do not add a second extrusion in Unity.",
+  "FF lean LEFT is baked into each spin frame affine \u2014 do not re-shear.",
+  "Putter bounce layering: Creator said ready when spin is good \u2014 not built in this pass.",
+  "Seamless loop: 24 frames \u00d7 50ms; phase 0 == phase 360."
+ ],
+ "lock": {
+  "status": "LOCKED_STILLS",
+  "date": "2026-10-24",
+  "by": "Brandon",
+  "authorized_by": "pt181u",
+  "intent": "Remove the wheel spin. Then lock and use it for next build.",
+  "stills": [
+   "body.png",
+   "shadow.png",
+   "tire_far_front.png",
+   "tire_near_front.png",
+   "tire_near_rear.png",
+   "composite.png"
+  ],
+  "spin": "REMOVED \u2014 not shipped; archived under losepopup/_archive_spin_20261024/",
+  "putter_bounce": "Do not build from spin until Brandon asks again.",
+  "note": "v20/v21 FF experiments are separate and NOT locked."
+ }
+}
