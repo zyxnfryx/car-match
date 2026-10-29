@@ -18,8 +18,8 @@ Because the SFX are now equal loudness, the volumes below are mix intent, not co
 | blocked_honk | Tapped car is blocked | 0.7 |
 | button_click | UI button | 0.5 |
 | booster_undo / _shuffle / _magnet / _super | Booster used | 0.8 |
-| level_win_fanfare | Level complete | 0.9 |
-| mascot_cheer | Mascot "yay" (~0.3 s after fanfare starts) | 0.75 |
+| level_win_fanfare | Level complete, once, on the lot celebration | 0.9 |
+| mascot_cheer | Unused on a clear (two short bursts; was the double beep). Studio card uses beep_beep instead | 0.75 |
 | level_fail | Level failed (gentle) | 0.7 |
 | coin_gain_00..02 | Coin awarded | 0.6 |
 | music_home_loop | Home / map screen (100 BPM, 16 bars, 38.4 s) | 0.4 |

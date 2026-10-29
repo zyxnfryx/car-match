@@ -2237,7 +2237,9 @@ namespace CarMatch
         // Confetti and a hop on the lot, with input locked, then the Perfect screen.
         IEnumerator LotCheer()
         {
-            AudioManager.Play(Sfx.MascotCheer);
+            // One win cue. mascot_cheer is two short bursts (the double beep) and the
+            // results screen used to play that plus the fanfare again.
+            AudioManager.Play(Sfx.Win);
             var block = Place(_screen, "CheerBlock", Vector2.zero, new Vector2(4000f, 4000f));
             var blockImage = block.gameObject.AddComponent<Image>();
             blockImage.color = new Color(0f, 0f, 0f, 0.001f);

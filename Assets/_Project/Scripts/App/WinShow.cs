@@ -221,13 +221,14 @@ namespace CarMatch
             RectTransform mascot, RectTransform ribbon, RectTransform title, RectTransform piggy, Text plus, Text coinText,
             Button next, Button home)
         {
-            // Every win opens with the LOT LOOP car finale (tap anywhere to skip), then the fanfare and coins.
+            // Every win opens with the LOT LOOP car finale (tap anywhere to skip), then the coins.
+            // The win fanfare already played once on the lot.
             rays.gameObject.SetActive(false);
             glow.gameObject.SetActive(false);
             yield return CarFinale(screen);
             rays.gameObject.SetActive(true);
             glow.gameObject.SetActive(true);
-            AudioManager.Play(Sfx.Win);
+            // Fanfare already played once on the lot. Do not replay it or mascot_cheer (two beeps).
 #if !UNITY_WEBGL
             Haptics.Success();
 #endif
@@ -237,7 +238,6 @@ namespace CarMatch
             host.StartCoroutine(Pop(ribbon, 0.0f, 0.38f));
             host.StartCoroutine(Pop(title, 0.12f, 0.42f));
             yield return Pop(mascot, 0.18f, 0.40f);
-            AudioManager.Play(Sfx.MascotCheer);
             var heroAnim = mascot.GetComponent<FrameAnim>();
             var cheer = heroAnim != null ? Frames("win_truck_cheer") : null;
             if (cheer != null)
@@ -406,10 +406,9 @@ namespace CarMatch
                 var sprite = CarFrames.Heading((CarColor)(i % 8), 0);
                 if (sprite != null) img.sprite = sprite;
             }
-            // 2) Honk in unison and bounce (~0.6 s).
+            // 2) Bounce in unison (~0.6 s). The win fanfare already played on the lot.
             if (!_skip)
             {
-                AudioManager.Play(Sfx.Blocked, 0.9f);
 #if !UNITY_WEBGL
                 Haptics.Thud();
 #endif
@@ -552,7 +551,6 @@ namespace CarMatch
             {
                 var center = new Vector2(UnityEngine.Random.Range(-halfW, halfW), UnityEngine.Random.Range(380f, 820f));
                 var col = cols[b % cols.Length];
-                AudioManager.Play(Sfx.SlotArrive, 0.6f);
                 for (int i = 0; i < 18; i++)
                 {
                     var spark = Img(screen, "Firework", UiArt.Get("glow") ?? SpriteKit.Round, center, new Vector2(30f, 30f), col);
