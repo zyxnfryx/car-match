@@ -31,6 +31,8 @@ namespace CarMatch
         {
             if (board == null || !ExitPath.IsLegal(board, tap))
                 return new MoveResult();
+            if (tap.Kind == TapKind.Parked)
+                return ParkStrip.Apply(board, tap);
 
             Car car;
             if (tap.Kind == TapKind.Lane)

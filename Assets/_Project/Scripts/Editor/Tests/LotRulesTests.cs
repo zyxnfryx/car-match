@@ -78,6 +78,24 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_SolverSkipsTheParkingStrip()
+        {
+            RuleChecks.SolverSkipsTheParkingStrip();
+        }
+
+        [Test]
+        public void Ads_InterstitialPlan()
+        {
+            RuleChecks.InterstitialPlanChecks();
+        }
+
+        [Test]
+        public void Levels_DifficultyKeepsRising()
+        {
+            RuleChecks.DifficultyCurveRises(Json());
+        }
+
+        [Test]
         public void Boosters_ShuffleKeepsColorCounts()
         {
             RuleChecks.ShuffleKeepsColorCounts();
@@ -213,6 +231,78 @@ namespace CarMatch.Tests
         public void Levels_AreSolvable()
         {
             RuleChecks.AllLevelsSolvable(Json());
+        }
+
+        [Test]
+        public void Lanes_SidewaysExitWhenTheNextStallIsOpen()
+        {
+            RuleChecks.SidewaysExitWhenTheNextStallIsOpen();
+        }
+
+        [Test]
+        public void Lanes_BackwardPathStaysBlocked()
+        {
+            RuleChecks.BackwardPathStaysBlocked();
+        }
+
+        [Test]
+        public void Tutorial_Level1MatchThenReleases()
+        {
+            RuleChecks.Level1TutorialMatchesThreeThenReleases(Json());
+        }
+
+        [Test]
+        public void Coach_LessonsTriggerOnTheirLevels()
+        {
+            RuleChecks.CoachLessonsTriggerOnTheirLevels();
+        }
+
+        [Test]
+        public void Levels_EarlyRampStaysOnTheFrontRow()
+        {
+            RuleChecks.EarlyLevelsStayOnTheFrontRow(Json());
+        }
+
+        [Test]
+        public void Glove_StaysInsidePortraitScreens()
+        {
+            RuleChecks.GloveStaysInsidePortraitScreens();
+        }
+
+        [Test]
+        public void Ui_TapTargetsClear44Pt()
+        {
+            RuleChecks.TapTargetsClearThe44PtBar();
+        }
+
+        [Test]
+        public void Plane_FliesOncePerLocalDay()
+        {
+            RuleChecks.UsaPlaneFliesOncePerLocalDay();
+        }
+
+        [Test]
+        public void Lift_DropsThenRisesAndTicksTheBadge()
+        {
+            RuleChecks.DrivewayLiftDropsThenRises();
+        }
+
+        [Test]
+        public void SideLots_SitOutsideEveryLane()
+        {
+            RuleChecks.SideLotsSitOutsideTheLot(Json());
+        }
+
+        [Test]
+        public void Lift_IsTaughtOnLevel21()
+        {
+            RuleChecks.UndergroundLiftIsTaughtOnLevel21(Json());
+        }
+
+        [Test]
+        public void Levels_SuperHardEarnsTheLabel()
+        {
+            RuleChecks.SuperHardLevelsEarnTheLabel(Json());
         }
     }
 }

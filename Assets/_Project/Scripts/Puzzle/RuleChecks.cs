@@ -111,11 +111,11 @@ namespace CarMatch
             Expect(taps.Count == 1 && taps[0].Cell == 0, "only the tunnel mouth is open; the back lime is walled in");
             BoardRules.Play(board, null, taps[0]);
             Expect(board.Lanes[0].Cells[0].TunnelCount == 2, "count drops when a car leaves");
-            Expect(!ExitPath.LaneOpen(board.Lanes[0], 1), "lime stays blocked");
+            Expect(!ExitPath.LaneOpen(board, 0, 1), "lime stays blocked");
             BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0));
             BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0));
             Expect(board.Lanes[0].Cells[0].Empty, "the tunnel is gone");
-            Expect(ExitPath.LaneOpen(board.Lanes[0], 1), "lime can leave once the tunnel is empty");
+            Expect(ExitPath.LaneOpen(board, 0, 1), "lime can leave once the tunnel is empty");
             Expect(board.Bar.Count == 0, "three coral matched as they came out");
         }
 
@@ -164,9 +164,76 @@ namespace CarMatch
             for (int i = 0; i < 7; i++)
                 BoardRules.Play(board, history, new Tap(TapKind.Lane, i, 0));
             Expect(board.Failed && history.Count == 7, "the lot failed with history intact");
-            Board restored;
-            Expect(BoosterKit.SuperUndo(history, out restored), "continue uses super undo");
-            Expect(!restored.Failed && restored.Bar.Count == 4, "three cars left the bar and the lot can continue");
+            var only = new List<Tap>();
+            ExitPath.Collect(board, only);
+            Expect(only.Count == 1 && only[0].Kind == TapKind.Parked && only[0].Cell < 0, "on a full bar the only move is park");
+            string lot = BoardQuery.Key(board);
+            Expect(ParkStrip.TakeCount(board) == 3, "a full bar can park three");
+            var move = BoardRules.Play(board, history, ParkStrip.ContinueTap);
+            Expect(move.Accepted && !board.Failed, "continue parks instead of rewinding");
+            Expect(board.Bar.Count == 4 && board.Parked.Count == 3 && board.StripOpen, "three cars sit in the strip");
+            Expect(board.Parked[0] == CarColor.Lime && board.Parked[1] == CarColor.Lime && board.Parked[2] == CarColor.Violet, "the right-hand three leave the bar");
+            Expect(board.Lanes[6].Cells[0].Empty, "they do not go back to their old stalls");
+            Expect(history[history.Count - 1].Failed && history[history.Count - 1].Parked.Count == 0, "undo still remembers the full bar");
+            var back = BoardRules.Play(board, history, new Tap(TapKind.Parked, 0, 2));
+            Expect(back.Accepted && board.Parked.Count == 2, "a tap sends one car back");
+            Expect(MatchClear.Count(board.Bar, CarColor.Violet) == 1, "it re-enters the bar");
+            // Two of a color already in the bar do not pull the third out of the strip.
+            var sit = Tiny("[[\"teal\"]]");
+            sit.Bar.Add(CarColor.Coral);
+            sit.Bar.Add(CarColor.Coral);
+            sit.Parked.Add(CarColor.Coral);
+            sit.StripOpen = true;
+            Expect(sit.Bar.Count == 2 && sit.Parked.Count == 1, "a parked car stays put until it is tapped");
+            var sitting = new List<Tap>();
+            ExitPath.Collect(sit, sitting);
+            bool canReturn = false;
+            for (int i = 0; i < sitting.Count; i++)
+                if (sitting[i].Kind == TapKind.Parked && sitting[i].Cell == 0) canReturn = true;
+            Expect(canReturn, "the parked coral can be tapped back");
+            // Fill the strip, then a second full bar cannot park.
+            board.Parked.Clear();
+            board.Parked.Add(CarColor.Coral);
+            board.Parked.Add(CarColor.Amber);
+            board.Parked.Add(CarColor.Teal);
+            board.Failed = true;
+            Expect(!ParkStrip.CanReceive(board) && !ExitPath.IsLegal(board, ParkStrip.ContinueTap), "a full strip refuses another continue");
+            Expect(ContinueOffer.Face(true, true, false) == ContinueFace.Unavailable, "VIP still cannot park into a full strip");
+            Expect(ContinueOffer.Face(false, true, true) == ContinueFace.Ad, "a loaded ad shows the play badge");
+            Expect(ContinueOffer.Face(true, false, true) == ContinueFace.Crown, "VIP skips the ad");
+            Expect(ContinueOffer.Face(false, false, true) == ContinueFace.Unavailable && !ContinueOffer.CanPress(ContinueFace.Unavailable), "no fill greys the button");
+            // A parked car that completes a set clears, same as any arrival.
+            var match = Tiny("[[\"coral\"]]");
+            match.Bar.Add(CarColor.Coral);
+            match.Bar.Add(CarColor.Coral);
+            match.Parked.Add(CarColor.Coral);
+            match.StripOpen = true;
+            var cleared = BoardRules.Play(match, null, new Tap(TapKind.Parked, 0, 0));
+            Expect(cleared.Accepted && cleared.Matched && match.Parked.Count == 0 && match.Bar.Count == 0, "tapping the third coral clears the set");
+            Expect(lot.Length > 0, "the failed lot was recorded");
+            // One spot left: only that car leaves, and the bar is playable again.
+            var tight = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            var tightHist = new List<Board>();
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(tight, tightHist, new Tap(TapKind.Lane, i, 0));
+            tight.Parked.Add(CarColor.Amber);
+            tight.Parked.Add(CarColor.Lime);
+            tight.StripOpen = true;
+            Expect(tight.Failed && ParkStrip.Room(tight) == 1 && ParkStrip.TakeCount(tight) == 1, "a second continue parks only the open spot");
+            var parkedOne = BoardRules.Play(tight, tightHist, ParkStrip.ContinueTap);
+            Expect(parkedOne.Accepted && !tight.Failed && tight.Bar.Count == 6 && tight.Parked.Count == 3, "one car un-fails the bar");
+            Expect(tight.StripOpen, "the strip stays up after it is emptied of room");
+        }
+
+        public static void SolverSkipsTheParkingStrip()
+        {
+            var board = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(board, null, new Tap(TapKind.Lane, i, 0));
+            Expect(board.Failed, "the search starts from a full bar");
+            var report = LotSolve.Search(board, 5000);
+            Expect(report.Outlook == LotSolve.Outlook.Stuck, "parking is not a way through a failed lot");
+            Expect(report.Nodes < 20, "the search does not walk cars back out of the strip");
         }
 
         public static void ShuffleKeepsColorCounts()
@@ -733,6 +800,7 @@ namespace CarMatch
             UndoRestoresThePreviousBoard();
             SuperUndoReturnsThreeCars();
             ContinueUndoesAFullBar();
+            SolverSkipsTheParkingStrip();
             ShuffleKeepsColorCounts();
             ShuffleRefusesWhenNothingCanChange();
             RapidMultiTap();
@@ -749,6 +817,21 @@ namespace CarMatch
             LivesSpendAndRegen();
             NoEmptyStartingCells(json);
             AllLevelsSolvable(json);
+            SidewaysExitWhenTheNextStallIsOpen();
+            BackwardPathStaysBlocked();
+            Level1TutorialMatchesThreeThenReleases(json);
+            CoachLessonsTriggerOnTheirLevels();
+            EarlyLevelsStayOnTheFrontRow(json);
+            GloveStaysInsidePortraitScreens();
+            TapTargetsClearThe44PtBar();
+            UsaPlaneFliesOncePerLocalDay();
+            Level11ShorterLaneGateIsNotAnExit(json);
+            DrivewayLiftDropsThenRises();
+            SideLotsSitOutsideTheLot(json);
+            UndergroundLiftIsTaughtOnLevel21(json);
+            SuperHardLevelsEarnTheLabel(json);
+            DifficultyCurveRises(json);
+            InterstitialPlanChecks();
             BoostersOnEveryLevel(json);
             LevelsAreUnique(json);
             EachBoosterOnceFree();
@@ -975,6 +1058,344 @@ namespace CarMatch
             for (int i = 0; i < 3; i++) BoardRules.Play(far, null, new Tap(TapKind.Lane, i, 0));
             Expect(far.Lanes[3].Cells[2].Box, "a box away from the match stays shut");
             Expect(LotSolve.Search(Tiny("[[\"coral\",\"box:teal\",\"teal\"],[\"coral\",\"teal\"],[\"coral\"]]")).Outlook == LotSolve.Outlook.Winnable, "the solver opens boxes");
+        }
+
+        // Level 2 photo: teal sits behind a coral, and the stalls beside it are empty.
+        // It may slide sideways and then forward. It may not back out the top.
+        public static void SidewaysExitWhenTheNextStallIsOpen()
+        {
+            var board = Tiny("[[\"coral\",\"teal\"],[\"-\",\"-\"],[\"-\",\"-\"]]");
+            var teal = new Tap(TapKind.Lane, 0, 1);
+            Expect(ExitPath.IsLegal(board, teal), "teal can reach the bar through the open stall");
+            Expect(EyeState.IsOpen(board, teal), "that teal is drawn awake");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 0)), "the coral in front can still leave");
+            var route = new List<DriveStep>();
+            Expect(ExitPath.TryRoute(board, 0, 1, route) && route.Count >= 2, "the drive has a route");
+            int prev = 99;
+            bool side = false;
+            for (int i = 0; i < route.Count; i++)
+            {
+                if (route[i].Cell < 0) continue;
+                Expect(route[i].Cell <= prev, "the route never backs up");
+                prev = route[i].Cell;
+                if (route[i].Lane == 1) side = true;
+            }
+            Expect(side, "the route uses the empty neighboring stall");
+            Expect(route[route.Count - 1].Cell < 0, "the route leaves toward the bar");
+            Expect(!ExitPath.ExitsBack(board, teal), "it does not leave out the back");
+            var bag = Tiny("[[\"coral\",\"?teal\"],[\"-\",\"-\"]]");
+            Expect(!ExitPath.IsLegal(bag, new Tap(TapKind.Lane, 0, 1)), "a bagged car does not take the sideways path");
+        }
+
+        // Open road behind the car would reach the bar only by driving up first. That stays illegal.
+        public static void BackwardPathStaysBlocked()
+        {
+            var board = Tiny("[[\"coral\",\"teal\",\"-\"],[\"-\",\"lime\",\"-\"],[\"-\",\"-\",\"-\"]]");
+            var car = new Tap(TapKind.Lane, 0, 1);
+            Expect(board.Lanes[0].Cells[2].Empty, "the cell behind the teal is empty");
+            Expect(!ExitPath.IsLegal(board, car), "the teal still cannot leave");
+            Expect(!EyeState.IsOpen(board, car), "and it stays asleep");
+            Expect(!ExitPath.TryRoute(board, 0, 1, null), "no forward route");
+            Expect(!ExitPath.ExitsBack(board, car), "the back is not an exit");
+            var walled = Tiny("[[\"coral\",\"teal\",\"amber\"],[\"lime\",\"lime\",\"lime\"]]");
+            Expect(!ExitPath.IsLegal(walled, new Tap(TapKind.Lane, 0, 2)), "a boxed-in back car stays blocked");
+        }
+
+        public static void Level1TutorialMatchesThreeThenReleases(string json)
+        {
+            var level = LevelJson.Parse(json)[0];
+            Expect(level.Number == 1, "level 1");
+            var store = new MemoryFlags();
+            var board = level.Board.Clone();
+            HiddenReveal.Sweep(board);
+            var world = new CoachWorld { Level = 1, Board = board };
+            var cue = LotCoach.Cue(store, world);
+            Expect(cue.Lesson == CoachLesson.MatchThree && cue.LockCars && cue.HasCar, "level 1 points at a car");
+            Expect(cue.Car.Kind == TapKind.Lane && cue.Car.Index == 0 && cue.Car.Cell == 0, "the first point is the front coral");
+            Expect(!LotCoach.Allows(cue, new Tap(TapKind.Lane, 1, 0)), "the other lane is not tappable yet");
+            for (int step = 0; step < 3; step++)
+            {
+                cue = LotCoach.Cue(store, world);
+                Expect(cue.LockCars && cue.HasCar, "step " + step + " still guides");
+                Expect(LotCoach.Allows(cue, cue.Car), "the pointed car can be tapped");
+                var move = BoardRules.Play(board, null, cue.Car);
+                Expect(move.Accepted, "guided tap " + step + " plays");
+                world.Board = board;
+                world.Moves = step + 1;
+                if (step < 2) Expect(!move.Matched, "the match waits for the third coral");
+                else Expect(move.Matched, "the third coral clears");
+            }
+            LotCoach.Complete(store, CoachLesson.MatchThree);
+            cue = LotCoach.Cue(store, world);
+            Expect(cue.Lesson == CoachLesson.None, "the lesson is finished");
+            Expect(LotCoach.Allows(cue, new Tap(TapKind.Lane, 1, 0)), "the lot is free");
+            var again = LotCoach.Cue(store, new CoachWorld { Level = 1, Board = level.Board.Clone() });
+            Expect(again.Lesson == CoachLesson.None, "a later visit does not replay it");
+        }
+
+        public static void CoachLessonsTriggerOnTheirLevels()
+        {
+            var store = new MemoryFlags();
+            var covered = Tiny("[[\"coral\",\"?teal\",\"amber\"],[\"coral\",\"amber\",\"teal\"],[\"teal\",\"coral\",\"amber\"]]");
+            var cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.CoveredLevel, Board = covered, Moves = 2, CanShuffle = true });
+            Expect(cue.Lesson == CoachLesson.Covered && cue.HasCar && !cue.LockCars, "level 4 spotlights the bag");
+            Expect(cue.Car.Cell == 1, "the glove sits on the covered car");
+
+            var side = Tiny("[[\"coral\",\"teal\"],[\"teal\",\"teal\"],[\"amber\",\"amber\"]]", "[{\"lane\":0,\"at\":0,\"cars\":[\"coral\",\"coral\",\"amber\"]}]");
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SideLevel, Board = side, CanShuffle = true, CanMagnet = true });
+            Expect(cue.Lesson == CoachLesson.SideLot && cue.Car.Kind == TapKind.Side, "level 5 spotlights the side lot before shuffle");
+            LotCoach.Complete(store, CoachLesson.SideLot);
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.ShuffleLevel, Board = side, CanShuffle = true });
+            Expect(cue.Lesson == CoachLesson.Shuffle && cue.Booster == "Shuffle", "shuffle follows the side-lot intro");
+
+            var tube = Tiny("[[\"tunnel:coral,coral,coral\",\"teal\",\"teal\"],[\"teal\"]]");
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.GarageLevel, Board = tube, CanShuffle = true });
+            Expect(cue.Lesson == CoachLesson.Garage && cue.Car.Cell == 0, "level 6 spotlights the garage");
+
+            var plain = Tiny("[[\"coral\",\"teal\"],[\"teal\",\"coral\"]]");
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.UndoLevel, Board = plain, Moves = 1 });
+            Expect(cue.Lesson == CoachLesson.Undo && cue.Booster == "Undo", "undo appears once a move exists on level 3");
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.UndoLevel, Board = plain, Moves = 0 });
+            Expect(cue.Lesson == CoachLesson.None, "undo waits until it is useful");
+
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.MagnetLevel, Board = plain, CanMagnet = true, CanShuffle = false });
+            Expect(cue.Lesson == CoachLesson.Magnet && cue.Booster == "Magnet", "magnet appears on level 7");
+            LotCoach.Complete(store, CoachLesson.Shuffle);
+            LotCoach.Complete(store, CoachLesson.Magnet);
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SuperLevel, Board = plain, CanSuper = true, CanShuffle = true, CanMagnet = true });
+            Expect(cue.Lesson == CoachLesson.Super && cue.Booster == "Super", "super appears on level 9 after earlier lessons");
+            cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SuperLevel, Board = plain, CanSuper = true });
+            Expect(cue.Lesson == CoachLesson.Super, "super stays the lesson");
+            Expect(LotCoach.Key(CoachLesson.ParkStrip) == "lotloop.coach.parkstrip", "park 3 cars has its own one-time flag");
+            var failed = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(failed, null, new Tap(TapKind.Lane, i, 0));
+            cue = LotCoach.Cue(store, new CoachWorld { Level = 12, Board = failed, Moves = 7 });
+            Expect(cue.Lesson != CoachLesson.ParkStrip, "the park glove is on the fail button, not the lot");
+        }
+
+        public static void EarlyLevelsStayOnTheFrontRow(string json)
+        {
+            var levels = LevelJson.Parse(json);
+            Expect(levels.Count >= 9, "early ramp");
+            var taps = new List<Tap>();
+            for (int i = 0; i < 9; i++)
+            {
+                var board = levels[i].Board.Clone();
+                HiddenReveal.Sweep(board);
+                ExitPath.Collect(board, taps);
+                Expect(taps.Count > 0, levels[i].Id + " has an opening");
+                for (int t = 0; t < taps.Count; t++)
+                {
+                    if (taps[t].Kind != TapKind.Lane) continue;
+                    Expect(taps[t].Cell == 0, levels[i].Id + " opening tap is not on the front row");
+                }
+            }
+            var tunnel = levels[5].Board.Clone();
+            BoardRules.Play(tunnel, null, new Tap(TapKind.Lane, 1, 0));
+            Expect(!ExitPath.IsLegal(tunnel, new Tap(TapKind.Lane, 0, 1)), "clearing the short lane does not free the car behind the tunnel");
+        }
+
+        public static void GloveStaysInsidePortraitScreens()
+        {
+            // Canvas sizes from the 1080x1920 scaler (match 0.5 on tall phones, match height on iPad).
+            CheckGlove("iPhone 18 Pro", 976.6f, 2123.3f);
+            CheckGlove("iPad A16", 1334.2f, 1920f);
+            CheckGlove("Samsung", 978.3f, 2119.6f);
+        }
+
+        static void CheckGlove(string name, float width, float height)
+        {
+            float glove = LotCoach.GloveUnits;
+            var min = new UnityFreeVec(-width * 0.5f, -height * 0.5f);
+            var max = new UnityFreeVec(width * 0.5f, height * 0.5f);
+            UnityFreeVec[] targets =
+            {
+                new UnityFreeVec(min.X + 70f, max.Y - 80f),
+                new UnityFreeVec(max.X - 70f, min.Y + 120f),
+                new UnityFreeVec(0f, 0f),
+                new UnityFreeVec(min.X + 40f, min.Y + 40f)
+            };
+            for (int i = 0; i < targets.Length; i++)
+            {
+                UnityFreeVec center;
+                float deg;
+                LotCoach.PlaceGlove(targets[i], glove, min, max, 12f, out center, out deg);
+                float half = glove * 0.5f;
+                Expect(center.X - half >= min.X - 0.5f && center.X + half <= max.X + 0.5f, name + " glove x " + i);
+                Expect(center.Y - half >= min.Y - 0.5f && center.Y + half <= max.Y + 0.5f, name + " glove y " + i);
+                float dx = center.X - targets[i].X;
+                float dy = center.Y - targets[i].Y;
+                Expect(dx * dx + dy * dy <= glove * glove, name + " glove still reaches the car " + i);
+            }
+        }
+
+        public static void TapTargetsClearThe44PtBar()
+        {
+            // Points per canvas unit on the tightest of the three portrait canvases (Samsung).
+            const float SamsungPt = 0.3680f;
+            const float IphonePt = 0.4116f;
+            const float IpadPt = 0.6146f;
+            Expect(LotCoach.MinTapUnits * SamsungPt >= 44f, "44pt on Samsung");
+            Expect(LotCoach.MinTapUnits * IphonePt >= 44f, "44pt on iPhone 18 Pro");
+            Expect(LotCoach.MinTapUnits * IpadPt >= 44f, "44pt on iPad");
+        }
+
+        public static void UsaPlaneFliesOncePerLocalDay()
+        {
+            var morning = new System.DateTime(2026, 10, 29, 8, 0, 0);
+            var night = new System.DateTime(2026, 10, 29, 23, 30, 0);
+            var next = new System.DateTime(2026, 10, 30, 0, 5, 0);
+            string today = UsaPlaneDay.Stamp(morning);
+            Expect(today == "2026-10-29" && UsaPlaneDay.Stamp(night) == today, "stamp is the local calendar day");
+            Expect(UsaPlaneDay.Stamp(next) == "2026-10-30", "the next local day");
+            string stored = "";
+            Expect(UsaPlaneDay.TryBegin(stored, today, false, out stored) && stored == today, "the first win of the day flies");
+            string again;
+            Expect(!UsaPlaneDay.TryBegin(stored, UsaPlaneDay.Stamp(night), false, out again) && again == stored, "a later win the same day does not fly");
+            Expect(UsaPlaneDay.TryBegin(stored, UsaPlaneDay.Stamp(next), false, out again) && again == "2026-10-30", "the next day flies again");
+            Expect(!UsaPlaneDay.MayStart("2026-10-29", "", false), "an empty day does not fly");
+        }
+
+        // L11's right lane is one stall shorter, so its closed-end gate sits a row lower.
+        // That mark is the hard wall at the back of the short lane. Cars do not leave through it.
+        public static void Level11ShorterLaneGateIsNotAnExit(string json)
+        {
+            var level = LevelJson.Parse(json)[10];
+            Expect(level.Number == 11, "level 11");
+            var board = level.Board;
+            Expect(board.Lanes.Count >= 2, "two lanes");
+            int left = board.Lanes[0].Cells.Count;
+            int right = board.Lanes[1].Cells.Count;
+            Expect(left == right + 1, "the right lane ends one stall sooner (" + left + " vs " + right + ")");
+            var back = new Tap(TapKind.Lane, 1, right - 1);
+            Expect(!ExitPath.IsLegal(board, back), "the car against the lower gate cannot leave through it");
+            Expect(!ExitPath.ExitsBack(board, back), "the lower gate is not an exit");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 0)), "the right lane still exits at its mouth");
+        }
+
+        public static void DrivewayLiftDropsThenRises()
+        {
+            Expect(DrivewayLift.Seconds >= 0.6f && DrivewayLift.Seconds <= 0.9f, "the lift takes 0.6-0.9s");
+            Expect(DrivewayLift.Locked(10f, 10.2f) && !DrivewayLift.Locked(10f, 10f + DrivewayLift.Seconds), "that lane stays locked until it settles");
+            Expect(DrivewayLift.Dropping(0.2f) && !DrivewayLift.Dropping(0.7f), "the empty deck drops before the new one rises");
+            float down = DrivewayLift.DeckOffset(0.4f, 100f);
+            float up = DrivewayLift.DeckOffset(0.95f, 100f);
+            Expect(down < -40f && up > -15f, "the deck travels down and back up");
+            Expect(DrivewayLift.Badge(3, 1, 0.5f) == 3 && DrivewayLift.Badge(3, 1, 0.95f) == 1, "the badge ticks down on arrival");
+            Expect(DrivewayLift.FinalWave(0) && !DrivewayLift.FinalWave(1), "the last wave is the one that empties the queue");
+            // Two spots, three queued cars: the first opening brings two up and leaves one below.
+            var board = Tiny("[[\"coral\",\"teal\"],[\"amber\",\"amber\"],[\"coral\",\"teal\"]]",
+                null);
+            board.Garages.Add(new Garage { Lane = 1 });
+            board.Garages[0].Cells.Add(0);
+            board.Garages[0].Cells.Add(1);
+            board.Garages[0].Queue.Add(new Car { Color = CarColor.Lime });
+            board.Garages[0].Queue.Add(new Car { Color = CarColor.Lime });
+            board.Garages[0].Queue.Add(new Car { Color = CarColor.Lime });
+            Expect(board.Garages[0].Queue.Count == 3, "three cars wait below");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 0));
+            Expect(board.Garages[0].Queue.Count == 3, "one empty spot does not open the lift");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 1));
+            Expect(board.Garages[0].Opens == 1 && board.Garages[0].Queue.Count == 1, "two cars rise and one stays below");
+            Expect(!board.Lanes[1].Cells[0].Car.Hidden && board.Lanes[1].Cells[0].Car.Color == CarColor.Lime, "the front arrival is uncovered");
+            Expect(board.Lanes[1].Cells[1].Car.Hidden, "the car behind it stays in the crate");
+        }
+
+        public static void SideLotsSitOutsideTheLot(string json)
+        {
+            var levels = LevelJson.Parse(json);
+            for (int i = 0; i < levels.Count; i++)
+            {
+                var board = levels[i].Board;
+                int lanes = board.Lanes.Count;
+                int left = 0, right = 0;
+                for (int s = 0; s < board.Sides.Count; s++)
+                {
+                    int lane = board.Sides[s].Lane;
+                    Expect(lane >= 0 && lane < lanes, levels[i].Id + " side lane");
+                    int depth = board.Lanes[lane].Cells.Count;
+                    Expect(board.Sides[s].Cell >= 0 && board.Sides[s].Cell < depth, levels[i].Id + " side cell");
+                    bool onLeft = lane * 2 < lanes;
+                    int ordinal = onLeft ? left++ : right++;
+                    float index = SideLotLayout.CenterIndex(lanes, lane, ordinal);
+                    Expect(index < -0.1f || index > lanes - 0.1f, levels[i].Id + " side overlaps a lane");
+                    float pitch = 100f;
+                    float sideX = SideLotLayout.CenterX(0f, pitch, index);
+                    for (int l = 0; l < lanes; l++)
+                    {
+                        var stall = new SideLotLayout.Rect { X = l * pitch, Y = board.Sides[s].Cell * pitch, W = 90f, H = 90f };
+                        var bay = new SideLotLayout.Rect { X = sideX, Y = board.Sides[s].Cell * pitch, W = 90f, H = 90f };
+                        Expect(!SideLotLayout.Hits(stall, bay), levels[i].Id + " bay hits stall " + l);
+                        int n = board.Lanes[l].Cells.Count;
+                        var gate = new SideLotLayout.Rect { X = l * pitch, Y = (n - 0.5f) * pitch + 40f, W = 90f, H = 56f };
+                        Expect(!SideLotLayout.Hits(gate, bay), levels[i].Id + " bay hits gate " + l);
+                    }
+                }
+            }
+            // L20's old draw put a lane-2 bay on top of lane 3. The edge rule does not.
+            float l20 = SideLotLayout.CenterIndex(4, 2, 0);
+            Expect(l20 >= 4f, "a right-hand bay clears the last lane");
+        }
+
+        public static void UndergroundLiftIsTaughtOnLevel21(string json)
+        {
+            var level = LevelJson.Parse(json)[20];
+            Expect(level.Number == 21 && level.Board.Garages.Count > 0, "level 21 has the lift");
+            var store = new MemoryFlags();
+            var cue = LotCoach.Cue(store, new CoachWorld { Level = 21, Board = level.Board, CanShuffle = true });
+            Expect(cue.Lesson == CoachLesson.Underground && cue.HasCar && !cue.LockCars, "the glove introduces the lift");
+            Expect(cue.Car.Index == level.Board.Garages[0].Lane, "the glove is on the lift's lane");
+            Expect(level.Board.Garages[0].Queue.Count == 3, "the badge starts at the cars still below");
+        }
+
+        public static void DifficultyCurveRises(string json)
+        {
+            var levels = LevelJson.Parse(json);
+            var scores = new List<float>(levels.Count);
+            for (int i = 0; i < levels.Count; i++)
+                scores.Add(Difficulty.Measure(levels[i].Board).Value);
+            Difficulty.AssertRising(scores, delegate (bool ok, string message) { Expect(ok, message); });
+            for (int i = 0; i < levels.Count; i++)
+            {
+                if (!levels[i].SuperHard) continue;
+                if (i > 0)
+                    Expect(scores[i] > scores[i - 1], levels[i].Id + " should outscore the level before it");
+                if (i + 1 < levels.Count)
+                    Expect(scores[i] > scores[i + 1], levels[i].Id + " should outscore the level after it");
+            }
+        }
+
+        public static void InterstitialPlanChecks()
+        {
+            Expect(!InterstitialPlan.Due(9, 3, false, true, false, -1f), "before level 10");
+            Expect(!InterstitialPlan.Due(12, 2, false, true, false, -1f), "not every win");
+            Expect(InterstitialPlan.Due(12, 3, false, true, false, -1f), "every third win from level 10");
+            Expect(InterstitialPlan.Due(30, 6, false, true, false, 90f), "the cooldown has elapsed");
+            Expect(!InterstitialPlan.Due(12, 3, true, true, false, -1f), "VIP skips interstitials");
+            Expect(!InterstitialPlan.Due(12, 3, false, false, false, -1f), "no unit id is a no-op");
+            Expect(!InterstitialPlan.Due(12, 3, false, true, true, -1f), "not during the tutorial");
+            Expect(!InterstitialPlan.Due(12, 3, false, true, false, 10f), "not within 90s of a rewarded ad");
+        }
+
+        public static void SuperHardLevelsEarnTheLabel(string json)
+        {
+            foreach (var level in LevelJson.Parse(json))
+            {
+                if (!level.SuperHard) continue;
+                var board = level.Board;
+                var hist = BoardQuery.Histogram(board);
+                int colors = 0;
+                for (int c = 0; c < hist.Length; c++) if (hist[c] > 0) colors++;
+                bool covered = BoardQuery.HasHidden(board);
+                bool garage = board.Garages.Count > 0;
+                bool side = board.Sides.Count > 0;
+                bool tunnel = BoardQuery.HasTunnel(board);
+                int mechanics = (covered ? 1 : 0) + (garage ? 1 : 0) + (side ? 1 : 0) + (tunnel ? 1 : 0);
+                Expect(colors >= 4, level.Id + " super hard needs at least 4 colors, has " + colors);
+                Expect(mechanics >= 2, level.Id + " super hard needs two of covered/garage/side/tunnel");
+                Expect(BoardQuery.Total(board) >= 18, level.Id + " super hard is too small");
+            }
         }
 
         public static void SuperHardEveryTenth(string json)

@@ -8,7 +8,26 @@ namespace CarMatch
     {
         static int Main(string[] args)
         {
-            // --each <levels.json>: one line per level with its solver outlook (used by tools/levels/gen_levels.py).
+            // --diff <levels.json>: one line per level with the difficulty score.
+            if (args.Length == 2 && args[0] == "--diff")
+            {
+                var defs = LevelJson.Parse(File.ReadAllText(args[1]));
+                var values = new System.Collections.Generic.List<float>(defs.Count);
+                for (int i = 0; i < defs.Count; i++)
+                {
+                    var s = Difficulty.Measure(defs[i].Board);
+                    values.Add(s.Value);
+                    float roll = Difficulty.Rolling(values, i, Difficulty.Window);
+                    Console.WriteLine(defs[i].Number + " " + s.Value.ToString("0.00")
+                        + " roll" + roll.ToString("0.00")
+                        + " col" + s.Colors + " cars" + s.Cars + " L" + s.Lanes + " d" + s.Depth
+                        + " mech" + s.Mechanics + " open" + s.OpenAtStart
+                        + " peak" + s.PeakBar + " slack" + s.Slack.ToString("0")
+                        + " br" + s.Branch.ToString("0.00") + " nodes" + s.Nodes
+                        + " " + (s.Solved ? "ok" : "UNSOLVED"));
+                }
+                return 0;
+            }
             if (args.Length == 2 && args[0] == "--each")
             {
                 var defs = LevelJson.Parse(File.ReadAllText(args[1]));
@@ -19,6 +38,8 @@ namespace CarMatch
                 }
                 return 0;
             }
+            if (args.Length == 2 && args[0] == "--raise")
+                return CurveRaise.Run(args[1]);
             // --rate <levels.json>: share of 400 random-legal-tap playthroughs that win (difficulty proxy).
             if (args.Length == 2 && args[0] == "--rate")
             {

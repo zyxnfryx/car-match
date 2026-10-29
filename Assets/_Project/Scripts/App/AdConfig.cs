@@ -12,10 +12,12 @@ namespace CarMatch
         [Header("LevelPlay > Apps > Lot Loop (iOS, com.zfxgames.carmatch)")]
         public string IosAppKey = Placeholder;
         public string IosRewardedAdUnitId = Placeholder;
+        public string IosInterstitialAdUnitId = "";
 
         [Header("LevelPlay > Apps > Lot Loop (Android, com.zfxgames.carmatch)")]
         public string AndroidAppKey = Placeholder;
         public string AndroidRewardedAdUnitId = Placeholder;
+        public string AndroidInterstitialAdUnitId = "";
 
         [Tooltip("Keno's testMode: enables the LevelPlay test suite + integration validation. Set false for store builds.")]
         public bool TestMode = true;
@@ -30,6 +32,16 @@ namespace CarMatch
         public string RewardedAdUnitId
         {
             get { return Application.platform == RuntimePlatform.Android ? AndroidRewardedAdUnitId : IosRewardedAdUnitId; }
+        }
+
+        public string InterstitialAdUnitId
+        {
+            get { return Application.platform == RuntimePlatform.Android ? AndroidInterstitialAdUnitId : IosInterstitialAdUnitId; }
+        }
+
+        public bool HasInterstitial
+        {
+            get { return Usable(InterstitialAdUnitId); }
         }
 
         public bool HasKeys

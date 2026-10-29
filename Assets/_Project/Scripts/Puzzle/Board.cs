@@ -69,12 +69,15 @@ namespace CarMatch
         public readonly List<CarColor> Bar = new List<CarColor>();
         // Parallel to Bar: where each bar car came from (lane * 100 + cell), or -1 for side lots and tunnels' queues.
         public readonly List<int> BarFrom = new List<int>();
+        // Cars moved out of the bar by Park 3 Cars. At most three. They stay until tapped back.
+        public readonly List<CarColor> Parked = new List<CarColor>();
+        public bool StripOpen;
         public bool Won;
         public bool Failed;
 
         public Board Clone()
         {
-            var copy = new Board { Won = Won, Failed = Failed };
+            var copy = new Board { Won = Won, Failed = Failed, StripOpen = StripOpen };
             for (int i = 0; i < Lanes.Count; i++)
                 copy.Lanes.Add(Lanes[i].Clone());
             for (int i = 0; i < Sides.Count; i++)
@@ -84,6 +87,7 @@ namespace CarMatch
             copy.Bar.AddRange(Bar);
             copy.BarFrom.AddRange(BarFrom);
             while (copy.BarFrom.Count < copy.Bar.Count) copy.BarFrom.Add(-1);
+            copy.Parked.AddRange(Parked);
             return copy;
         }
     }
