@@ -6,7 +6,7 @@ Teaching pattern for every new mechanic (Flock Five coach style): a one-line blu
 
 | # | Band (intro level) | Mechanic | Status |
 |---|---|---|---|
-| 1 | 1–2 (1) | Clear lane + match three, 2 lanes, 2 colors. A car may leave out **either end** of its lane (front to the bar road, or the back onto the ring road) when that end is clear | Live (rear exit: build 11) |
+| 1 | 1–2 (1) | Clear lane + match three, 2 lanes, 2 colors. A car leaves only **forward**, toward the bar. The back of every lane is a hard wall (no backing onto the ring road) | Live |
 | 2 | 3–15 (3) | More lanes (to 6) and colors (to 8), mixing grows each level | Live |
 | 3 | 16–25 (16) | Side lots (carports) | Live |
 | 3b | 21–25 (21) | Underground garages: a hatch under two parked spots; when both are empty it opens and its queued cars drive up a ramp into them (as `?` cars until they can exit); badge shows how many are still below | Live (build 11) |
@@ -89,6 +89,9 @@ Level token `box:<color>`. A box fills a lane cell, blocks the lane and can't be
 
 ## Build 11 retune (rear exits)
 Rear exits made mid/late levels easier. `tools/levels/retune_backexit.py` re-rolled every level from 25 up whose casual-player win rate (`SolveCheck --rate`: 400 greedy playthroughs) rose more than 10 points above its pre-build-11 rate (`tools/levels/rate_before_b11.txt`). It added sets, mixing and `?` cars until the rate was back near its old value. `?` cars and boxes never sit at either end of a lane. Levels 1–24 are unchanged (levels 1–5 still win 100%). All 100 are still Winnable.
+
+## Front-only exits
+The back of every lane is a wall again. `ExitPath.LaneOpen` is front-clear only, side lots leave only through `FrontClear`, and the drive never pulls out onto the ring road. A painted curb closes the top of each lane. Levels the wall made unsolvable are reordered within their lanes so the pack stays solvable.
 
 ## Rules for adding a mechanic
 1. Add rules in `Assets/_Project/Scripts/Puzzle` (pure C#, no Unity types), then teach `LotSolve` and `RuleChecks`.

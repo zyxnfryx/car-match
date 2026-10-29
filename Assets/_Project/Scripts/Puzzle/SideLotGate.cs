@@ -1,7 +1,7 @@
 namespace CarMatch
 {
     // Shared by input, the view, reveal, and the solver. The side car may
-    // leave when its lane cell is empty and either end of the lane is clear from there.
+    // enter its lane cell and leave only forward, toward the bar.
     public static class SideLotGate
     {
         public static bool IsOpen(Board board, int sideIndex)
@@ -13,8 +13,7 @@ namespace CarMatch
             var lane = board.Lanes[side.Lane];
             if ((uint)side.Cell >= (uint)lane.Cells.Count) return false;
             if (!lane.Cells[side.Cell].Empty) return false;
-            // Into the lane at its cell, then out either end of the lane.
-            return ExitPath.FrontClear(lane, side.Cell) || ExitPath.BackClear(lane, side.Cell);
+            return ExitPath.FrontClear(lane, side.Cell);
         }
 
         public static bool FrontOpen(Board board, int sideIndex)

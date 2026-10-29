@@ -577,6 +577,67 @@ namespace CarMatch
             float roadY = mouth - roadH * 0.5f - 10f;
             for (float x = -520f; x < 540f; x += 110f)
                 Bar("Dash", new Vector2(x, roadY - roadH * 0.32f), new Vector2(60f, 8f), new Color(0.98f, 0.82f, 0.22f, 0.8f));
+            DrawBackWalls(lanes);
+        }
+
+        // Hard wall at the back of every lane. Stalls that end on the same row share one curb
+        // so the closed end reads as a single toy barrier, not a gap a car could back through.
+        void DrawBackWalls(int lanes)
+        {
+            int i = 0;
+            while (i < lanes)
+            {
+                int n = _board.Lanes[i].Cells.Count;
+                if (n <= 0) { i++; continue; }
+                float backY = LaneAnchor(i, n - 1).y;
+                int j = i + 1;
+                while (j < lanes && _board.Lanes[j].Cells.Count > 0)
+                {
+                    float yj = LaneAnchor(j, _board.Lanes[j].Cells.Count - 1).y;
+                    if (Mathf.Abs(yj - backY) > 0.5f) break;
+                    j++;
+                }
+                float pitch = _metrics.CellW + _metrics.Gap;
+                float left = LaneAnchor(i, 0).x;
+                float right = LaneAnchor(j - 1, 0).x;
+                DrawBackWall((left + right) * 0.5f, backY + _metrics.CellH * 0.5f, (right - left) + pitch);
+                i = j;
+            }
+        }
+
+        void DrawBackWall(float x, float cellTop, float width)
+        {
+            const float bodyH = 56f;
+            float y = cellTop + 20f;
+            Bar("BackWallShade", new Vector2(x, cellTop - 4f), new Vector2(width - 12f, 14f), new Color(0.16f, 0.14f, 0.12f, 0.35f));
+            Curb("BackWallRim", new Vector2(x, y), new Vector2(width + 8f, bodyH + 8f), new Color(0.45f, 0.40f, 0.34f, 1f));
+            Curb("BackWall", new Vector2(x, y + 2f), new Vector2(width, bodyH), new Color(0.80f, 0.77f, 0.70f, 1f));
+            Bar("BackWallCap", new Vector2(x, y + 14f), new Vector2(Mathf.Max(24f, width - 36f), 12f), new Color(0.98f, 0.78f, 0.22f, 1f));
+            BackPost(new Vector2(x - width * 0.5f, y + 4f));
+            BackPost(new Vector2(x + width * 0.5f, y + 4f));
+        }
+
+        void Curb(string name, Vector2 pos, Vector2 size, Color color)
+        {
+            var rt = Place(_screen, name, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteKit.Round;
+            img.type = Image.Type.Sliced;
+            img.color = color;
+            img.raycastTarget = false;
+        }
+
+        void BackPost(Vector2 pos)
+        {
+            var rt = Place(_screen, "BackPost", pos, new Vector2(22f, 72f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteKit.Round;
+            img.color = new Color(0.86f, 0.38f, 0.28f, 1f);
+            img.raycastTarget = false;
+            var band = Place(rt, "Band", new Vector2(0f, 6f), new Vector2(22f, 10f));
+            var stripe = band.gameObject.AddComponent<Image>();
+            stripe.color = new Color(0.98f, 0.95f, 0.88f, 1f);
+            stripe.raycastTarget = false;
         }
 
         // The loop: a rounded-rectangle road around the lot with a dashed centre line, (the intro's
@@ -1154,58 +1215,36 @@ namespace CarMatch
             return slot.Car.Hidden;
         }
 
-        // Control points for a curvy drive (smoothed with Catmull-Rom in Drive). Front exits swoop
-        // out of the lane mouth onto the bar road; rear exits pull out the back onto the ring road,
-        // round the nearest corners, run down the side road and sweep along the bar road. Every
-        // drive ends with a curved approach into the slot from below-and-beside.
+        // Control points for a curvy drive (smoothed with Catmull-Rom in Drive). Every car
+        // leaves forward, out of the lane mouth onto the bar road. The back of the lane is a wall,
+        // so nothing pulls out onto the ring road. The drive ends with a curved approach into the slot.
         List<Vector2> BuildDrivePath(Tap tap, int slotIndex)
         {
-            var points = new List<Vector2>(16);
-            int lane, cell;
-            bool back = ExitPath.ExitsBack(_board, tap);
+            var points = new List<Vector2>(12);
+            int lane;
             if (tap.Kind == TapKind.Side)
             {
                 var side = _board.Sides[tap.Index];
                 points.Add(SideAnchor(side));
                 lane = side.Lane;
-                cell = side.Cell;
-                points.Add(LaneAnchor(lane, cell));
+                points.Add(LaneAnchor(lane, side.Cell));
             }
             else
             {
                 lane = tap.Index;
-                cell = tap.Cell;
-                points.Add(LaneAnchor(lane, cell));
+                points.Add(LaneAnchor(lane, tap.Cell));
             }
             var slotPos = BarSlotCenter(slotIndex);
             var m = _metrics;
             var start = points[points.Count - 1];
-            float bottom = m.RingBottom, R = m.RingR0;
-            if (back)
-            {
-                // Out the rear, bending toward the nearer side road.
-                float sx = start.x <= 0f ? -1f : 1f;
-                float roadX = sx < 0f ? m.RingL : m.RingRt;
-                float top = m.RingTop;
-                points.Add(new Vector2(start.x, Mathf.Lerp(start.y, top, 0.6f)));
-                points.Add(new Vector2(start.x + sx * R * 0.6f, top));
-                points.Add(new Vector2(roadX - sx * R, top));
-                points.Add(new Vector2(roadX - sx * R * 0.29f, top - R * 0.29f));
-                points.Add(new Vector2(roadX, top - R));
-                points.Add(new Vector2(roadX, bottom + R));
-                points.Add(new Vector2(roadX - sx * R * 0.29f, bottom + R * 0.29f));
-                points.Add(new Vector2(roadX - sx * R, bottom));
-            }
-            else
-            {
-                // Arc out of the lane mouth, leaning away from the slot first.
-                var mouth = LaneAnchor(lane, 0);
-                float sway = Mathf.Sign(slotPos.x - mouth.x);
-                if (Mathf.Abs(slotPos.x - mouth.x) < 1f) sway = lane % 2 == 0 ? 1f : -1f;
-                float y0 = mouth.y - m.CellH * 0.5f;
-                points.Add(new Vector2(mouth.x - sway * m.CellW * 0.10f, Mathf.Lerp(start.y, y0, 0.7f)));
-                points.Add(new Vector2(mouth.x + sway * m.CellW * 0.22f, bottom + 6f));
-            }
+            float bottom = m.RingBottom;
+            // Arc out of the lane mouth, leaning away from the slot first.
+            var mouth = LaneAnchor(lane, 0);
+            float sway = Mathf.Sign(slotPos.x - mouth.x);
+            if (Mathf.Abs(slotPos.x - mouth.x) < 1f) sway = lane % 2 == 0 ? 1f : -1f;
+            float y0 = mouth.y - m.CellH * 0.5f;
+            points.Add(new Vector2(mouth.x - sway * m.CellW * 0.10f, Mathf.Lerp(start.y, y0, 0.7f)));
+            points.Add(new Vector2(mouth.x + sway * m.CellW * 0.22f, bottom + 6f));
             // Along the bar road toward the slot, then a scooping curve down into it.
             float dir = Mathf.Sign(slotPos.x - points[points.Count - 1].x);
             if (dir == 0f) dir = 1f;

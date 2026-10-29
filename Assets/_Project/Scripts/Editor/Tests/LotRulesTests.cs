@@ -90,9 +90,9 @@ namespace CarMatch.Tests
         }
 
         [Test]
-        public void Lanes_BackOfLaneCanExit()
+        public void Lanes_BackOfLaneCannotExit()
         {
-            RuleChecks.BackOfLaneCanExit();
+            RuleChecks.BackOfLaneCannotExit();
         }
 
         [Test]

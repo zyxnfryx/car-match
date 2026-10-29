@@ -1,7 +1,7 @@
 namespace CarMatch
 {
     // Shared after every removal, on level load, and after a shuffle.
-    // A '?' car shows its color once the cell directly in front of it is empty (or it can exit out the back).
+    // A '?' car shows its color once the cell directly in front of it is empty.
     // Tunnel and side-lot mouths reveal when that dispenser can actually exit.
     public static class HiddenReveal
     {
@@ -18,8 +18,8 @@ namespace CarMatch
                 {
                     var slot = lane.Cells[c];
                     if (slot.Empty) continue;
-                    // Uncovered when the cell in front is empty, or when it can leave out the back.
-                    bool covered = c > 0 && !lane.Cells[c - 1].Empty && !ExitPath.BackClear(lane, c);
+                    // The back of the lane is a wall, so only an empty cell in front uncovers a car.
+                    bool covered = c > 0 && !lane.Cells[c - 1].Empty;
                     if (covered) continue;
                     if (slot.Tunnel)
                     {
