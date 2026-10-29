@@ -223,14 +223,8 @@ namespace CarMatch
             RectTransform mascot, RectTransform ribbon, RectTransform title, RectTransform piggy, Text plus, Text coinText,
             Button next, Button home)
         {
-            // Every win opens with the LOT LOOP car finale (tap anywhere to skip), then the coins.
-            // The win fanfare already played once on the lot.
-            rays.gameObject.SetActive(false);
-            glow.gameObject.SetActive(false);
-            yield return CarFinale(screen);
-            rays.gameObject.SetActive(true);
-            glow.gameObject.SetActive(true);
-            // Fanfare already played once on the lot. Do not replay it or mascot_cheer (two beeps).
+            // The lot already played the victory lap and the one fanfare. Open on PERFECT, then the coins.
+            // Fanfare is not replayed, and mascot_cheer (two beeps) stays silent.
 #if !UNITY_WEBGL
             Haptics.Success();
 #endif

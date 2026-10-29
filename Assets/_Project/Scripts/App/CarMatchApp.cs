@@ -2212,15 +2212,19 @@ namespace CarMatch
                 && Economy.CanAfford(Purse.Wallet, cost);
         }
 
-        // On-lot celebration, then the existing results screen. Reward amounts are unchanged.
-        public const float LotCheerSeconds = 1.5f;
-        const int LotConfettiCount = 24;
+        // Victory lap on the lot, then the results screen. Reward amounts are unchanged.
+        public const float LotCheerSeconds = 2f;
+        const int LotConfettiCount = 16;
+        const int LotStarCount = 8;
+        const int LapTrailCount = 18;
 
         static readonly Color[] LotConfettiColors =
         {
             new Color(1f, 0.36f, 0.42f), new Color(1f, 0.82f, 0.25f), new Color(0.35f, 0.82f, 0.45f),
             new Color(0.30f, 0.62f, 1f), new Color(0.75f, 0.45f, 1f), new Color(0.20f, 0.85f, 0.82f)
         };
+
+        static readonly CarColor[] LapColors = { CarColor.Coral, CarColor.Teal, CarColor.Amber };
 
         void EnterWin()
         {
@@ -2236,98 +2240,232 @@ namespace CarMatch
             StartCoroutine(LotCheer());
         }
 
-        // Confetti and a hop on the lot, with input locked, then the Perfect screen.
+        // About two seconds on the lot: a lap around the ring, a glow, then one cheer into Perfect.
         IEnumerator LotCheer()
         {
-            // One win cue. mascot_cheer is two short bursts (the double beep) and the
-            // results screen used to play that plus the fanfare again.
-            AudioManager.Play(Sfx.Win);
+            const float LapSec = 1.55f;
+            const float BurstAt = 1.55f;
+            var screenRt = _screen as RectTransform;
             var block = Place(_screen, "CheerBlock", Vector2.zero, new Vector2(4000f, 4000f));
             var blockImage = block.gameObject.AddComponent<Image>();
             blockImage.color = new Color(0f, 0f, 0f, 0.001f);
             blockImage.raycastTarget = true;
 
-            var bits = new RectTransform[LotConfettiCount];
-            var imgs = new Image[LotConfettiCount];
-            var vel = new Vector2[LotConfettiCount];
-            var spin = new float[LotConfettiCount];
-            var art = UiArt.Get("confetti");
-            float lotY = _metrics.CellH > 1f ? _metrics.BaseY + _metrics.CellH * 0.5f : 40f;
-            var origin = new Vector2(0f, lotY);
-            for (int i = 0; i < bits.Length; i++)
+            var glow = new List<Image>(48);
+            var glowBase = new List<Color>(48);
+            for (int i = 0; i < _screen.childCount; i++)
             {
-                var rt = Place(_screen, "LotConfetti", origin + new Vector2(Random.Range(-36f, 36f), Random.Range(-12f, 24f)), new Vector2(18f, 32f));
-                var img = rt.gameObject.AddComponent<Image>();
-                img.sprite = art != null ? art : SpriteKit.Round;
-                img.color = LotConfettiColors[i % LotConfettiColors.Length];
-                img.preserveAspect = false;
-                img.raycastTarget = false;
-                float ang = Random.Range(48f, 132f) * Mathf.Deg2Rad;
-                float speed = Random.Range(620f, 1180f);
-                vel[i] = new Vector2(Mathf.Cos(ang) * speed, Mathf.Sin(ang) * speed);
-                spin[i] = Random.Range(-420f, 420f);
-                bits[i] = rt;
-                imgs[i] = img;
+                var child = _screen.GetChild(i);
+                var n = child.name;
+                if (n != "LaneLine" && n != "Curb" && n != "CurbShade" && n != "StopBar" && n != "RingDash" && n != "RingEdge")
+                    continue;
+                var img = child.GetComponent<Image>();
+                if (img == null) continue;
+                glow.Add(img);
+                glowBase.Add(img.color);
             }
 
-            var hops = new List<RectTransform>(8);
-            var homes = new List<Vector2>(8);
-            var scales = new List<Vector3>(8);
-            var heights = new List<float>(8);
-            System.Action<RectTransform, float> addHop = delegate (RectTransform rt, float height)
+            var loop = RingLoop(22f);
+            float truckS = _metrics.Piece.x > 1f ? Mathf.Clamp(_metrics.Piece.x * 0.55f, 96f, 150f) : 120f;
+            var trucks = new RectTransform[LapColors.Length];
+            var truckImg = new Image[LapColors.Length];
+            for (int i = 0; i < LapColors.Length; i++)
             {
-                if (rt == null || !rt.gameObject.activeInHierarchy || hops.Count >= 12) return;
-                hops.Add(rt);
-                homes.Add(rt.anchoredPosition);
-                scales.Add(rt.localScale);
-                heights.Add(height);
-            };
-            int trucks = 0;
-            for (int i = 0; i < _barCars.Count; i++)
-                if (_barCars[i] != null && _barCars[i].gameObject.activeInHierarchy) trucks++;
-            foreach (var piece in _pieceAt.Values)
-                if (piece != null && piece.gameObject.activeInHierarchy && (_tray == null || !piece.IsChildOf(_tray))) trucks++;
-            addHop(_tray, trucks > 0 ? 8f : 22f);
-            for (int i = 0; i < _barCars.Count; i++) addHop(_barCars[i], 18f);
-            foreach (var piece in _pieceAt.Values)
-                if (piece != null && (_tray == null || !piece.IsChildOf(_tray))) addHop(piece, 18f);
+                Vector2 tangent;
+                var pos = LoopPoint(loop, i / (float)LapColors.Length, out tangent);
+                var rt = Place(_screen, "LapTruck", pos, new Vector2(truckS, truckS));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = LapSprite(LapColors[i], tangent);
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                trucks[i] = rt;
+                truckImg[i] = img;
+            }
+
+            var spark = UiArt.Get("sparkle") ?? UiArt.Get("glow") ?? SpriteKit.Round;
+            var trail = new RectTransform[LapTrailCount];
+            var trailImg = new Image[LapTrailCount];
+            var trailAge = new float[LapTrailCount];
+            for (int i = 0; i < LapTrailCount; i++)
+            {
+                var rt = Place(_screen, "LapSpark", Vector2.zero, new Vector2(28f, 28f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = spark;
+                img.color = new Color(1f, 0.9f, 0.45f, 0f);
+                img.raycastTarget = false;
+                trail[i] = rt;
+                trailImg[i] = img;
+                trailAge[i] = 9f;
+            }
+            for (int i = 0; i < trucks.Length; i++) trucks[i].SetAsLastSibling();
+
+            float lotY = _metrics.CellH > 1f ? _metrics.BaseY + _metrics.CellH * 0.35f : 40f;
+            var origin = new Vector2(0f, lotY);
+            var bits = new RectTransform[LotConfettiCount];
+            var bitImg = new Image[LotConfettiCount];
+            var vel = new Vector2[LotConfettiCount];
+            var spin = new float[LotConfettiCount];
+            var confetti = UiArt.Get("confetti");
+            for (int i = 0; i < bits.Length; i++)
+            {
+                var rt = Place(_screen, "LotConfetti", origin, new Vector2(18f, 32f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = confetti != null ? confetti : SpriteKit.Round;
+                var col = LotConfettiColors[i % LotConfettiColors.Length];
+                col.a = 0f;
+                img.color = col;
+                img.preserveAspect = false;
+                img.raycastTarget = false;
+                float ang = (i / (float)bits.Length) * Mathf.PI * 2f + 0.4f;
+                float speed = 520f + (i % 5) * 90f;
+                vel[i] = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * speed;
+                vel[i].y += 280f;
+                spin[i] = (i % 2 == 0 ? 1f : -1f) * (280f + (i % 4) * 40f);
+                bits[i] = rt;
+                bitImg[i] = img;
+            }
+            var stars = new RectTransform[LotStarCount];
+            var starImg = new Image[LotStarCount];
+            for (int i = 0; i < LotStarCount; i++)
+            {
+                var rt = Place(_screen, "LotStar", origin, new Vector2(42f, 42f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = UiArt.Get("shine") ?? spark;
+                img.color = new Color(1f, 0.95f, 0.7f, 0f);
+                img.raycastTarget = false;
+                stars[i] = rt;
+                starImg[i] = img;
+            }
+            var flash = Place(_screen, "LapFlash", origin, new Vector2(80f, 80f));
+            var flashImg = flash.gameObject.AddComponent<Image>();
+            var glowArt = UiArt.Get("glow") ?? SpriteKit.Round;
+            flashImg.sprite = glowArt;
+            flashImg.color = new Color(1f, 0.9f, 0.45f, 0f);
+            flashImg.raycastTarget = false;
             block.SetAsLastSibling();
 
+            int trailN = 0;
+            float trailClock = 0f;
+            bool cheered = false;
+            bool punched = false;
+            var trayHome = _tray != null ? _tray.anchoredPosition : Vector2.zero;
+            var gold = new Color(1f, 0.86f, 0.32f, 1f);
             float t = 0f;
             while (t < LotCheerSeconds)
             {
                 float dt = Time.unscaledDeltaTime;
                 if (dt > 0.05f) dt = 0.05f;
                 t += dt;
-                float fade = t > LotCheerSeconds - 0.35f ? Mathf.Clamp01((LotCheerSeconds - t) / 0.35f) : 1f;
-                for (int i = 0; i < bits.Length; i++)
+                float pulse = 0.5f + 0.5f * Mathf.Sin(t * Mathf.PI * 3.2f);
+                for (int i = 0; i < glow.Count; i++)
                 {
-                    if (bits[i] == null) continue;
-                    vel[i].y -= 1500f * dt;
-                    bits[i].anchoredPosition += vel[i] * dt;
-                    bits[i].localRotation = Quaternion.Euler(0f, 0f, spin[i] * t);
-                    var c = imgs[i].color;
-                    c.a = fade;
-                    imgs[i].color = c;
+                    if (glow[i] == null) continue;
+                    glow[i].color = Color.Lerp(glowBase[i], gold, pulse * 0.72f);
                 }
-                for (int i = 0; i < hops.Count; i++)
+                float lapU = t < LapSec ? t / LapSec : 1f;
+                lapU = lapU * lapU * (3f - 2f * lapU);
+                for (int i = 0; i < trucks.Length; i++)
                 {
-                    if (hops[i] == null) continue;
-                    float wave = Mathf.Abs(Mathf.Sin((t + i * 0.13f) * Mathf.PI * 2.1f));
-                    hops[i].anchoredPosition = homes[i] + new Vector2(0f, wave * heights[i]);
-                    float squash = 1f + 0.05f * Mathf.Sin((t + i * 0.13f) * Mathf.PI * 4.2f);
-                    var s = scales[i];
-                    hops[i].localScale = new Vector3(s.x * (2f - squash), s.y * squash, s.z);
+                    if (trucks[i] == null) continue;
+                    Vector2 tangent;
+                    trucks[i].anchoredPosition = LoopPoint(loop, lapU + i / (float)trucks.Length, out tangent);
+                    truckImg[i].sprite = LapSprite(LapColors[i], tangent);
+                }
+                trailClock += dt;
+                if (trailClock >= 0.05f && t < LapSec + 0.05f)
+                {
+                    trailClock = 0f;
+                    for (int i = 0; i < trucks.Length; i++)
+                    {
+                        int k = trailN % LapTrailCount;
+                        trailN++;
+                        trail[k].anchoredPosition = trucks[i].anchoredPosition;
+                        trail[k].localScale = Vector3.one;
+                        trailAge[k] = 0f;
+                        trailImg[k].color = new Color(1f, 0.92f, 0.55f, 0.9f);
+                    }
+                }
+                for (int i = 0; i < LapTrailCount; i++)
+                {
+                    if (trailAge[i] > 0.4f) continue;
+                    trailAge[i] += dt;
+                    float a = 1f - Mathf.Clamp01(trailAge[i] / 0.38f);
+                    trailImg[i].color = new Color(1f, 0.92f, 0.55f, a * 0.9f);
+                    float s = Mathf.Lerp(0.7f, 1.35f, Mathf.Clamp01(trailAge[i] / 0.38f));
+                    trail[i].localScale = new Vector3(s, s, 1f);
+                }
+                if (t >= BurstAt)
+                {
+                    if (!punched)
+                    {
+                        punched = true;
+                        if (_shake != null) _shake.Punch(0.28f, 11f, 3.5f);
+                    }
+                    if (!cheered)
+                    {
+                        cheered = true;
+                        AudioManager.Play(Sfx.Win);
+                    }
+                    float bt = t - BurstAt;
+                    float pop = Mathf.Sin(Mathf.Clamp01(bt / 0.42f) * Mathf.PI);
+                    if (screenRt != null) screenRt.localScale = Vector3.one * (1f + 0.05f * pop);
+                    flash.localScale = Vector3.one * Mathf.Lerp(0.4f, 8f, Mathf.Clamp01(bt / 0.4f));
+                    flashImg.color = new Color(1f, 0.92f, 0.5f, (1f - Mathf.Clamp01(bt / 0.4f)) * 0.85f);
+                    for (int i = 0; i < bits.Length; i++)
+                    {
+                        vel[i].y -= 980f * dt;
+                        bits[i].anchoredPosition += vel[i] * dt;
+                        bits[i].localRotation = Quaternion.Euler(0f, 0f, spin[i] * bt);
+                        var c = LotConfettiColors[i % LotConfettiColors.Length];
+                        c.a = 1f - Mathf.Clamp01((bt - 0.2f) / 0.25f);
+                        bitImg[i].color = c;
+                    }
+                    for (int i = 0; i < stars.Length; i++)
+                    {
+                        float ang = i / (float)stars.Length * Mathf.PI * 2f;
+                        float rad = Mathf.Lerp(20f, 210f, Mathf.Clamp01(bt / 0.38f));
+                        stars[i].anchoredPosition = origin + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * rad;
+                        float s = Mathf.Lerp(0.3f, 1.4f, Mathf.Clamp01(bt / 0.2f));
+                        stars[i].localScale = new Vector3(s, s, 1f);
+                        starImg[i].color = new Color(1f, 0.95f, 0.72f, 1f - Mathf.Clamp01(bt / 0.42f));
+                    }
+                    if (_tray != null)
+                    {
+                        float hop = Mathf.Abs(Mathf.Sin(bt * Mathf.PI * 3f)) * 16f * (1f - Mathf.Clamp01(bt / 0.45f));
+                        _tray.anchoredPosition = trayHome + new Vector2(0f, hop);
+                    }
                 }
                 yield return null;
             }
-            for (int i = 0; i < hops.Count; i++)
+            if (screenRt != null)
             {
-                if (hops[i] == null) continue;
-                hops[i].anchoredPosition = homes[i];
-                hops[i].localScale = scales[i];
+                screenRt.localScale = Vector3.one;
+                screenRt.anchoredPosition = Vector2.zero;
+                screenRt.localRotation = Quaternion.identity;
             }
+            if (_tray != null) _tray.anchoredPosition = trayHome;
             ShowWin();
+        }
+
+        static Vector2 LoopPoint(List<Vector2> pts, float u, out Vector2 tangent)
+        {
+            tangent = Vector2.up;
+            if (pts == null || pts.Count == 0) return Vector2.zero;
+            float wrapped = u - Mathf.Floor(u);
+            float f = wrapped * pts.Count;
+            int i = Mathf.FloorToInt(f) % pts.Count;
+            int j = (i + 1) % pts.Count;
+            float k = f - Mathf.Floor(f);
+            tangent = pts[j] - pts[i];
+            if (tangent.sqrMagnitude < 0.01f) tangent = Vector2.right;
+            return Vector2.Lerp(pts[i], pts[j], k);
+        }
+
+        static Sprite LapSprite(CarColor color, Vector2 tangent)
+        {
+            int index = Mathf.RoundToInt(CarFrames.HeadingAngle(tangent) / 22.5f) % 16;
+            var sprite = CarFrames.Heading(color, index);
+            return sprite != null ? sprite : CarArt.For(color, true);
         }
 
         void ShowWin()
