@@ -1137,13 +1137,22 @@ namespace CarMatch
         {
             var store = new MemoryFlags();
             var covered = Tiny("[[\"coral\",\"?teal\",\"amber\"],[\"coral\",\"amber\",\"teal\"],[\"teal\",\"coral\",\"amber\"]]");
-            var cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.CoveredLevel, Board = covered, Moves = 2, CanShuffle = true });
-            Expect(cue.Lesson == CoachLesson.Covered && cue.HasCar && !cue.LockCars, "level 4 spotlights the bag");
-            Expect(cue.Car.Cell == 1, "the glove sits on the covered car");
+            var covWorld = new CoachWorld { Level = LotCoach.CoveredLevel, Board = covered, Moves = 0 };
+            var hint = LotCoach.Hint(store, covWorld);
+            Expect(hint.Hint == CoachHint.Mystery && hint.Spot.Cell == 1, "level 4 points out the covered car with a hint");
+            Expect(LotCoach.Cue(store, covWorld).Lesson == CoachLesson.None, "the covered car is not a forced tap");
+            LotCoach.CompleteHint(store, CoachHint.Mystery);
+            Expect(LotCoach.Hint(store, covWorld).Hint == CoachHint.None, "the hint shows once");
 
             var side = Tiny("[[\"coral\",\"teal\"],[\"teal\",\"teal\"],[\"amber\",\"amber\"]]", "[{\"lane\":0,\"at\":0,\"cars\":[\"coral\",\"coral\",\"amber\"]}]");
+            var cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SideLevel, Board = side, CanShuffle = true, CanMagnet = true });
+            Expect(cue.Lesson == CoachLesson.Shuffle, "a closed side lot is not taught yet");
+            Expect(LotCoach.Hint(store, new CoachWorld { Level = LotCoach.SideLevel, Board = side }).Hint == CoachHint.SideLot, "a closed side lot gets a look-here hint");
+            BoardRules.Play(side, null, new Tap(TapKind.Lane, 0, 0));
             cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SideLevel, Board = side, CanShuffle = true, CanMagnet = true });
-            Expect(cue.Lesson == CoachLesson.SideLot && cue.Car.Kind == TapKind.Side, "level 5 spotlights the side lot before shuffle");
+            Expect(cue.Lesson == CoachLesson.SideLot && cue.Car.Kind == TapKind.Side && cue.LockCars, "an open side lot is a forced lesson before shuffle");
+            Expect(!LotCoach.Allows(cue, new Tap(TapKind.Lane, 1, 0)), "other cars are blocked during the lesson");
+            Expect(!LotCoach.AllowsBooster(cue, "Shuffle"), "boosters are blocked during a car lesson");
             LotCoach.Complete(store, CoachLesson.SideLot);
             cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.ShuffleLevel, Board = side, CanShuffle = true });
             Expect(cue.Lesson == CoachLesson.Shuffle && cue.Booster == "Shuffle", "shuffle follows the side-lot intro");
@@ -1155,6 +1164,10 @@ namespace CarMatch
             var plain = Tiny("[[\"coral\",\"teal\"],[\"teal\",\"coral\"]]");
             cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.UndoLevel, Board = plain, Moves = 1 });
             Expect(cue.Lesson == CoachLesson.Undo && cue.Booster == "Undo", "undo appears once a move exists on level 3");
+            Expect(cue.LockCars && !LotCoach.Allows(cue, new Tap(TapKind.Lane, 0, 0)) && LotCoach.AllowsBooster(cue, "Undo"), "the undo lesson is forced");
+            var paid = new MemoryFlags();
+            paid.Set(FreeBoosters.Key("Undo"));
+            Expect(LotCoach.Cue(paid, new CoachWorld { Level = LotCoach.UndoLevel, Board = plain, Moves = 1 }).Lesson == CoachLesson.None, "no forced booster lesson once its free use is gone");
             cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.UndoLevel, Board = plain, Moves = 0 });
             Expect(cue.Lesson == CoachLesson.None, "undo waits until it is useful");
 
@@ -1354,7 +1367,8 @@ namespace CarMatch
             Expect(level.Number == 21 && level.Board.Garages.Count > 0, "level 21 has the lift");
             var store = new MemoryFlags();
             var cue = LotCoach.Cue(store, new CoachWorld { Level = 21, Board = level.Board, CanShuffle = true });
-            Expect(cue.Lesson == CoachLesson.Underground && cue.HasCar && !cue.LockCars, "the glove introduces the lift");
+            Expect(cue.Lesson == CoachLesson.Underground && cue.HasCar && cue.LockCars, "the glove introduces the lift as a forced tap");
+            Expect(ExitPath.IsLegal(level.Board, cue.Car), "the forced lift tap can be played");
             Expect(cue.Car.Index == level.Board.Garages[0].Lane, "the glove is on the lift's lane");
             Expect(level.Board.Garages[0].Queue.Count == 3, "the badge starts at the cars still below");
         }

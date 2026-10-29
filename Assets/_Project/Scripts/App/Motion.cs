@@ -313,26 +313,6 @@ namespace CarMatch
         }
     }
 
-    // Port of Flock Five's CamShake punch for a uGUI root (the screen rect, not a camera).
-    public sealed class UiShake : MonoBehaviour
-    {
-        float _t, _dur, _amp, _twist, _seed;
-        public void Punch(float dur, float amp, float twist)
-        {
-            _dur = Mathf.Max(0.08f, dur); _amp = amp; _twist = twist; _t = _dur; _seed = Random.Range(0f, 80f);
-        }
-        void LateUpdate()
-        {
-            if (_t <= 0f) return;
-            _t -= Time.unscaledDeltaTime;
-            var rt = (RectTransform)transform;
-            if (_t <= 0f) { rt.anchoredPosition = Vector2.zero; rt.localRotation = Quaternion.identity; return; }
-            float u = Mathf.Clamp01(_t / _dur), decay = u * u, w = Time.unscaledTime * 62f + _seed;
-            rt.anchoredPosition = new Vector2(Mathf.Sin(w) * _amp * decay, Mathf.Cos(w * 1.17f) * _amp * 0.72f * decay);
-            rt.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(w * 1.3f) * _twist * decay);
-        }
-    }
-
     // 16-heading drive frames and the eye-open frames (Resources/Cars16, Resources/CarEyes).
     public static class CarFrames
     {

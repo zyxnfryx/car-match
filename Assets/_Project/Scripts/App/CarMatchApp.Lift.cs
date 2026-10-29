@@ -166,7 +166,7 @@ namespace CarMatch
                 int badge = g.Queue.Count;
                 if (moving && run != null) badge = DrivewayLift.Badge(run.Before, run.After, u);
                 if (badge > 0 || moving)
-                    LiftBadge(center + new Vector2(size.x * 0.5f - 18f, -size.y * 0.5f + 18f), moving && run != null ? run : null, badge);
+                    LiftLock(center, size, moving && run != null ? run : null, badge);
                 if (run != null && run.Final && !moving && !run.Celebrated)
                 {
                     run.Celebrated = true;
@@ -175,24 +175,97 @@ namespace CarMatch
             }
         }
 
-        void LiftBadge(Vector2 pos, LiftRun run, int count)
+        // Locked lift lane (Oct 29): a faded white overlay with light diagonal stripes over the
+        // lane, and a big soft painted countdown (cars still below: 3, 2, 1) that ticks as matches
+        // happen and fades out as the gate opens. Never takes a tap.
+        void LiftLock(Vector2 center, Vector2 size, LiftRun run, int count)
         {
-            // Blue chevron plate: cars still below. Not the red side chip or the tunnel's round tag.
-            var chip = Place(_screen, "LiftBadge", pos, new Vector2(78f, 64f));
-            var img = chip.gameObject.AddComponent<Image>();
-            img.sprite = SpriteKit.Round;
-            img.color = new Color(0.20f, 0.45f, 0.72f, 1f);
-            img.raycastTarget = false;
-            var chev = Place(chip, "Down", new Vector2(-22f, -2f), new Vector2(22f, 18f));
-            var cd = chev.gameObject.AddComponent<Image>();
-            cd.sprite = SpriteKit.Round;
-            cd.color = new Color(0.95f, 0.85f, 0.35f, 1f);
-            cd.raycastTarget = false;
-            var t = AddText(chip, count.ToString(), 30, Color.white, TextAnchor.MiddleCenter);
+            var veil = Place(_screen, "LiftVeil", center, size);
+            var raw = veil.gameObject.AddComponent<RawImage>();
+            raw.texture = StripeTex();
+            raw.uvRect = new Rect(0f, 0f, size.x / 96f, size.y / 96f);
+            raw.color = new Color(1f, 1f, 1f, 0.55f);
+            raw.raycastTarget = false;
+            var veilGroup = veil.gameObject.AddComponent<CanvasGroup>();
+            veilGroup.blocksRaycasts = false;
+            veilGroup.interactable = false;
+
+            // PinBadges keeps the number above the parked cars (not in the outlined Badges layer).
+            var holder = Place(_screen, "LiftCount", center, size);
+            var holderGroup = holder.gameObject.AddComponent<CanvasGroup>();
+            holderGroup.blocksRaycasts = false;
+            holderGroup.interactable = false;
+            int font = Mathf.RoundToInt(Mathf.Clamp(Mathf.Min(size.x, size.y) * 0.62f, 60f, 150f));
+            var t = AddText(holder, count.ToString(), font, new Color(1f, 0.99f, 0.95f, 0.88f), TextAnchor.MiddleCenter);
             t.font = ChunkyFont();
-            t.rectTransform.offsetMin = new Vector2(18f, 0f);
-            Outlined(t, new Color(0.05f, 0.12f, 0.22f, 1f), 2f);
-            if (run != null) chip.gameObject.AddComponent<BadgeTick>().Init(run.Start, run.Before, run.After, t);
+            t.raycastTarget = false;
+            Outlined(t, new Color(0.30f, 0.36f, 0.48f, 0.45f), 3f);
+            var tick = holder.gameObject.AddComponent<LiftCountdown>();
+            tick.Init(run, t, holderGroup, veilGroup, count);
+        }
+
+        static Texture2D _stripeTex;
+
+        static Texture2D StripeTex()
+        {
+            if (_stripeTex != null) return _stripeTex;
+            const int n = 64;
+            var tex = new Texture2D(n, n, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Repeat;
+            tex.filterMode = FilterMode.Bilinear;
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    // Soft diagonal band every 32 px; base wash so the lane reads as closed.
+                    float d = Mathf.Repeat(x + y, 32f);
+                    float band = Mathf.Clamp01(1f - Mathf.Abs(d - 8f) / 7f);
+                    float a = 0.30f + 0.35f * band * band * (3f - 2f * band);
+                    px[y * n + x] = new Color32(255, 255, 255, (byte)Mathf.RoundToInt(a * 255f));
+                }
+            tex.SetPixels32(px);
+            tex.Apply(false, true);
+            _stripeTex = tex;
+            return tex;
+        }
+
+        sealed class LiftCountdown : MonoBehaviour
+        {
+            LiftRun _run;
+            Text _text;
+            CanvasGroup _number, _veil;
+            int _shown;
+            float _pop;
+
+            public void Init(LiftRun run, Text text, CanvasGroup number, CanvasGroup veil, int count)
+            {
+                _run = run; _text = text; _number = number; _veil = veil; _shown = count;
+                if (count <= 0 && run == null) { number.alpha = 0f; veil.alpha = 0f; }
+            }
+
+            void Update()
+            {
+                if (_text == null) return;
+                if (_run == null) return;
+                float u = DrivewayLift.Along(_run.Start, Time.unscaledTime);
+                int n = DrivewayLift.Badge(_run.Before, _run.After, u);
+                if (n != _shown) { _shown = n; _pop = 0.25f; }
+                _text.text = n > 0 ? n.ToString() : (_run.Before > 0 ? "1" : "");
+                if (_pop > 0f)
+                {
+                    _pop -= Time.unscaledDeltaTime;
+                    // Soft fade-dip on the number change (no scale: Oct 29 no pulses).
+                    if (_number != null) _number.alpha = 0.55f + 0.45f * (1f - Mathf.Clamp01(_pop / 0.25f));
+                }
+                else if (_number != null && _run.After > 0) _number.alpha = 1f;
+                if (_run.After == 0)
+                {
+                    // Last wave: the gate opens; the countdown and the stripes fade away.
+                    float f = 1f - Mathf.Clamp01((u - 0.35f) / 0.5f);
+                    if (_number != null) _number.alpha = f;
+                    if (_veil != null) _veil.alpha = f;
+                }
+            }
         }
 
         sealed class ShowOnRise : MonoBehaviour
@@ -226,6 +299,7 @@ namespace CarMatch
             }
         }
 
+        // Kept for reference by older code paths; unused since the Oct 29 lift countdown.
         sealed class BadgeTick : MonoBehaviour
         {
             float _start;
@@ -273,11 +347,15 @@ namespace CarMatch
         }
 
         CoachCue _cue;
+        HintCue _hint;
+        CoachGlove _glove;
 
         void DrawCoach()
         {
+            _hint = default;
+            _glove = null;
             if (_board == null || _level == null) return;
-            _cue = LotCoach.Cue(PrefsFlags.Shared, new CoachWorld
+            var world = new CoachWorld
             {
                 Level = _level.Number,
                 Board = _board,
@@ -285,40 +363,108 @@ namespace CarMatch
                 CanShuffle = BoosterKit.CanShuffle(_board),
                 CanMagnet = CanMagnet(),
                 CanSuper = CanSuper()
-            });
-            if (_cue.Lesson == CoachLesson.None) return;
+            };
+            _cue = LotCoach.Cue(PrefsFlags.Shared, world);
+            var screen = _screen as RectTransform;
+            var rect = screen != null ? screen.rect : new Rect(-540f, -960f, 1080f, 1920f);
+            if (_cue.Lesson == CoachLesson.None)
+            {
+                _hint = LotCoach.Hint(PrefsFlags.Shared, world);
+                if (_hint.Hint != CoachHint.None) DrawLookHint(_hint, rect);
+                return;
+            }
             Vector2 at;
+            Vector2 hole = _metrics.Piece;
             if (_cue.IsBooster)
             {
                 var named = _screen.Find("Booster" + _cue.Booster) as RectTransform;
-                if (named == null) return;
+                if (named == null) { _cue = default; return; }
                 at = named.anchoredPosition;
-            }
-            else if (_cue.Lesson == CoachLesson.Underground && _board.Garages.Count > 0)
-            {
-                var g = _board.Garages[0];
-                at = LaneAnchor(g.Lane, g.Cells.Count > 0 ? g.Cells[0] : 0);
+                hole = named.sizeDelta;
             }
             else if (_cue.HasCar && _pieceAt.TryGetValue(PieceKey(_cue.Car), out var piece) && piece != null)
+            {
                 at = piece.anchoredPosition;
+                hole = piece.sizeDelta;
+            }
             else if (_cue.HasCar)
                 at = _cue.Car.Kind == TapKind.Side && (uint)_cue.Car.Index < (uint)_board.Sides.Count
                     ? SideAnchor(_board.Sides[_cue.Car.Index])
                     : LaneAnchor(_cue.Car.Index, _cue.Car.Cell);
-            else return;
-            var screen = _screen as RectTransform;
-            var rect = screen != null ? screen.rect : new Rect(-540f, -960f, 1080f, 1920f);
-            UnityFreeVec center;
-            float deg;
-            LotCoach.PlaceGlove(new UnityFreeVec(at.x, at.y), LotCoach.GloveUnits,
-                new UnityFreeVec(rect.xMin, rect.yMin), new UnityFreeVec(rect.xMax, rect.yMax), 16f, out center, out deg);
-            var glove = Place(_screen, "Glove", new Vector2(center.X, center.Y), new Vector2(LotCoach.GloveUnits, LotCoach.GloveUnits));
-            var img = glove.gameObject.AddComponent<Image>();
-            img.sprite = UiArt.Get("glove") ?? SpriteKit.Round;
-            img.preserveAspect = true;
-            img.raycastTarget = false;
-            glove.localRotation = Quaternion.Euler(0f, 0f, deg);
-            glove.SetAsLastSibling();
+            else { _cue = default; return; }
+            // Forced lesson: everything but the target is dimmed and takes no taps.
+            DrawCoachDim(rect, new Rect(at - hole * 0.5f - new Vector2(14f, 14f), hole + new Vector2(28f, 28f)));
+            float h = CoachGlove.HeightFor(rect.height, CoachGlove.Wide());
+            _glove = CoachGlove.Make(screen, at, h, rect);
+            _glove.transform.SetAsLastSibling();
+        }
+
+        // Four dim panels around the hole. They catch every tap outside the glove's target.
+        void DrawCoachDim(Rect screen, Rect hole)
+        {
+            var layer = Place(_screen, "CoachLayer", Vector2.zero, new Vector2(8f, 8f));
+            float big = 4000f;
+            var dim = new Color(0.02f, 0.03f, 0.08f, 0.50f);
+            void Panel(string name, float x0, float y0, float x1, float y1)
+            {
+                if (x1 <= x0 || y1 <= y0) return;
+                var rt = Place(layer, name, new Vector2((x0 + x1) * 0.5f, (y0 + y1) * 0.5f), new Vector2(x1 - x0, y1 - y0));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.color = dim;
+                img.raycastTarget = true;
+            }
+            Panel("DimBelow", -big, -big, big, hole.yMin);
+            Panel("DimAbove", -big, hole.yMax, big, big);
+            Panel("DimLeft", -big, hole.yMin, hole.xMin, hole.yMax);
+            Panel("DimRight", hole.xMax, hole.yMin, big, hole.yMax);
+        }
+
+        // Look-here hint: soft glow on the thing, a bobbing arrow above it, a short label. No dim, no lock.
+        void DrawLookHint(HintCue hint, Rect screen)
+        {
+            Vector2 at;
+            Vector2 size = _metrics.Piece;
+            if (hint.Hint == CoachHint.SideLot && (uint)hint.Spot.Index < (uint)_board.Sides.Count)
+                at = SideAnchor(_board.Sides[hint.Spot.Index]);
+            else if (hint.Hint == CoachHint.LiftGate && (uint)hint.Garage < (uint)_board.Garages.Count)
+            {
+                var g = _board.Garages[hint.Garage];
+                float y0 = float.MaxValue, y1 = float.MinValue;
+                for (int i = 0; i < g.Cells.Count; i++) { float y = LaneAnchor(g.Lane, g.Cells[i]).y; y0 = Mathf.Min(y0, y); y1 = Mathf.Max(y1, y); }
+                at = new Vector2(LaneAnchor(g.Lane, 0).x, (y0 + y1) * 0.5f);
+                size = new Vector2(_metrics.CellW, y1 - y0 + _metrics.CellH);
+            }
+            else at = LaneAnchor(hint.Spot.Index, hint.Spot.Cell);
+            var root = Place(_screen, "LookHint", Vector2.zero, new Vector2(8f, 8f));
+            var group = root.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
+            group.alpha = 0f;
+            var glow = Place(root, "Glow", at, size * 1.45f);
+            var gi = glow.gameObject.AddComponent<Image>();
+            gi.sprite = UiArt.Get("fx_land_glow") ?? SpriteKit.Round;
+            gi.color = new Color(1f, 0.93f, 0.55f, 0.45f);
+            gi.raycastTarget = false;
+            var arrowHome = at + new Vector2(0f, size.y * 0.5f + 70f);
+            var arrow = Place(root, "Arrow", arrowHome, new Vector2(72f, 84f));
+            var ai = arrow.gameObject.AddComponent<RawImage>();
+            ai.texture = LookHint.ArrowTex();
+            ai.raycastTarget = false;
+            float labelW = Mathf.Min(760f, 26f * hint.Label.Length + 80f);
+            float lx = Mathf.Clamp(at.x, screen.xMin + labelW * 0.5f + 16f, screen.xMax - labelW * 0.5f - 16f);
+            var pill = Place(root, "Label", new Vector2(lx, arrowHome.y + 92f), new Vector2(labelW, 84f));
+            var pi = pill.gameObject.AddComponent<Image>();
+            pi.sprite = UiArt.Get("pill") ?? SpriteKit.Round;
+            pi.type = Image.Type.Sliced;
+            pi.color = new Color(0.12f, 0.16f, 0.30f, 0.92f);
+            pi.raycastTarget = false;
+            var text = AddText(pill, hint.Label, 34, Cream, TextAnchor.MiddleCenter);
+            text.raycastTarget = false;
+            var look = root.gameObject.AddComponent<LookHint>();
+            look.Glow = gi;
+            look.Arrow = arrow;
+            look.ArrowHome = arrowHome;
+            look.Group = group;
         }
     }
 }
