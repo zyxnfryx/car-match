@@ -671,6 +671,23 @@ namespace CarMatch
             }
         }
 
+        // Every lane cell is occupied when the level loads. A '-' or blank token is an empty spot.
+        public static void NoEmptyStartingCells(string json)
+        {
+            var levels = LevelJson.Parse(json);
+            for (int i = 0; i < levels.Count; i++)
+            {
+                var board = levels[i].Board;
+                for (int l = 0; l < board.Lanes.Count; l++)
+                {
+                    var cells = board.Lanes[l].Cells;
+                    Expect(cells.Count > 0, levels[i].Id + " lane " + l + " has no cells");
+                    for (int c = 0; c < cells.Count; c++)
+                        Expect(!cells[c].Empty, levels[i].Id + " lane " + l + " cell " + c + " starts empty");
+                }
+            }
+        }
+
         public static void AllLevelsSolvable(string json)
         {
             var levels = LevelJson.Parse(json);
@@ -730,6 +747,7 @@ namespace CarMatch
             OnlyWinsPay();
             LoseGivesNoCoins();
             LivesSpendAndRegen();
+            NoEmptyStartingCells(json);
             AllLevelsSolvable(json);
             BoostersOnEveryLevel(json);
             LevelsAreUnique(json);

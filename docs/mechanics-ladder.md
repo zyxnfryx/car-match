@@ -6,8 +6,8 @@ Teaching pattern for every new mechanic (Flock Five coach style): a one-line blu
 
 | # | Band (intro level) | Mechanic | Status |
 |---|---|---|---|
-| 1 | 1–7 | Early ramp, one new idea each: match three (1), uneven lanes (2), third color (3), covered car (4), side lot (5), tunnel (6), fourth color on a wide lot (7). Cars leave only **forward**; the back of every lane is a wall | Live |
-| 2 | 8–15 | More lanes and colors; mixing grows | Live |
+| 1 | 1–9 | Early ramp, every lane filled: match three (1), three short lanes (2), third color (3), covered car (4), side lot (5), tunnel (6), fourth color (7), first real mix (8), deeper four-color mix (9). Cars leave only **forward** | Live |
+| 2 | 10–15 | More lanes and colors; mixing grows. Level 10 is the first super-hard | Live |
 | 3 | 16–25 (16) | Side lots (carports) | Live |
 | 3b | 21–25 (21) | Underground garages: a hatch under two parked spots; when both are empty it opens and its queued cars drive up a ramp into them (as `?` cars until they can exit); badge shows how many are still below | Live (build 11) |
 | 4 | 26–30 (26) | Mystery boxes: cardboard `?` boxes break when a neighboring car is cleared in a match | Live (build 9) |
@@ -21,7 +21,7 @@ Teaching pattern for every new mechanic (Flock Five coach style): a one-line blu
 | 11 | 101+ | Stacked / layered cars | Stub |
 | 12 | 101+ | Tow-truck drop | Stub |
 
-Levels 1–7 are a hand-set teaching ramp (one new idea each). From level 8 the pack follows `tools/levels/gen_levels.py` (lanes 2→6, colors 2→8, sets and mixing rising smoothly). Every level is proven Winnable by the game's own solver (`RuleChecks.AllLevelsSolvable`, run in the EditMode tests and `tools/SolveCheck`). Covered cars, side lots, and tunnels appear first in tiny form at levels 4–6; their fuller introductions stay at 31, 16, and 36. Stacks, gates, and barriers stay stubs in `LevelHooks` and are not used here, because the board ignores them. Blurbs are in the data and are no longer drawn under the level title.
+Levels 1–9 are a hand-set ramp: each lane in those levels is the same length, so the lot does not draw an empty bay. From level 10 the pack follows `tools/levels/gen_levels.py`. Every level is proven Winnable (`RuleChecks.AllLevelsSolvable` and `NoEmptyStartingCells`). Covered cars, side lots, and tunnels appear first in tiny form at levels 4–6; their fuller introductions stay at 31, 16, and 36. Stacks, gates, and barriers stay stubs in `LevelHooks` and are not used here. Blurbs are in the data and are no longer drawn under the level title.
 
 ## Delivery: ways new cars enter the field
 

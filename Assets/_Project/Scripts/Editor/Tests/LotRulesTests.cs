@@ -204,6 +204,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Levels_NoEmptyStartingCells()
+        {
+            RuleChecks.NoEmptyStartingCells(Json());
+        }
+
+        [Test]
         public void Levels_AreSolvable()
         {
             RuleChecks.AllLevelsSolvable(Json());
