@@ -3,15 +3,15 @@
   {
    "id": "lot-001",
    "title": "First Lot",
-   "blurb": "Tap a car with a clear lane.",
+   "blurb": "Tap the front car. Three of a color clear.",
    "lanes": [
     [
      "coral",
      "coral",
-     "teal"
+     "coral"
     ],
     [
-     "coral",
+     "teal",
      "teal",
      "teal"
     ]
@@ -19,16 +19,16 @@
   },
   {
    "id": "lot-002",
-   "title": "Festival Drive",
-   "blurb": "",
+   "title": "Tall and Short",
+   "blurb": "Lanes can be short or tall. Only the front car leaves.",
    "lanes": [
     [
-     "teal",
      "coral",
      "teal"
     ],
     [
      "coral",
+     "teal",
      "coral",
      "teal"
     ]
@@ -36,85 +36,119 @@
   },
   {
    "id": "lot-003",
-   "title": "Three Streets",
-   "blurb": "Three colors, three lanes.",
+   "title": "Amber Street",
+   "blurb": "A new color. Three ambers clear too.",
    "lanes": [
     [
-     "coral",
-     "coral",
-     "teal"
+     "amber",
+     "amber",
+     "amber"
     ],
     [
-     "teal",
-     "teal",
      "coral"
+    ],
+    [
+     "coral",
+     "teal",
+     "coral",
+     "teal",
+     "teal"
     ]
    ]
   },
   {
    "id": "lot-004",
-   "title": "Pier Garage",
-   "blurb": "",
+   "title": "Under the Tarp",
+   "blurb": "A covered car shows its color when the car in front leaves.",
    "lanes": [
     [
      "coral",
-     "teal",
+     "?coral",
+     "amber",
      "teal"
     ],
     [
      "coral",
+     "amber",
+     "amber",
      "teal",
-     "coral"
+     "teal"
     ]
    ]
   },
   {
    "id": "lot-005",
-   "title": "Pier Stop",
-   "blurb": "",
+   "title": "Side Lot",
+   "blurb": "The side lot opens when its spot is empty.",
    "lanes": [
     [
-     "coral",
-     "teal",
      "coral"
     ],
     [
-     "coral",
+     "teal",
      "teal",
      "teal"
+    ],
+    [
+     "amber",
+     "amber",
+     "amber"
     ]
+   ],
+   "sides": [
+    {
+     "lane": 0,
+     "at": 0,
+     "cars": [
+      "coral",
+      "coral"
+     ]
+    }
    ]
   },
   {
    "id": "lot-006",
-   "title": "Lantern Bay",
-   "blurb": "",
+   "title": "Tunnel Mouth",
+   "blurb": "Empty the tunnel before the car behind it can leave.",
    "lanes": [
     [
-     "teal",
-     "coral",
+     "tunnel:coral,coral,coral",
      "teal"
     ],
     [
-     "coral",
+     "amber",
+     "amber"
+    ],
+    [
      "teal",
-     "coral"
+     "teal",
+     "amber"
     ]
    ]
   },
   {
    "id": "lot-007",
-   "title": "Garden Circle",
-   "blurb": "",
+   "title": "Four Corners",
+   "blurb": "Four lanes, four colors. Clear one color at a time.",
    "lanes": [
     [
-     "teal",
-     "teal",
+     "coral",
+     "coral",
      "coral"
     ],
     [
-     "coral",
-     "coral",
+     "amber",
+     "amber",
+     "amber"
+    ],
+    [
+     "lime",
+     "lime"
+    ],
+    [
+     "lime",
+     "teal",
+     "teal",
      "teal"
     ]
    ]
