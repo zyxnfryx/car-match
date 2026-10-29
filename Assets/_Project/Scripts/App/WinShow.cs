@@ -15,6 +15,8 @@ namespace CarMatch
         {
             public int Pay;
             public int CoinsBefore;
+            // Called once when the coin count-up starts, after the results screen is up.
+            public Action OnAward;
             public bool More;
             public Sprite Mascot;
             public Font Font;
@@ -262,6 +264,8 @@ namespace CarMatch
                 ? piggy.anchoredPosition + new Vector2(0f, SlotFromFloor * piggy.sizeDelta.y)
                 : piggy.anchoredPosition + new Vector2(0f, 120f);
             if (s.Shake != null) s.Shake.Punch(0.3f, 10f, 0.8f);
+            // Results are on screen. Award the win purse now, as the coins start to fly.
+            if (s.OnAward != null) s.OnAward();
             // Coins pop out of the mascot, arc, and fly into the piggy's slot.
             int n = Mathf.Clamp(s.Pay, 1, CoinFlyMax);
             int shown = 0;

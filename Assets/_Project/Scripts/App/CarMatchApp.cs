@@ -50,6 +50,7 @@ namespace CarMatch
         // Runs drives and set-pops on their own object so a board redraw (ClearScreen) never stops them.
         sealed class FlyHost : MonoBehaviour { }
         bool _settled;
+        bool _winPaid;
         bool _winCheer;
         bool _failPaid;
         bool _lastMatch;
@@ -159,7 +160,7 @@ namespace CarMatch
                 ShowHome();
                 return;
             }
-            // The win purse is granted when the lot clears, but the count-up still belongs to the results screen.
+            // Win coins stay off the purse until the results screen starts the count-up.
             if (_coinText != null && _phase != Phase.Win && !_winCheer) _coinText.text = Purse.Wallet.Coins.ToString();
             if (_livesText != null) _livesText.text = LivesLine();
             if (_phase == Phase.Fail && _retryButton != null)
@@ -301,6 +302,7 @@ namespace CarMatch
             _eyes.Clear();
             _garageOpens.Clear();
             _settled = false;
+            _winPaid = false;
             _winCheer = false;
             _failPaid = false;
             _lastMatch = false;
@@ -2228,7 +2230,7 @@ namespace CarMatch
             if (!_settled)
             {
                 _settled = true;
-                Purse.Grant(Economy.WinPayFor(_level != null && _level.SuperHard));
+                // Next level unlocks now. The coin purse waits until the results count-up.
                 Purse.Advance(_index, _levels.Count);
             }
             StartCoroutine(LotCheer());
@@ -2336,10 +2338,12 @@ namespace CarMatch
             ClearScreen();
             Backdrop();
             int pay = Economy.WinPayFor(_level != null && _level.SuperHard);
+            int coinsBefore = Purse.Wallet.Coins;
             WinShow.Build(this, _screen, new WinShow.Setup
             {
                 Pay = pay,
-                CoinsBefore = Purse.Wallet.Coins - pay,
+                CoinsBefore = coinsBefore,
+                OnAward = delegate { GrantWin(pay); },
                 More = _index < _levels.Count - 1,
                 Mascot = PaintedMascot(MascotArt.Cheer ?? MascotArt.Happy),
                 Font = ChunkyFont(),
@@ -2350,6 +2354,14 @@ namespace CarMatch
                 Shake = _shake,
                 HeroColor = _lastClearColor
             });
+        }
+
+        // Once, when the results count-up starts. Not during the on-lot celebration.
+        void GrantWin(int pay)
+        {
+            if (_winPaid || pay <= 0) return;
+            _winPaid = true;
+            Purse.Grant(pay);
         }
 
         static Sprite PaintedMascot(Sprite painted)
@@ -2650,6 +2662,7 @@ namespace CarMatch
             _board = _seed.Clone();
             _history.Clear();
             _settled = false;
+            _winPaid = false;
             _winCheer = false;
             _failPaid = false;
             _lastMatch = false;
