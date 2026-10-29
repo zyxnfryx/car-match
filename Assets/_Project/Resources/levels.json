@@ -3,15 +3,15 @@
   {
    "id": "lot-001",
    "title": "First Lot",
-   "blurb": "Tap a car with a clear lane.",
+   "blurb": "Tap the front car. Three of a color clear.",
    "lanes": [
     [
      "coral",
      "coral",
-     "teal"
+     "coral"
     ],
     [
-     "coral",
+     "teal",
      "teal",
      "teal"
     ]
@@ -19,16 +19,18 @@
   },
   {
    "id": "lot-002",
-   "title": "Festival Drive",
-   "blurb": "",
+   "title": "Three Stalls",
+   "blurb": "Three short lanes. Take one car to reach the match.",
    "lanes": [
     [
-     "teal",
      "coral",
      "teal"
     ],
     [
-     "coral",
+     "teal",
+     "coral"
+    ],
+    [
      "coral",
      "teal"
     ]
@@ -36,123 +38,164 @@
   },
   {
    "id": "lot-003",
-   "title": "Three Streets",
-   "blurb": "Three colors, three lanes.",
+   "title": "Amber Street",
+   "blurb": "A new color. Three ambers clear too.",
    "lanes": [
     [
-     "coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "teal",
-     "coral"
-    ]
-   ]
-  },
-  {
-   "id": "lot-004",
-   "title": "Pier Garage",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ]
-   ]
-  },
-  {
-   "id": "lot-005",
-   "title": "Pier Stop",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ]
-   ]
-  },
-  {
-   "id": "lot-006",
-   "title": "Lantern Bay",
-   "blurb": "",
-   "lanes": [
-    [
-     "teal",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ]
-   ]
-  },
-  {
-   "id": "lot-007",
-   "title": "Garden Circle",
-   "blurb": "",
-   "lanes": [
-    [
-     "teal",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "coral",
-     "teal"
-    ]
-   ]
-  },
-  {
-   "id": "lot-008",
-   "title": "Seaside Court",
-   "blurb": "",
-   "lanes": [
-    [
-     "teal",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ]
-   ]
-  },
-  {
-   "id": "lot-009",
-   "title": "Market Lane",
-   "blurb": "",
-   "lanes": [
-    [
-     "coral",
-     "coral",
-     "teal",
+     "amber",
      "amber",
      "amber"
     ],
     [
      "coral",
      "teal",
+     "coral"
+    ],
+    [
+     "coral",
+     "teal",
+     "teal"
+    ]
+   ]
+  },
+  {
+   "id": "lot-004",
+   "title": "Under the Tarp",
+   "blurb": "A covered car shows its color when the car in front leaves.",
+   "lanes": [
+    [
+     "coral",
+     "?coral",
+     "teal"
+    ],
+    [
+     "coral",
+     "amber",
+     "amber"
+    ],
+    [
+     "teal",
+     "amber",
+     "teal"
+    ]
+   ]
+  },
+  {
+   "id": "lot-005",
+   "title": "Side Lot",
+   "blurb": "The side lot opens when its spot is empty.",
+   "lanes": [
+    [
+     "coral",
+     "teal"
+    ],
+    [
+     "teal",
+     "teal"
+    ],
+    [
+     "amber",
+     "amber"
+    ]
+   ],
+   "sides": [
+    {
+     "lane": 0,
+     "at": 0,
+     "cars": [
+      "coral",
+      "coral",
+      "amber"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lot-006",
+   "title": "Tunnel Mouth",
+   "blurb": "Empty the tunnel before the car behind it can leave.",
+   "lanes": [
+    [
+     "tunnel:coral,coral,coral",
+     "teal"
+    ],
+    [
+     "teal",
+     "teal"
+    ]
+   ]
+  },
+  {
+   "id": "lot-007",
+   "title": "Four Corners",
+   "blurb": "Four lanes and a fourth color. Clear one color at a time.",
+   "lanes": [
+    [
+     "coral",
+     "coral",
+     "coral"
+    ],
+    [
+     "amber",
+     "amber",
+     "amber"
+    ],
+    [
+     "lime",
+     "teal",
+     "lime"
+    ],
+    [
+     "lime",
+     "teal",
+     "teal"
+    ]
+   ]
+  },
+  {
+   "id": "lot-008",
+   "title": "Little Mix",
+   "blurb": "No lane is one color. Park a car, then finish the set.",
+   "lanes": [
+    [
+     "coral",
+     "amber",
+     "coral"
+    ],
+    [
+     "teal",
+     "coral",
+     "teal"
+    ],
+    [
+     "amber",
      "teal",
      "amber"
+    ]
+   ]
+  },
+  {
+   "id": "lot-009",
+   "title": "Market Lane",
+   "blurb": "Four colors, a little deeper. Finish a set before the bar fills.",
+   "lanes": [
+    [
+     "coral",
+     "teal",
+     "amber",
+     "coral"
+    ],
+    [
+     "coral",
+     "amber",
+     "teal",
+     "lime"
+    ],
+    [
+     "amber",
+     "teal",
+     "lime",
+     "lime"
     ]
    ]
   },
