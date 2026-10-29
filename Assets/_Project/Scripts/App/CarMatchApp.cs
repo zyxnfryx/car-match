@@ -2393,18 +2393,143 @@ namespace CarMatch
 #if !UNITY_WEBGL
             Haptics.Thud();
 #endif
-            Label(new Vector2(0f, 360f), new Vector2(900f, 90f), "Bar's full", 68, Cream, TextAnchor.MiddleCenter);
-            string body = "There's no open slot left. Retry uses a life and starts this lot over. " +
-                          "Home uses a life and goes back to the menu. Continue plays a rewarded ad and puts the last three cars back.";
-            if (!string.IsNullOrEmpty(status)) body = status;
-            Label(new Vector2(0f, 140f), new Vector2(860f, 220f), body, 32, Cream, TextAnchor.MiddleCenter);
-            _livesText = Label(new Vector2(0f, -40f), new Vector2(700f, 50f), LivesLine(), 32, Gold, TextAnchor.MiddleCenter);
-            _retryButton = MakeButton(new Vector2(0f, -220f), new Vector2(640f, 140f), Green, "Retry", 52, OnRetry);
-            _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
-            var cont = MakeButton(new Vector2(0f, -400f), new Vector2(640f, 140f), new Color(0.22f, 0.45f, 0.82f, 1f), "Continue", 48, OnContinue);
+            var font = ChunkyFont();
+            var ink = new Color(0.27f, 0.13f, 0.32f, 1f);
+            var dim = Place(_screen, "FailDim", Vector2.zero, new Vector2(4000f, 4000f));
+            var dimImage = dim.gameObject.AddComponent<Image>();
+            dimImage.color = new Color(0.10f, 0.06f, 0.18f, 0.55f);
+
+            // 9-slice card (insets 84/84/84, bottom 96 for the 3D lip).
+            var card = Place(_screen, "FailCard", new Vector2(0f, -40f), new Vector2(920f, 1100f));
+            var cardImage = card.gameObject.AddComponent<Image>();
+            cardImage.sprite = UiArt.Get("lose_panel") ?? SpriteKit.Round;
+            cardImage.type = Image.Type.Sliced;
+            cardImage.raycastTarget = false;
+
+            // Word-art title overlapping the card's top edge.
+            var title = Place(_screen, "FailTitle", new Vector2(0f, 550f), new Vector2(940f, 254f));
+            var titleArt = UiArt.Get("lose_title");
+            if (titleArt != null)
+            {
+                var ti = title.gameObject.AddComponent<Image>();
+                ti.sprite = titleArt;
+                ti.preserveAspect = true;
+                ti.raycastTarget = false;
+            }
+            else
+            {
+                var tt = AddText(title, "Bar's Full!", 110, Gold, TextAnchor.MiddleCenter);
+                tt.font = font;
+                Outlined(tt, ink, 5f);
+            }
+
+            LoseHero(card);
+
+            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -80f), 780f, 150f, "Park 3 Cars", 64, OnContinue, false);
             cont.interactable = !_busy;
-            Label(new Vector2(0f, -530f), new Vector2(800f, 40f), "Watch a rewarded ad to continue.", 26, new Color(1f, 0.94f, 0.86f, 0.8f), TextAnchor.MiddleCenter);
-            MakeButton(new Vector2(0f, -680f), new Vector2(320f, 90f), new Color(0.20f, 0.24f, 0.34f, 0.9f), "Home", 32, OnHome);
+            _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -250f), 780f, 150f, "Retry", 68, OnRetry, false);
+            RetryLifeBadge(_retryButton);
+            _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
+            LoseButton(card, "lose_btn_home", new Vector2(0f, -410f), 480f, 124f, "Home", 54, OnHome, false);
+        }
+
+        // Locked hero_truck_v19 stills. Each layer is the full 560×378 canvas, baked
+        // at the origin, so they share one rect. No Z rotation: a spin tumbles the
+        // ellipse. Wheel spin and putter bounce stay out until Brandon asks.
+        void LoseHero(RectTransform card)
+        {
+            // Same slot height as the previous crop (432). 432 * 560/378 = 640, so the
+            // canvas is not letterboxed. v19 is centered, so the rect sits on the card
+            // (the old +56 offset only recentered a left-heavy crop).
+            const float height = 432f;
+            const float width = 640f;
+            var hero = Place(card, "FailHero", new Vector2(0f, 260f), new Vector2(width, height));
+            string[] layers =
+            {
+                "shadow",
+                "tire_far_front",
+                "tire_near_rear",
+                "tire_near_front",
+                "body",
+            };
+            for (int i = 0; i < layers.Length; i++)
+            {
+                var sprite = UiArt.Get("lose_hero_v19/" + layers[i]);
+                if (sprite == null) continue;
+                var layer = Place(hero, layers[i], Vector2.zero, new Vector2(width, height));
+                layer.localRotation = Quaternion.identity;
+                var img = layer.gameObject.AddComponent<Image>();
+                img.sprite = sprite;
+                img.raycastTarget = false;
+            }
+        }
+
+        // Small "-1" heart beside the Retry label: Retry costs a life.
+        void RetryLifeBadge(Button retry)
+        {
+            var sprite = UiArt.Get("lose_heart_minus1");
+            if (sprite == null) return;
+            var rt = (RectTransform)retry.transform;
+            float h = rt.sizeDelta.y;
+            var label = retry.GetComponentInChildren<Text>();
+            float lw = label != null ? label.preferredWidth : 160f;
+            var badge = Place(rt, "LifeCost", new Vector2(lw * 0.5f + h * 0.40f, h * 0.06f), new Vector2(h * 0.58f, h * 0.58f));
+            var bi = badge.gameObject.AddComponent<Image>();
+            bi.sprite = sprite;
+            bi.preserveAspect = true;
+            bi.raycastTarget = false;
+        }
+
+        // 3-slice pill button from the lose-popup art: caps scale with the height, the middle stretches.
+        Button LoseButton(RectTransform parent, string art, Vector2 pos, float width, float height, string value, int fontSize, UnityEngine.Events.UnityAction action, bool adBadge)
+        {
+            var rt = Place(parent, "Button", pos, new Vector2(width, height));
+            var image = rt.gameObject.AddComponent<Image>();
+            var sprite = UiArt.Get(art);
+            if (sprite != null)
+            {
+                image.sprite = sprite;
+                image.type = Image.Type.Sliced;
+                image.pixelsPerUnitMultiplier = 128f / height;
+            }
+            else
+            {
+                image.sprite = SpriteKit.Round;
+                image.type = Image.Type.Sliced;
+                image.color = art.EndsWith("retry") ? Green : art.EndsWith("home") ? new Color(0.98f, 0.62f, 0.18f, 1f) : new Color(0.25f, 0.55f, 0.95f, 1f);
+            }
+            var button = rt.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            var colors = button.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = Color.white;
+            colors.pressedColor = new Color(0.90f, 0.90f, 0.90f, 1f);
+            colors.disabledColor = new Color(0.60f, 0.60f, 0.62f, 0.9f);
+            button.colors = colors;
+            var label = AddText(rt, value, fontSize, Color.white, TextAnchor.MiddleCenter);
+            label.font = ChunkyFont();
+            label.horizontalOverflow = HorizontalWrapMode.Wrap;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = Mathf.Max(24, fontSize * 2 / 3);
+            label.resizeTextMaxSize = fontSize;
+            // The face sits above the baked lip (bottom ~25% of the art).
+            label.rectTransform.offsetMin = new Vector2(adBadge ? height * 0.55f : 0f, height * 0.16f);
+            label.rectTransform.offsetMax = new Vector2(0f, -height * 0.04f);
+            Outlined(label, new Color(0.18f, 0.10f, 0.28f, 0.95f), Mathf.Max(2f, fontSize / 18f));
+            if (adBadge)
+            {
+                float lw = Mathf.Min(label.preferredWidth, width - height);
+                var badge = Place(rt, "AdBadge", new Vector2(height * 0.275f - lw * 0.5f - 52f, height * 0.06f), new Vector2(height * 0.48f, height * 0.48f));
+                var bi = badge.gameObject.AddComponent<Image>();
+                bi.sprite = UiArt.Get("lose_badge_ad");
+                bi.preserveAspect = true;
+                bi.raycastTarget = false;
+                if (bi.sprite == null) bi.enabled = false;
+            }
+            rt.gameObject.AddComponent<PressSquash>().Sink = height * 0.05f;
+            button.onClick.AddListener(delegate { AudioManager.Play(Sfx.Click); });
+            if (action != null) button.onClick.AddListener(action);
+            return button;
         }
 
         void OnRetry()

@@ -57,6 +57,14 @@ namespace CarMatch.Editor
                 float b = file == "btn_booster" ? 70f : file == "pill" ? 56f : file == "btn_navy" ? 60f : 96f;
                 importer.spriteBorder = new Vector4(b, b * 0.8f, b, b * 0.8f);
             }
+            // Lose popup (art/losepopup/nineslice.json). Vector4 is (left, bottom, right, top).
+            // Its buttons are 3-slice: caps only, no vertical border (the centre band is 0px tall).
+            if (path.StartsWith(Extra[0], System.StringComparison.Ordinal))
+            {
+                if (file == "lose_panel") importer.spriteBorder = new Vector4(84f, 96f, 84f, 84f);
+                else if (file.StartsWith("lose_btn_", System.StringComparison.Ordinal)) importer.spriteBorder = new Vector4(60f, 0f, 60f, 0f);
+                else if (file.StartsWith("lose_", System.StringComparison.Ordinal)) importer.spriteBorder = Vector4.zero;
+            }
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
@@ -87,7 +95,7 @@ namespace CarMatch.Editor
         }
 
         // Bump when the rules below change so Unity reimports every matching texture.
-        public override uint GetVersion() { return 2; }
+        public override uint GetVersion() { return 3; }
 
         const string UiPath = "Assets/_Project/Resources/UI/";
         const string FxPath = "Assets/_Project/Resources/FX/";
