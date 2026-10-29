@@ -50,6 +50,8 @@ namespace CarMatch
         // Runs drives and set-pops on their own object so a board redraw (ClearScreen) never stops them.
         sealed class FlyHost : MonoBehaviour { }
         bool _settled;
+        bool _winPaid;
+        bool _winCheer;
         bool _failPaid;
         bool _lastMatch;
         float _tick;
@@ -158,7 +160,8 @@ namespace CarMatch
                 ShowHome();
                 return;
             }
-            if (_coinText != null && _phase != Phase.Win) _coinText.text = Purse.Wallet.Coins.ToString();
+            // Win coins stay off the purse until the results screen starts the count-up.
+            if (_coinText != null && _phase != Phase.Win && !_winCheer) _coinText.text = Purse.Wallet.Coins.ToString();
             if (_livesText != null) _livesText.text = LivesLine();
             if (_phase == Phase.Fail && _retryButton != null)
                 _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
@@ -299,6 +302,8 @@ namespace CarMatch
             _eyes.Clear();
             _garageOpens.Clear();
             _settled = false;
+            _winPaid = false;
+            _winCheer = false;
             _failPaid = false;
             _lastMatch = false;
             _busy = false;
@@ -2246,28 +2251,276 @@ namespace CarMatch
                 && Economy.CanAfford(Purse.Wallet, cost);
         }
 
+        // Victory lap on the lot, then the results screen. Reward amounts are unchanged.
+        public const float LotCheerSeconds = 2f;
+        const int LotConfettiCount = 16;
+        const int LotStarCount = 8;
+        const int LapTrailCount = 18;
+
+        static readonly Color[] LotConfettiColors =
+        {
+            new Color(1f, 0.36f, 0.42f), new Color(1f, 0.82f, 0.25f), new Color(0.35f, 0.82f, 0.45f),
+            new Color(0.30f, 0.62f, 1f), new Color(0.75f, 0.45f, 1f), new Color(0.20f, 0.85f, 0.82f)
+        };
+
+        static readonly CarColor[] LapColors = { CarColor.Coral, CarColor.Teal, CarColor.Amber };
+
         void EnterWin()
         {
+            if (_winCheer || _phase == Phase.Win) return;
+            _winCheer = true;
+            _busy = true;
             if (!_settled)
             {
                 _settled = true;
-                Purse.Grant(Economy.WinPayFor(_level != null && _level.SuperHard));
+                // Next level unlocks now. The coin purse waits until the results count-up.
                 Purse.Advance(_index, _levels.Count);
             }
+            StartCoroutine(LotCheer());
+        }
+
+        // About two seconds on the lot: a lap around the ring, a glow, then one cheer into Perfect.
+        IEnumerator LotCheer()
+        {
+            const float LapSec = 1.55f;
+            const float BurstAt = 1.55f;
+            var screenRt = _screen as RectTransform;
+            var block = Place(_screen, "CheerBlock", Vector2.zero, new Vector2(4000f, 4000f));
+            var blockImage = block.gameObject.AddComponent<Image>();
+            blockImage.color = new Color(0f, 0f, 0f, 0.001f);
+            blockImage.raycastTarget = true;
+
+            var glow = new List<Image>(48);
+            var glowBase = new List<Color>(48);
+            for (int i = 0; i < _screen.childCount; i++)
+            {
+                var child = _screen.GetChild(i);
+                var n = child.name;
+                if (n != "LaneLine" && n != "Curb" && n != "CurbShade" && n != "StopBar" && n != "RingDash" && n != "RingEdge")
+                    continue;
+                var img = child.GetComponent<Image>();
+                if (img == null) continue;
+                glow.Add(img);
+                glowBase.Add(img.color);
+            }
+
+            var loop = RingLoop(22f);
+            float truckS = _metrics.Piece.x > 1f ? Mathf.Clamp(_metrics.Piece.x * 0.55f, 96f, 150f) : 120f;
+            var trucks = new RectTransform[LapColors.Length];
+            var truckImg = new Image[LapColors.Length];
+            for (int i = 0; i < LapColors.Length; i++)
+            {
+                Vector2 tangent;
+                var pos = LoopPoint(loop, i / (float)LapColors.Length, out tangent);
+                var rt = Place(_screen, "LapTruck", pos, new Vector2(truckS, truckS));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = LapSprite(LapColors[i], tangent);
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                trucks[i] = rt;
+                truckImg[i] = img;
+            }
+
+            var spark = UiArt.Get("sparkle") ?? UiArt.Get("glow") ?? SpriteKit.Round;
+            var trail = new RectTransform[LapTrailCount];
+            var trailImg = new Image[LapTrailCount];
+            var trailAge = new float[LapTrailCount];
+            for (int i = 0; i < LapTrailCount; i++)
+            {
+                var rt = Place(_screen, "LapSpark", Vector2.zero, new Vector2(28f, 28f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = spark;
+                img.color = new Color(1f, 0.9f, 0.45f, 0f);
+                img.raycastTarget = false;
+                trail[i] = rt;
+                trailImg[i] = img;
+                trailAge[i] = 9f;
+            }
+            for (int i = 0; i < trucks.Length; i++) trucks[i].SetAsLastSibling();
+
+            float lotY = _metrics.CellH > 1f ? _metrics.BaseY + _metrics.CellH * 0.35f : 40f;
+            var origin = new Vector2(0f, lotY);
+            var bits = new RectTransform[LotConfettiCount];
+            var bitImg = new Image[LotConfettiCount];
+            var vel = new Vector2[LotConfettiCount];
+            var spin = new float[LotConfettiCount];
+            var confetti = UiArt.Get("confetti");
+            for (int i = 0; i < bits.Length; i++)
+            {
+                var rt = Place(_screen, "LotConfetti", origin, new Vector2(18f, 32f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = confetti != null ? confetti : SpriteKit.Round;
+                var col = LotConfettiColors[i % LotConfettiColors.Length];
+                col.a = 0f;
+                img.color = col;
+                img.preserveAspect = false;
+                img.raycastTarget = false;
+                float ang = (i / (float)bits.Length) * Mathf.PI * 2f + 0.4f;
+                float speed = 520f + (i % 5) * 90f;
+                vel[i] = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * speed;
+                vel[i].y += 280f;
+                spin[i] = (i % 2 == 0 ? 1f : -1f) * (280f + (i % 4) * 40f);
+                bits[i] = rt;
+                bitImg[i] = img;
+            }
+            var stars = new RectTransform[LotStarCount];
+            var starImg = new Image[LotStarCount];
+            for (int i = 0; i < LotStarCount; i++)
+            {
+                var rt = Place(_screen, "LotStar", origin, new Vector2(42f, 42f));
+                var img = rt.gameObject.AddComponent<Image>();
+                img.sprite = UiArt.Get("shine") ?? spark;
+                img.color = new Color(1f, 0.95f, 0.7f, 0f);
+                img.raycastTarget = false;
+                stars[i] = rt;
+                starImg[i] = img;
+            }
+            var flash = Place(_screen, "LapFlash", origin, new Vector2(80f, 80f));
+            var flashImg = flash.gameObject.AddComponent<Image>();
+            var glowArt = UiArt.Get("glow") ?? SpriteKit.Round;
+            flashImg.sprite = glowArt;
+            flashImg.color = new Color(1f, 0.9f, 0.45f, 0f);
+            flashImg.raycastTarget = false;
+            block.SetAsLastSibling();
+
+            int trailN = 0;
+            float trailClock = 0f;
+            bool cheered = false;
+            bool punched = false;
+            var trayHome = _tray != null ? _tray.anchoredPosition : Vector2.zero;
+            var gold = new Color(1f, 0.86f, 0.32f, 1f);
+            float t = 0f;
+            while (t < LotCheerSeconds)
+            {
+                float dt = Time.unscaledDeltaTime;
+                if (dt > 0.05f) dt = 0.05f;
+                t += dt;
+                float pulse = 0.5f + 0.5f * Mathf.Sin(t * Mathf.PI * 3.2f);
+                for (int i = 0; i < glow.Count; i++)
+                {
+                    if (glow[i] == null) continue;
+                    glow[i].color = Color.Lerp(glowBase[i], gold, pulse * 0.72f);
+                }
+                float lapU = t < LapSec ? t / LapSec : 1f;
+                lapU = lapU * lapU * (3f - 2f * lapU);
+                for (int i = 0; i < trucks.Length; i++)
+                {
+                    if (trucks[i] == null) continue;
+                    Vector2 tangent;
+                    trucks[i].anchoredPosition = LoopPoint(loop, lapU + i / (float)trucks.Length, out tangent);
+                    truckImg[i].sprite = LapSprite(LapColors[i], tangent);
+                }
+                trailClock += dt;
+                if (trailClock >= 0.05f && t < LapSec + 0.05f)
+                {
+                    trailClock = 0f;
+                    for (int i = 0; i < trucks.Length; i++)
+                    {
+                        int k = trailN % LapTrailCount;
+                        trailN++;
+                        trail[k].anchoredPosition = trucks[i].anchoredPosition;
+                        trail[k].localScale = Vector3.one;
+                        trailAge[k] = 0f;
+                        trailImg[k].color = new Color(1f, 0.92f, 0.55f, 0.9f);
+                    }
+                }
+                for (int i = 0; i < LapTrailCount; i++)
+                {
+                    if (trailAge[i] > 0.4f) continue;
+                    trailAge[i] += dt;
+                    float a = 1f - Mathf.Clamp01(trailAge[i] / 0.38f);
+                    trailImg[i].color = new Color(1f, 0.92f, 0.55f, a * 0.9f);
+                    float s = Mathf.Lerp(0.7f, 1.35f, Mathf.Clamp01(trailAge[i] / 0.38f));
+                    trail[i].localScale = new Vector3(s, s, 1f);
+                }
+                if (t >= BurstAt)
+                {
+                    if (!punched)
+                    {
+                        punched = true;
+                        if (_shake != null) _shake.Punch(0.28f, 11f, 3.5f);
+                    }
+                    if (!cheered)
+                    {
+                        cheered = true;
+                        AudioManager.Play(Sfx.Win);
+                    }
+                    float bt = t - BurstAt;
+                    float pop = Mathf.Sin(Mathf.Clamp01(bt / 0.42f) * Mathf.PI);
+                    if (screenRt != null) screenRt.localScale = Vector3.one * (1f + 0.05f * pop);
+                    flash.localScale = Vector3.one * Mathf.Lerp(0.4f, 8f, Mathf.Clamp01(bt / 0.4f));
+                    flashImg.color = new Color(1f, 0.92f, 0.5f, (1f - Mathf.Clamp01(bt / 0.4f)) * 0.85f);
+                    for (int i = 0; i < bits.Length; i++)
+                    {
+                        vel[i].y -= 980f * dt;
+                        bits[i].anchoredPosition += vel[i] * dt;
+                        bits[i].localRotation = Quaternion.Euler(0f, 0f, spin[i] * bt);
+                        var c = LotConfettiColors[i % LotConfettiColors.Length];
+                        c.a = 1f - Mathf.Clamp01((bt - 0.2f) / 0.25f);
+                        bitImg[i].color = c;
+                    }
+                    for (int i = 0; i < stars.Length; i++)
+                    {
+                        float ang = i / (float)stars.Length * Mathf.PI * 2f;
+                        float rad = Mathf.Lerp(20f, 210f, Mathf.Clamp01(bt / 0.38f));
+                        stars[i].anchoredPosition = origin + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * rad;
+                        float s = Mathf.Lerp(0.3f, 1.4f, Mathf.Clamp01(bt / 0.2f));
+                        stars[i].localScale = new Vector3(s, s, 1f);
+                        starImg[i].color = new Color(1f, 0.95f, 0.72f, 1f - Mathf.Clamp01(bt / 0.42f));
+                    }
+                    if (_tray != null)
+                    {
+                        float hop = Mathf.Abs(Mathf.Sin(bt * Mathf.PI * 3f)) * 16f * (1f - Mathf.Clamp01(bt / 0.45f));
+                        _tray.anchoredPosition = trayHome + new Vector2(0f, hop);
+                    }
+                }
+                yield return null;
+            }
+            if (screenRt != null)
+            {
+                screenRt.localScale = Vector3.one;
+                screenRt.anchoredPosition = Vector2.zero;
+                screenRt.localRotation = Quaternion.identity;
+            }
+            if (_tray != null) _tray.anchoredPosition = trayHome;
             ShowWin();
+        }
+
+        static Vector2 LoopPoint(List<Vector2> pts, float u, out Vector2 tangent)
+        {
+            tangent = Vector2.up;
+            if (pts == null || pts.Count == 0) return Vector2.zero;
+            float wrapped = u - Mathf.Floor(u);
+            float f = wrapped * pts.Count;
+            int i = Mathf.FloorToInt(f) % pts.Count;
+            int j = (i + 1) % pts.Count;
+            float k = f - Mathf.Floor(f);
+            tangent = pts[j] - pts[i];
+            if (tangent.sqrMagnitude < 0.01f) tangent = Vector2.right;
+            return Vector2.Lerp(pts[i], pts[j], k);
+        }
+
+        static Sprite LapSprite(CarColor color, Vector2 tangent)
+        {
+            int index = Mathf.RoundToInt(CarFrames.HeadingAngle(tangent) / 22.5f) % 16;
+            var sprite = CarFrames.Heading(color, index);
+            return sprite != null ? sprite : CarArt.For(color, true);
         }
 
         void ShowWin()
         {
             _phase = Phase.Win;
+            _winCheer = false;
             _busy = false;
             ClearScreen();
             Backdrop();
             int pay = Economy.WinPayFor(_level != null && _level.SuperHard);
+            int coinsBefore = Purse.Wallet.Coins;
             WinShow.Build(this, _screen, new WinShow.Setup
             {
                 Pay = pay,
-                CoinsBefore = Purse.Wallet.Coins - pay,
+                CoinsBefore = coinsBefore,
+                OnAward = delegate { GrantWin(pay); },
                 More = _index < _levels.Count - 1,
                 Mascot = PaintedMascot(MascotArt.Cheer ?? MascotArt.Happy),
                 Font = ChunkyFont(),
@@ -2278,6 +2531,14 @@ namespace CarMatch
                 Shake = _shake,
                 HeroColor = _lastClearColor
             });
+        }
+
+        // Once, when the results count-up starts. Not during the on-lot celebration.
+        void GrantWin(int pay)
+        {
+            if (_winPaid || pay <= 0) return;
+            _winPaid = true;
+            Purse.Grant(pay);
         }
 
         static Sprite PaintedMascot(Sprite painted)
@@ -2578,6 +2839,8 @@ namespace CarMatch
             _board = _seed.Clone();
             _history.Clear();
             _settled = false;
+            _winPaid = false;
+            _winCheer = false;
             _failPaid = false;
             _lastMatch = false;
             KillFlights();

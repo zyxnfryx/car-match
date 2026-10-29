@@ -15,6 +15,8 @@ namespace CarMatch
         {
             public int Pay;
             public int CoinsBefore;
+            // Called once when the coin count-up starts, after the results screen is up.
+            public Action OnAward;
             public bool More;
             public Sprite Mascot;
             public Font Font;
@@ -221,13 +223,8 @@ namespace CarMatch
             RectTransform mascot, RectTransform ribbon, RectTransform title, RectTransform piggy, Text plus, Text coinText,
             Button next, Button home)
         {
-            // Every win opens with the LOT LOOP car finale (tap anywhere to skip), then the fanfare and coins.
-            rays.gameObject.SetActive(false);
-            glow.gameObject.SetActive(false);
-            yield return CarFinale(screen);
-            rays.gameObject.SetActive(true);
-            glow.gameObject.SetActive(true);
-            AudioManager.Play(Sfx.Win);
+            // The lot already played the victory lap and the one fanfare. Open on PERFECT, then the coins.
+            // Fanfare is not replayed, and mascot_cheer (two beeps) stays silent.
 #if !UNITY_WEBGL
             Haptics.Success();
 #endif
@@ -237,7 +234,6 @@ namespace CarMatch
             host.StartCoroutine(Pop(ribbon, 0.0f, 0.38f));
             host.StartCoroutine(Pop(title, 0.12f, 0.42f));
             yield return Pop(mascot, 0.18f, 0.40f);
-            AudioManager.Play(Sfx.MascotCheer);
             var heroAnim = mascot.GetComponent<FrameAnim>();
             var cheer = heroAnim != null ? Frames("win_truck_cheer") : null;
             if (cheer != null)
@@ -262,6 +258,8 @@ namespace CarMatch
                 ? piggy.anchoredPosition + new Vector2(0f, SlotFromFloor * piggy.sizeDelta.y)
                 : piggy.anchoredPosition + new Vector2(0f, 120f);
             if (s.Shake != null) s.Shake.Punch(0.3f, 10f, 0.8f);
+            // Results are on screen. Award the win purse now, as the coins start to fly.
+            if (s.OnAward != null) s.OnAward();
             // Coins pop out of the mascot, arc, and fly into the piggy's slot.
             int n = Mathf.Clamp(s.Pay, 1, CoinFlyMax);
             int shown = 0;
@@ -406,10 +404,9 @@ namespace CarMatch
                 var sprite = CarFrames.Heading((CarColor)(i % 8), 0);
                 if (sprite != null) img.sprite = sprite;
             }
-            // 2) Honk in unison and bounce (~0.6 s).
+            // 2) Bounce in unison (~0.6 s). The win fanfare already played on the lot.
             if (!_skip)
             {
-                AudioManager.Play(Sfx.Blocked, 0.9f);
 #if !UNITY_WEBGL
                 Haptics.Thud();
 #endif
@@ -552,7 +549,6 @@ namespace CarMatch
             {
                 var center = new Vector2(UnityEngine.Random.Range(-halfW, halfW), UnityEngine.Random.Range(380f, 820f));
                 var col = cols[b % cols.Length];
-                AudioManager.Play(Sfx.SlotArrive, 0.6f);
                 for (int i = 0; i < 18; i++)
                 {
                     var spark = Img(screen, "Firework", UiArt.Get("glow") ?? SpriteKit.Round, center, new Vector2(30f, 30f), col);

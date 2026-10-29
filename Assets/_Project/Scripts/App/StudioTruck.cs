@@ -219,7 +219,8 @@ namespace CarMatch
             if (!_beeped && _t >= BeepAt)
             {
                 _beeped = true;
-                if (_audio.clip != null && !AudioManager.Muted) _audio.Play();
+                // Two-tap beep is the studio-card button only. Level complete does not play it.
+                if (StudioCard.Active && _audio.clip != null && !AudioManager.Muted) _audio.Play();
             }
         }
 
