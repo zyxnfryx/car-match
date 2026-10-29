@@ -202,6 +202,8 @@ namespace CarMatch
                 _img.enabled = !DrivewayLift.Dropping(DrivewayLift.Along(StartAt, Time.unscaledTime));
             }
         }
+
+        sealed class DeckMotion : MonoBehaviour
         {
             float _start, _travel;
             Vector2 _home;

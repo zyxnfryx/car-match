@@ -164,17 +164,76 @@ namespace CarMatch
             for (int i = 0; i < 7; i++)
                 BoardRules.Play(board, history, new Tap(TapKind.Lane, i, 0));
             Expect(board.Failed && history.Count == 7, "the lot failed with history intact");
-            Board restored;
-            Expect(BoosterKit.SuperUndo(history, out restored), "continue uses super undo");
-            Expect(!restored.Failed && restored.Bar.Count == 4, "three cars left the bar and the lot can continue");
-            var trips = ContinuePark.Returning(board, restored);
-            Expect(trips.Count == 3, "the three cars drive back to their stalls");
-            Expect(trips[0].Color == CarColor.Lime && trips[0].Lane == 4 && trips[0].Cell == 0, "first return is the lime");
-            Expect(trips[1].Color == CarColor.Lime && trips[1].Lane == 5, "second return is the other lime");
-            Expect(trips[2].Color == CarColor.Violet && trips[2].Lane == 6 && trips[2].Cell == 0, "violet goes back to its stall");
-            Expect(ContinueOffer.Face(false, true) == ContinueFace.Ad, "a loaded ad shows the play badge");
-            Expect(ContinueOffer.Face(true, false) == ContinueFace.Crown, "VIP skips the ad");
-            Expect(ContinueOffer.Face(false, false) == ContinueFace.Unavailable && !ContinueOffer.CanPress(ContinueFace.Unavailable), "no fill greys the button");
+            var only = new List<Tap>();
+            ExitPath.Collect(board, only);
+            Expect(only.Count == 1 && only[0].Kind == TapKind.Parked && only[0].Cell < 0, "on a full bar the only move is park");
+            string lot = BoardQuery.Key(board);
+            Expect(ParkStrip.TakeCount(board) == 3, "a full bar can park three");
+            var move = BoardRules.Play(board, history, ParkStrip.ContinueTap);
+            Expect(move.Accepted && !board.Failed, "continue parks instead of rewinding");
+            Expect(board.Bar.Count == 4 && board.Parked.Count == 3 && board.StripOpen, "three cars sit in the strip");
+            Expect(board.Parked[0] == CarColor.Lime && board.Parked[1] == CarColor.Lime && board.Parked[2] == CarColor.Violet, "the right-hand three leave the bar");
+            Expect(board.Lanes[6].Cells[0].Empty, "they do not go back to their old stalls");
+            Expect(history[history.Count - 1].Failed && history[history.Count - 1].Parked.Count == 0, "undo still remembers the full bar");
+            var back = BoardRules.Play(board, history, new Tap(TapKind.Parked, 0, 2));
+            Expect(back.Accepted && board.Parked.Count == 2, "a tap sends one car back");
+            Expect(MatchClear.Count(board.Bar, CarColor.Violet) == 1, "it re-enters the bar");
+            // Two of a color already in the bar do not pull the third out of the strip.
+            var sit = Tiny("[[\"teal\"]]");
+            sit.Bar.Add(CarColor.Coral);
+            sit.Bar.Add(CarColor.Coral);
+            sit.Parked.Add(CarColor.Coral);
+            sit.StripOpen = true;
+            Expect(sit.Bar.Count == 2 && sit.Parked.Count == 1, "a parked car stays put until it is tapped");
+            var sitting = new List<Tap>();
+            ExitPath.Collect(sit, sitting);
+            bool canReturn = false;
+            for (int i = 0; i < sitting.Count; i++)
+                if (sitting[i].Kind == TapKind.Parked && sitting[i].Cell == 0) canReturn = true;
+            Expect(canReturn, "the parked coral can be tapped back");
+            // Fill the strip, then a second full bar cannot park.
+            board.Parked.Clear();
+            board.Parked.Add(CarColor.Coral);
+            board.Parked.Add(CarColor.Amber);
+            board.Parked.Add(CarColor.Teal);
+            board.Failed = true;
+            Expect(!ParkStrip.CanReceive(board) && !ExitPath.IsLegal(board, ParkStrip.ContinueTap), "a full strip refuses another continue");
+            Expect(ContinueOffer.Face(true, true, false) == ContinueFace.Unavailable, "VIP still cannot park into a full strip");
+            Expect(ContinueOffer.Face(false, true, true) == ContinueFace.Ad, "a loaded ad shows the play badge");
+            Expect(ContinueOffer.Face(true, false, true) == ContinueFace.Crown, "VIP skips the ad");
+            Expect(ContinueOffer.Face(false, false, true) == ContinueFace.Unavailable && !ContinueOffer.CanPress(ContinueFace.Unavailable), "no fill greys the button");
+            // A parked car that completes a set clears, same as any arrival.
+            var match = Tiny("[[\"coral\"]]");
+            match.Bar.Add(CarColor.Coral);
+            match.Bar.Add(CarColor.Coral);
+            match.Parked.Add(CarColor.Coral);
+            match.StripOpen = true;
+            var cleared = BoardRules.Play(match, null, new Tap(TapKind.Parked, 0, 0));
+            Expect(cleared.Accepted && cleared.Matched && match.Parked.Count == 0 && match.Bar.Count == 0, "tapping the third coral clears the set");
+            Expect(lot.Length > 0, "the failed lot was recorded");
+            // One spot left: only that car leaves, and the bar is playable again.
+            var tight = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            var tightHist = new List<Board>();
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(tight, tightHist, new Tap(TapKind.Lane, i, 0));
+            tight.Parked.Add(CarColor.Amber);
+            tight.Parked.Add(CarColor.Lime);
+            tight.StripOpen = true;
+            Expect(tight.Failed && ParkStrip.Room(tight) == 1 && ParkStrip.TakeCount(tight) == 1, "a second continue parks only the open spot");
+            var parkedOne = BoardRules.Play(tight, tightHist, ParkStrip.ContinueTap);
+            Expect(parkedOne.Accepted && !tight.Failed && tight.Bar.Count == 6 && tight.Parked.Count == 3, "one car un-fails the bar");
+            Expect(tight.StripOpen, "the strip stays up after it is emptied of room");
+        }
+
+        public static void SolverSkipsTheParkingStrip()
+        {
+            var board = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(board, null, new Tap(TapKind.Lane, i, 0));
+            Expect(board.Failed, "the search starts from a full bar");
+            var report = LotSolve.Search(board, 5000);
+            Expect(report.Outlook == LotSolve.Outlook.Stuck, "parking is not a way through a failed lot");
+            Expect(report.Nodes < 20, "the search does not walk cars back out of the strip");
         }
 
         public static void ShuffleKeepsColorCounts()
@@ -741,6 +800,7 @@ namespace CarMatch
             UndoRestoresThePreviousBoard();
             SuperUndoReturnsThreeCars();
             ContinueUndoesAFullBar();
+            SolverSkipsTheParkingStrip();
             ShuffleKeepsColorCounts();
             ShuffleRefusesWhenNothingCanChange();
             RapidMultiTap();
@@ -1104,6 +1164,12 @@ namespace CarMatch
             Expect(cue.Lesson == CoachLesson.Super && cue.Booster == "Super", "super appears on level 9 after earlier lessons");
             cue = LotCoach.Cue(store, new CoachWorld { Level = LotCoach.SuperLevel, Board = plain, CanSuper = true });
             Expect(cue.Lesson == CoachLesson.Super, "super stays the lesson");
+            Expect(LotCoach.Key(CoachLesson.ParkStrip) == "lotloop.coach.parkstrip", "park 3 cars has its own one-time flag");
+            var failed = Tiny("[[\"coral\"],[\"teal\"],[\"amber\"],[\"lime\"],[\"violet\"],[\"coral\"],[\"teal\",\"amber\"]]");
+            for (int i = 0; i < 7; i++)
+                BoardRules.Play(failed, null, new Tap(TapKind.Lane, i, 0));
+            cue = LotCoach.Cue(store, new CoachWorld { Level = 12, Board = failed, Moves = 7 });
+            Expect(cue.Lesson != CoachLesson.ParkStrip, "the park glove is on the fail button, not the lot");
         }
 
         public static void EarlyLevelsStayOnTheFrontRow(string json)

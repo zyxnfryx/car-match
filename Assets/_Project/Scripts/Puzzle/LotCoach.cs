@@ -13,7 +13,8 @@ namespace CarMatch
         Shuffle = 6,
         Magnet = 7,
         Super = 8,
-        Underground = 9
+        Underground = 9,
+        ParkStrip = 10
     }
 
     public struct CoachWorld
@@ -65,6 +66,7 @@ namespace CarMatch
                 case CoachLesson.Magnet: return "lotloop.coach.magnet";
                 case CoachLesson.Super: return "lotloop.coach.super";
                 case CoachLesson.Underground: return "lotloop.coach.underground";
+                case CoachLesson.ParkStrip: return "lotloop.coach.parkstrip";
                 default: return "";
             }
         }

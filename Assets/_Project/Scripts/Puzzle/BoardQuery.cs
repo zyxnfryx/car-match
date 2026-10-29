@@ -179,6 +179,9 @@ namespace CarMatch
             bar.Sort();
             for (int i = 0; i < bar.Count; i++)
                 sb.Append((int)bar[i]);
+            sb.Append('P');
+            for (int i = 0; i < board.Parked.Count; i++)
+                sb.Append((int)board.Parked[i]);
             if (board.Won) sb.Append('W');
             if (board.Failed) sb.Append('F');
             return sb.ToString();

@@ -50,6 +50,9 @@ namespace CarMatch
                 var ordered = Order(frame.Board, taps);
                 for (int i = ordered.Count - 1; i >= 0; i--)
                 {
+                    // Park 3 Cars is a fail-screen continue. Searching it blows the node cap
+                    // and a winning line never needs to overflow the bar.
+                    if (ordered[i].Kind == TapKind.Parked && ordered[i].Cell < 0) continue;
                     var next = frame.Board.Clone();
                     var move = BoardRules.TryTap(next, ordered[i]);
                     if (!move.Accepted || next.Failed) continue;

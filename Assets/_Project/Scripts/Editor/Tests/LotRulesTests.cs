@@ -78,6 +78,12 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Boosters_SolverSkipsTheParkingStrip()
+        {
+            RuleChecks.SolverSkipsTheParkingStrip();
+        }
+
+        [Test]
         public void Boosters_ShuffleKeepsColorCounts()
         {
             RuleChecks.ShuffleKeepsColorCounts();

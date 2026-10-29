@@ -5,7 +5,8 @@ namespace CarMatch
     public enum TapKind : byte
     {
         Lane = 0,
-        Side = 1
+        Side = 1,
+        Parked = 2
     }
 
     public readonly struct Tap
@@ -131,7 +132,10 @@ namespace CarMatch
 
         public static bool IsLegal(Board board, Tap tap)
         {
-            if (board == null || board.Won || board.Failed) return false;
+            if (board == null || board.Won) return false;
+            if (tap.Kind == TapKind.Parked)
+                return ParkStrip.Legal(board, tap);
+            if (board.Failed) return false;
             if (tap.Kind == TapKind.Lane)
                 return CanReachBar(board, tap.Index, tap.Cell);
             if ((uint)tap.Index >= (uint)board.Sides.Count) return false;
@@ -141,7 +145,12 @@ namespace CarMatch
         public static void Collect(Board board, List<Tap> into)
         {
             into.Clear();
-            if (board == null || board.Won || board.Failed) return;
+            if (board == null || board.Won) return;
+            if (board.Failed)
+            {
+                if (ParkStrip.CanReceive(board)) into.Add(ParkStrip.ContinueTap);
+                return;
+            }
             for (int lane = 0; lane < board.Lanes.Count; lane++)
             {
                 var cells = board.Lanes[lane].Cells;
@@ -154,10 +163,20 @@ namespace CarMatch
             for (int s = 0; s < board.Sides.Count; s++)
                 if (SideLotGate.IsOpen(board, s))
                     into.Add(new Tap(TapKind.Side, s, board.Sides[s].Cell));
+            for (int i = 0; i < board.Parked.Count; i++)
+            {
+                var back = new Tap(TapKind.Parked, 0, i);
+                if (ParkStrip.Legal(board, back)) into.Add(back);
+            }
         }
 
         public static CarColor ColorOf(Board board, Tap tap)
         {
+            if (tap.Kind == TapKind.Parked)
+            {
+                if (tap.Cell < 0 || board.Parked == null || tap.Cell >= board.Parked.Count) return CarColor.Coral;
+                return board.Parked[tap.Cell];
+            }
             if (tap.Kind == TapKind.Lane)
             {
                 var slot = board.Lanes[tap.Index].Cells[tap.Cell];
