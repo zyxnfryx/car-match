@@ -2423,12 +2423,7 @@ namespace CarMatch
                 Outlined(tt, ink, 5f);
             }
 
-            var hero = Place(card, "FailHero", new Vector2(56f, 260f), new Vector2(590f, 432f));
-            var heroImage = hero.gameObject.AddComponent<Image>();
-            heroImage.sprite = UiArt.Get("lose_hero");
-            heroImage.preserveAspect = true;
-            heroImage.raycastTarget = false;
-            if (heroImage.sprite == null) heroImage.enabled = false;
+            LoseHero(card);
 
             var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -80f), 780f, 150f, "Park 3 Cars", 64, OnContinue, false);
             cont.interactable = !_busy;
@@ -2436,6 +2431,37 @@ namespace CarMatch
             RetryLifeBadge(_retryButton);
             _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
             LoseButton(card, "lose_btn_home", new Vector2(0f, -410f), 480f, 124f, "Home", 54, OnHome, false);
+        }
+
+        // Locked hero_truck_v19 stills. Each layer is the full 560×378 canvas, baked
+        // at the origin, so they share one rect. No Z rotation: a spin tumbles the
+        // ellipse. Wheel spin and putter bounce stay out until Brandon asks.
+        void LoseHero(RectTransform card)
+        {
+            // Same slot height as the previous crop (432). 432 * 560/378 = 640, so the
+            // canvas is not letterboxed. v19 is centered, so the rect sits on the card
+            // (the old +56 offset only recentered a left-heavy crop).
+            const float height = 432f;
+            const float width = 640f;
+            var hero = Place(card, "FailHero", new Vector2(0f, 260f), new Vector2(width, height));
+            string[] layers =
+            {
+                "shadow",
+                "tire_far_front",
+                "tire_near_rear",
+                "tire_near_front",
+                "body",
+            };
+            for (int i = 0; i < layers.Length; i++)
+            {
+                var sprite = UiArt.Get("lose_hero_v19/" + layers[i]);
+                if (sprite == null) continue;
+                var layer = Place(hero, layers[i], Vector2.zero, new Vector2(width, height));
+                layer.localRotation = Quaternion.identity;
+                var img = layer.gameObject.AddComponent<Image>();
+                img.sprite = sprite;
+                img.raycastTarget = false;
+            }
         }
 
         // Small "-1" heart beside the Retry label: Retry costs a life.
