@@ -23,7 +23,7 @@ Because the SFX are now equal loudness, the volumes below are mix intent, not co
 | level_fail | Level failed (gentle) | 0.7 |
 | coin_gain_00..02 | Coin awarded | 0.6 |
 | music_home_loop | Home / map screen (100 BPM, 16 bars, 38.4 s) | 0.4 |
-| music_gameplay_loop | In-level (112 BPM, 28 bars, 60 s: A A B B A A + turnaround) | 0.4 |
+| music_gameplay_loop | In-level (112 BPM, 28 bars, 60 s: A A B B A A + turnaround) | 0.32 |
 | music_bed_loop | Legacy v1 bed (kept) | 0.4 |
 
 Tips
