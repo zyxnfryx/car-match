@@ -17,5 +17,11 @@ namespace CarMatch
             yield return new WaitForSecondsRealtime(0.45f);
             if (onDone != null) onDone(WillGrant);
         }
+
+        public IEnumerator ShowInterstitial(string placement, Action<bool> onDone)
+        {
+            if (onDone != null) onDone(false);
+            yield break;
+        }
     }
 }

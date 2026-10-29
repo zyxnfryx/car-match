@@ -185,6 +185,13 @@ namespace CarMatch
                 sp.gameObject.AddComponent<FrameAnim>().HideWhenDone = true;
             }
             else piggy = Img(screen, "Piggy", UiArt.Get("piggy"), new Vector2(0f, -190f), new Vector2(360f, 360f), Color.white);
+            var pigImage = piggy.GetComponent<Image>();
+            if (pigImage != null) pigImage.raycastTarget = true;
+            var pigButton = piggy.gameObject.AddComponent<Button>();
+            pigButton.targetGraphic = pigImage;
+            pigButton.transition = Selectable.Transition.None;
+            var pet = piggy.gameObject.AddComponent<PiggyPet>();
+            pigButton.onClick.AddListener(pet.Tap);
             // Reward plate: coin icon + big counting '+N'.
             var plate = Img(screen, "Plate", UiArt.Get("pill"), new Vector2(0f, -420f), new Vector2(420f, 136f), Color.white);
             plate.GetComponent<Image>().preserveAspect = false;
@@ -230,7 +237,6 @@ namespace CarMatch
 #endif
             host.StartCoroutine(Spin(rays, glow));
             host.StartCoroutine(Confetti(screen));
-            host.StartCoroutine(Fireworks(screen));
             host.StartCoroutine(Pop(ribbon, 0.0f, 0.38f));
             host.StartCoroutine(Pop(title, 0.12f, 0.42f));
             yield return Pop(mascot, 0.18f, 0.40f);
@@ -618,6 +624,66 @@ namespace CarMatch
                 yield return null;
             }
             if (rt != null) rt.localScale = Vector3.one;
+        }
+    }
+
+    // A tap on the results piggy. Squash and a sound only. It does not pay coins or cover Next.
+    public sealed class PiggyPet : MonoBehaviour
+    {
+        float _next;
+
+        public void Tap()
+        {
+            if (Time.unscaledTime < _next) return;
+            _next = Time.unscaledTime + 0.6f;
+            AudioManager.Play(Sfx.Oink);
+            AudioManager.Play(Sfx.Coin, 0.28f);
+            StopAllCoroutines();
+            StartCoroutine(Squash());
+        }
+
+        IEnumerator Squash()
+        {
+            var rt = (RectTransform)transform;
+            float t = 0f;
+            var spark = new RectTransform[5];
+            for (int i = 0; i < spark.Length; i++)
+            {
+                var go = new GameObject("OinkSpark", typeof(RectTransform));
+                go.transform.SetParent(transform, false);
+                var s = go.GetComponent<RectTransform>();
+                s.sizeDelta = new Vector2(28f, 28f);
+                s.anchoredPosition = Vector2.zero;
+                var img = go.AddComponent<Image>();
+                img.sprite = UiArt.Get("sparkle") ?? SpriteKit.Round;
+                img.color = new Color(1f, 0.9f, 0.4f, 1f);
+                img.raycastTarget = false;
+                spark[i] = s;
+            }
+            while (t < 0.36f && rt != null)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / 0.36f);
+                float w = Mathf.Sin(u * Mathf.PI);
+                rt.localScale = new Vector3(1f + 0.2f * w, 1f - 0.16f * w, 1f);
+                for (int i = 0; i < spark.Length; i++)
+                {
+                    if (spark[i] == null) continue;
+                    float a = i / (float)spark.Length * Mathf.PI * 2f;
+                    spark[i].anchoredPosition = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * (40f + 70f * u);
+                    var img = spark[i].GetComponent<Image>();
+                    if (img != null)
+                    {
+                        var c = img.color;
+                        c.a = 1f - u;
+                        img.color = c;
+                    }
+                }
+                yield return null;
+            }
+            if (rt != null) rt.localScale = Vector3.one;
+            for (int i = 0; i < spark.Length; i++)
+                if (spark[i] != null) Destroy(spark[i].gameObject);
         }
     }
 }

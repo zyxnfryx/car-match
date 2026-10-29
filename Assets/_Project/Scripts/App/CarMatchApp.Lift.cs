@@ -51,6 +51,8 @@ namespace CarMatch
             {
                 var g = _board.Garages[i];
                 if (g.Opens <= before[i]) continue;
+                if (_cue.Lesson == CoachLesson.Underground)
+                    LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Underground);
                 _garageOpens[i] = g.Opens;
                 var riders = new List<Car>();
                 for (int c = 0; c < g.Cells.Count; c++)
@@ -284,8 +286,13 @@ namespace CarMatch
             });
             if (_cue.Lesson == CoachLesson.None) return;
             Vector2 at;
-            if (_cue.IsBooster) return;
-            if (_cue.Lesson == CoachLesson.Underground && _board.Garages.Count > 0)
+            if (_cue.IsBooster)
+            {
+                var named = _screen.Find("Booster" + _cue.Booster) as RectTransform;
+                if (named == null) return;
+                at = named.anchoredPosition;
+            }
+            else if (_cue.Lesson == CoachLesson.Underground && _board.Garages.Count > 0)
             {
                 var g = _board.Garages[0];
                 at = LaneAnchor(g.Lane, g.Cells.Count > 0 ? g.Cells[0] : 0);

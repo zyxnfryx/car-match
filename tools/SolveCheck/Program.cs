@@ -38,6 +38,8 @@ namespace CarMatch
                 }
                 return 0;
             }
+            if (args.Length == 2 && args[0] == "--raise")
+                return CurveRaise.Run(args[1]);
             // --rate <levels.json>: share of 400 random-legal-tap playthroughs that win (difficulty proxy).
             if (args.Length == 2 && args[0] == "--rate")
             {

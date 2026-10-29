@@ -88,6 +88,11 @@ namespace CarMatch
         int _hideParkedCount;
         bool _stripScaleIn;
         bool _holdBusy;
+        float _lastRewarded = -1f;
+        const string InterstitialWinsKey = "lotloop.interstitial.wins";
+        const string PlaneDayKey = "lotloop.usa.plane.day";
+        readonly HashSet<string> _bagCover = new HashSet<string>();
+        readonly HashSet<string> _revealLock = new HashSet<string>();
         RectTransform _badgeLayer;
         // Parked-bar trucks fill their well snugly (longer-bed art sits ~8% smaller in its canvas).
         const float BarCarScale = 1.12f;
@@ -313,6 +318,8 @@ namespace CarMatch
             _seed = _board.Clone();
             _history.Clear();
             _eyes.Clear();
+            _bagCover.Clear();
+            _revealLock.Clear();
             _garageOpens.Clear();
             _settled = false;
             _winPaid = false;
@@ -659,41 +666,66 @@ namespace CarMatch
             DrawBackWalls(lanes);
         }
 
-        // Hard wall at the back of every lane. Stalls that end on the same row share one curb
-        // so the closed end reads as a single toy barrier, not a gap a car could back through.
+        // One gate per lane, including a shorter lane's lower gate. It lifts only when a car
+        // leaves through that lane's mouth, then drops. The gate is the closed end, not an exit.
         void DrawBackWalls(int lanes)
         {
-            int i = 0;
-            while (i < lanes)
+            float pitch = _metrics.CellW + _metrics.Gap;
+            for (int i = 0; i < lanes; i++)
             {
                 int n = _board.Lanes[i].Cells.Count;
-                if (n <= 0) { i++; continue; }
+                if (n <= 0) continue;
                 float backY = LaneAnchor(i, n - 1).y;
-                int j = i + 1;
-                while (j < lanes && _board.Lanes[j].Cells.Count > 0)
-                {
-                    float yj = LaneAnchor(j, _board.Lanes[j].Cells.Count - 1).y;
-                    if (Mathf.Abs(yj - backY) > 0.5f) break;
-                    j++;
-                }
-                float pitch = _metrics.CellW + _metrics.Gap;
-                float left = LaneAnchor(i, 0).x;
-                float right = LaneAnchor(j - 1, 0).x;
-                DrawBackWall((left + right) * 0.5f, backY + _metrics.CellH * 0.5f, (right - left) + pitch);
-                i = j;
+                DrawLaneGate(i, LaneAnchor(i, 0).x, backY + _metrics.CellH * 0.5f, pitch - 4f);
             }
         }
 
-        void DrawBackWall(float x, float cellTop, float width)
+        void DrawLaneGate(int lane, float x, float cellTop, float width)
         {
             const float bodyH = 56f;
             float y = cellTop + 20f;
-            Bar("BackWallShade", new Vector2(x, cellTop - 4f), new Vector2(width - 12f, 14f), new Color(0.16f, 0.14f, 0.12f, 0.35f));
-            Curb("BackWallRim", new Vector2(x, y), new Vector2(width + 8f, bodyH + 8f), new Color(0.45f, 0.40f, 0.34f, 1f));
-            Curb("BackWall", new Vector2(x, y + 2f), new Vector2(width, bodyH), new Color(0.80f, 0.77f, 0.70f, 1f));
-            Bar("BackWallCap", new Vector2(x, y + 14f), new Vector2(Mathf.Max(24f, width - 36f), 12f), new Color(0.98f, 0.78f, 0.22f, 1f));
-            BackPost(new Vector2(x - width * 0.5f, y + 4f));
-            BackPost(new Vector2(x + width * 0.5f, y + 4f));
+            var gate = Place(_screen, "Gate" + lane, new Vector2(x, y), new Vector2(width + 8f, bodyH + 28f));
+            GateBar(gate, "Shade", new Vector2(0f, -bodyH * 0.55f), new Vector2(width - 12f, 14f), new Color(0.16f, 0.14f, 0.12f, 0.35f));
+            GateCurb(gate, "Rim", new Vector2(0f, 0f), new Vector2(width + 8f, bodyH + 8f), new Color(0.45f, 0.40f, 0.34f, 1f));
+            GateCurb(gate, "Wall", new Vector2(0f, 2f), new Vector2(width, bodyH), new Color(0.80f, 0.77f, 0.70f, 1f));
+            GateBar(gate, "Cap", new Vector2(0f, 14f), new Vector2(Mathf.Max(24f, width - 36f), 12f), new Color(0.98f, 0.78f, 0.22f, 1f));
+            var light = GateBar(gate, "Light", new Vector2(0f, 14f), new Vector2(16f, 10f), new Color(0.55f, 0.42f, 0.18f, 1f));
+            light.gameObject.name = "Light";
+            GatePost(gate, new Vector2(-width * 0.5f, 4f));
+            GatePost(gate, new Vector2(width * 0.5f, 4f));
+        }
+
+        RectTransform GateBar(RectTransform parent, string name, Vector2 pos, Vector2 size, Color color)
+        {
+            var rt = Place(parent, name, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteKit.Round;
+            img.color = color;
+            img.raycastTarget = false;
+            return rt;
+        }
+
+        void GateCurb(RectTransform parent, string name, Vector2 pos, Vector2 size, Color color)
+        {
+            var rt = Place(parent, name, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteKit.Round;
+            img.type = Image.Type.Sliced;
+            img.color = color;
+            img.raycastTarget = false;
+        }
+
+        void GatePost(RectTransform parent, Vector2 pos)
+        {
+            var rt = Place(parent, "BackPost", pos, new Vector2(22f, 72f));
+            var img = rt.gameObject.AddComponent<Image>();
+            img.sprite = SpriteKit.Round;
+            img.color = new Color(0.86f, 0.38f, 0.28f, 1f);
+            img.raycastTarget = false;
+            var band = Place(rt, "Band", new Vector2(0f, 6f), new Vector2(22f, 10f));
+            var stripe = band.gameObject.AddComponent<Image>();
+            stripe.color = new Color(0.98f, 0.95f, 0.88f, 1f);
+            stripe.raycastTarget = false;
         }
 
         void Curb(string name, Vector2 pos, Vector2 size, Color color)
@@ -926,13 +958,16 @@ namespace CarMatch
                     peekImage.raycastTarget = false;
                 }
                 _pieceAt[PieceKey(tap)] = rt;
-                // Car Match style: a big white count sitting on top of the garage arch.
-                var count = Place(rt, "Count", new Vector2(size.x * 0.22f, -size.y * 0.28f), new Vector2(size.x * 0.46f, size.y * 0.28f));
-                CountChip(count, Vector2.zero, slot.TunnelCount, new Color(0.12f, 0.18f, 0.38f, 1f), true);
+                // The number sits on its own tile, not painted on the roof.
+                RectTransform count = null;
+                if (slot.TunnelCount > 0)
+                    count = GarageCount(rt, new Vector2(size.x * 0.28f, size.y * 0.32f), slot.TunnelCount);
                 string tunnelKey = PieceKey(tap);
                 int lastCount;
                 if (_tunnelCounts.TryGetValue(tunnelKey, out lastCount) && lastCount > slot.TunnelCount && rt.Find("Peek") != null)
                     StartCoroutine(RollOut((RectTransform)rt.Find("Peek"), count));
+                if (_tunnelCounts.TryGetValue(tunnelKey, out lastCount) && lastCount > 0 && slot.TunnelCount == 0 && _fly != null)
+                    _fly.StartCoroutine(GarageCleared(rt.anchoredPosition, rt));
                 _tunnelCounts[tunnelKey] = slot.TunnelCount;
                 if (open) Hook(rt, tap);
                 else image.raycastTarget = false;
@@ -999,15 +1034,16 @@ namespace CarMatch
             var rt = Place(_screen, "Car", pos, size);
             _pieceAt[PieceKey(tap)] = rt;
             var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = car.Hidden ? HiddenSprite() : CarArt.For(car.Color, open);
+            bool bag = car.Hidden || (_bagCover != null && _bagCover.Contains(PieceKey(tap)));
+            image.sprite = bag ? HiddenSprite() : CarArt.For(car.Color, open);
             image.preserveAspect = true;
             image.color = open ? Color.white : new Color(0.84f, 0.84f, 0.84f, 1f) /* keep hue, slight darken */;
-            AnimateEyes(rt, image, car, open, tap);
+            if (!bag) AnimateEyes(rt, image, car, open, tap);
             if (queueCount > 1)
             {
                 CountChip(rt, new Vector2(size.x * 0.28f, size.y * 0.30f), queueCount, new Color(0.86f, 0.16f, 0.22f, 1f), true);
             }
-            if (!car.Hidden)
+            if (!bag)
             {
                 var idle = rt.gameObject.AddComponent<CarIdle>();
                 idle.Awake = open;
@@ -1261,6 +1297,19 @@ namespace CarMatch
             bool free = FreeBoosters.IsFree(PrefsFlags.Shared, name);
             bool afford = free || Economy.CanAfford(Purse.Wallet, cost);
             var button = MakeButton(new Vector2(x, y), new Vector2(220f, _dockBoosterH), new Color(0.22f, 0.45f, 0.82f, 1f), name, 40, action, "btn_booster");
+            button.gameObject.name = "Booster" + name;
+            var iconSprite = UiArt.Get("boost_" + name.ToLowerInvariant());
+            var label = button.GetComponentInChildren<Text>();
+            if (iconSprite != null)
+            {
+                if (label != null) label.text = "";
+                var icon = Place(button.transform, "Icon", new Vector2(0f, _dockBoosterH * 0.16f), new Vector2(96f, 96f));
+                var iconImage = icon.gameObject.AddComponent<Image>();
+                iconImage.sprite = iconSprite;
+                iconImage.preserveAspect = true;
+                iconImage.raycastTarget = false;
+                if (!legal) iconImage.color = new Color(0.65f, 0.65f, 0.68f, 1f);
+            }
             // Unaffordable boosters stay tappable so the tap can explain itself (shake + toast + coin popup).
             if (!afford)
             {
@@ -1269,7 +1318,6 @@ namespace CarMatch
                 button.onClick.AddListener(delegate { NotEnoughCoins(rt); });
             }
             button.interactable = legal && !_busy && !_driving && _board != null && !_board.Won && !_board.Failed;
-            var label = button.GetComponentInChildren<Text>();
             if (label != null) label.rectTransform.offsetMin = new Vector2(0f, _dockBoosterH * 0.45f);
             // Cost chip: coin icon + price in a small pill on the button face.
             var chip = Place(button.transform, "Cost", new Vector2(0f, -10f), new Vector2(150f, 56f));
@@ -1313,6 +1361,7 @@ namespace CarMatch
         {
             if (_busy || _phase != Phase.Play || _board == null || _board.Won || _board.Failed) return;
             if (TapBlockedByLift(tap)) return;
+            if (_revealLock.Contains(PieceKey(tap))) return;
             if (_cue.LockCars && !LotCoach.Allows(_cue, tap)) return;
             if (_metrics.Lanes <= 0 || !_legal.IsLegal(tap)) return;
             if (tap.Kind == TapKind.Parked)
@@ -1322,6 +1371,11 @@ namespace CarMatch
             }
             var color = ExitPath.ColorOf(_board, tap);
             bool hidden = PieceHidden(tap);
+            bool wasTunnel = tap.Kind == TapKind.Lane && (uint)tap.Index < (uint)_board.Lanes.Count
+                && (uint)tap.Cell < (uint)_board.Lanes[tap.Index].Cells.Count
+                && _board.Lanes[tap.Index].Cells[tap.Cell].Tunnel;
+            int exitLane = ExitLaneOf(tap);
+            var covered = CoveredKeys();
             var points = BuildDrivePath(tap, _barView.InsertIndex(color));
             if (piece != null) points[0] = piece.anchoredPosition;
             var size = piece != null ? piece.sizeDelta : _metrics.Piece;
@@ -1331,6 +1385,13 @@ namespace CarMatch
             if (!move.Accepted) return;
             if (_cue.Lesson == CoachLesson.MatchThree && move.Matched)
                 LotCoach.Complete(PrefsFlags.Shared, CoachLesson.MatchThree);
+            if (_cue.Lesson == CoachLesson.SideLot && tap.Kind == TapKind.Side)
+                LotCoach.Complete(PrefsFlags.Shared, CoachLesson.SideLot);
+            if (_cue.Lesson == CoachLesson.Garage && wasTunnel)
+                LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Garage);
+            var fresh = FreshReveals(covered);
+            if (fresh.Count > 0 && _cue.Lesson == CoachLesson.Covered)
+                LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Covered);
             NoteLifts(opensBefore);
             foreach (var bc in boxesBefore)
                 if (!_board.Lanes[bc[0]].Cells[bc[1]].Box) _pendingBoxBreaks.Add(bc);
@@ -1344,6 +1405,8 @@ namespace CarMatch
 #endif
             _fly.StartCoroutine(Drive(flyer, points, entry, color, hidden));
             ShowPlay();
+            if (_fly != null && exitLane >= 0) _fly.StartCoroutine(LiftGate(exitLane));
+            if (_fly != null && fresh.Count > 0) _fly.StartCoroutine(RevealBags(fresh));
         }
 
         void ReturnFromStrip(Tap tap, RectTransform piece)
@@ -1831,6 +1894,7 @@ namespace CarMatch
             if (!BoosterKit.Undo(_history, out restored)) return;
             if (!FreeBoosters.Pay(PrefsFlags.Shared, "Undo", Economy.UndoCost, Purse.TrySpend)) return;
             AudioManager.Play(Sfx.BoosterUndo);
+            LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Undo);
             var before = _board;
             _board = restored;
             _lastMatch = false;
@@ -1858,6 +1922,7 @@ namespace CarMatch
             }
             _history.Add(before);
             AudioManager.Play(Sfx.BoosterSuper);
+            LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Super);
             _lastMatch = true;
             StartCoroutine(SuperFx(before, pulled, color, fromBar));
         }
@@ -1891,6 +1956,7 @@ namespace CarMatch
                 return;
             }
             AudioManager.Play(Sfx.BoosterShuffle);
+            LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Shuffle);
             _lastMatch = false;
             ShowPlay();
             StartCoroutine(ShuffleFx(before));
@@ -1917,6 +1983,7 @@ namespace CarMatch
                 return;
             }
             AudioManager.Play(Sfx.BoosterMagnet);
+            LotCoach.Complete(PrefsFlags.Shared, CoachLesson.Magnet);
             _lastMatch = true;
             StartCoroutine(MagnetFx(pulled, moves));
         }
@@ -2434,6 +2501,11 @@ namespace CarMatch
                 // Next level unlocks now. The coin purse waits until the results count-up.
                 Purse.Advance(_index, _levels.Count);
             }
+            if (_level != null && _level.Number >= InterstitialPlan.FirstLevel)
+            {
+                PlayerPrefs.SetInt(InterstitialWinsKey, PlayerPrefs.GetInt(InterstitialWinsKey, 0) + 1);
+                PlayerPrefs.Save();
+            }
             StartCoroutine(LotCheer());
         }
 
@@ -2441,7 +2513,6 @@ namespace CarMatch
         IEnumerator LotCheer()
         {
             const float LapSec = 1.55f;
-            const float BurstAt = 1.55f;
             var screenRt = _screen as RectTransform;
             var block = Place(_screen, "CheerBlock", Vector2.zero, new Vector2(4000f, 4000f));
             var blockImage = block.gameObject.AddComponent<Image>();
@@ -2543,12 +2614,9 @@ namespace CarMatch
 
             int trailN = 0;
             float trailClock = 0f;
-            bool cheered = false;
-            bool punched = false;
-            var trayHome = _tray != null ? _tray.anchoredPosition : Vector2.zero;
             var gold = new Color(1f, 0.86f, 0.32f, 1f);
             float t = 0f;
-            while (t < LotCheerSeconds)
+            while (t < LapSec)
             {
                 float dt = Time.unscaledDeltaTime;
                 if (dt > 0.05f) dt = 0.05f;
@@ -2591,46 +2659,6 @@ namespace CarMatch
                     float s = Mathf.Lerp(0.7f, 1.35f, Mathf.Clamp01(trailAge[i] / 0.38f));
                     trail[i].localScale = new Vector3(s, s, 1f);
                 }
-                if (t >= BurstAt)
-                {
-                    if (!punched)
-                    {
-                        punched = true;
-                    }
-                    if (!cheered)
-                    {
-                        cheered = true;
-                        AudioManager.Play(Sfx.Win);
-                    }
-                    float bt = t - BurstAt;
-                    float pop = Mathf.Sin(Mathf.Clamp01(bt / 0.42f) * Mathf.PI);
-                    if (screenRt != null) screenRt.localScale = Vector3.one * (1f + 0.05f * pop);
-                    flash.localScale = Vector3.one * Mathf.Lerp(0.4f, 8f, Mathf.Clamp01(bt / 0.4f));
-                    flashImg.color = new Color(1f, 0.92f, 0.5f, (1f - Mathf.Clamp01(bt / 0.4f)) * 0.85f);
-                    for (int i = 0; i < bits.Length; i++)
-                    {
-                        vel[i].y -= 980f * dt;
-                        bits[i].anchoredPosition += vel[i] * dt;
-                        bits[i].localRotation = Quaternion.Euler(0f, 0f, spin[i] * bt);
-                        var c = LotConfettiColors[i % LotConfettiColors.Length];
-                        c.a = 1f - Mathf.Clamp01((bt - 0.2f) / 0.25f);
-                        bitImg[i].color = c;
-                    }
-                    for (int i = 0; i < stars.Length; i++)
-                    {
-                        float ang = i / (float)stars.Length * Mathf.PI * 2f;
-                        float rad = Mathf.Lerp(20f, 210f, Mathf.Clamp01(bt / 0.38f));
-                        stars[i].anchoredPosition = origin + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * rad;
-                        float s = Mathf.Lerp(0.3f, 1.4f, Mathf.Clamp01(bt / 0.2f));
-                        stars[i].localScale = new Vector3(s, s, 1f);
-                        starImg[i].color = new Color(1f, 0.95f, 0.72f, 1f - Mathf.Clamp01(bt / 0.42f));
-                    }
-                    if (_tray != null)
-                    {
-                        float hop = Mathf.Abs(Mathf.Sin(bt * Mathf.PI * 3f)) * 16f * (1f - Mathf.Clamp01(bt / 0.45f));
-                        _tray.anchoredPosition = trayHome + new Vector2(0f, hop);
-                    }
-                }
                 yield return null;
             }
             if (screenRt != null)
@@ -2639,7 +2667,8 @@ namespace CarMatch
                 screenRt.anchoredPosition = Vector2.zero;
                 screenRt.localRotation = Quaternion.identity;
             }
-            if (_tray != null) _tray.anchoredPosition = trayHome;
+            if (UsaPlaneDue()) yield return FlyUsaPlane();
+            yield return LotFireworks(screenRt);
             ShowWin();
         }
 
@@ -2729,8 +2758,321 @@ namespace CarMatch
             rt.localRotation = Quaternion.identity;
         }
 
+        bool UsaPlaneDue()
+        {
+            string today = UsaPlaneDay.Stamp(System.DateTime.Now);
+            string stored = PlayerPrefs.GetString(PlaneDayKey, "");
+            string record;
+            if (!UsaPlaneDay.TryBegin(stored, today, false, out record)) return false;
+            PlayerPrefs.SetString(PlaneDayKey, record);
+            PlayerPrefs.Save();
+            return true;
+        }
+
+        IEnumerator FlyUsaPlane()
+        {
+            AudioManager.Play(Sfx.Plane);
+            float y = _metrics.CellH > 1f ? _metrics.BaseY + 40f : 80f;
+            var plane = Place(_screen, "UsaPlane", new Vector2(-860f, y), new Vector2(240f, 120f));
+            var pi = plane.gameObject.AddComponent<Image>();
+            pi.sprite = UiArt.Get("fx_usa_plane") ?? SpriteKit.Round;
+            pi.preserveAspect = true;
+            pi.raycastTarget = false;
+            var banner = Place(_screen, "UsaBanner", new Vector2(-1040f, y - 36f), new Vector2(300f, 100f));
+            var bi = banner.gameObject.AddComponent<Image>();
+            bi.sprite = UiArt.Get("fx_usa_banner") ?? SpriteKit.Round;
+            bi.preserveAspect = true;
+            bi.raycastTarget = false;
+            float t = 0f;
+            const float dur = 1.65f;
+            while (t < dur && plane != null)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                float e = u * u * (3f - 2f * u);
+                float x = Mathf.Lerp(-860f, 900f, e);
+                plane.anchoredPosition = new Vector2(x, y + Mathf.Sin(u * Mathf.PI) * 24f);
+                if (banner != null) banner.anchoredPosition = new Vector2(x - 230f, y - 28f);
+                yield return null;
+            }
+            if (plane != null) Destroy(plane.gameObject);
+            if (banner != null) Destroy(banner.gameObject);
+        }
+
+        IEnumerator LotFireworks(RectTransform screenRt)
+        {
+            AudioManager.Play(Sfx.Win);
+            Color[] cols =
+            {
+                new Color(1f, 0.36f, 0.42f),
+                new Color(0.20f, 0.78f, 0.72f),
+                new Color(1f, 0.72f, 0.22f),
+                new Color(0.55f, 0.85f, 0.28f),
+                new Color(0.62f, 0.45f, 0.95f)
+            };
+            var bits = new List<RectTransform>();
+            var vel = new List<Vector2>();
+            var born = new List<float>();
+            var tint = new List<Color>();
+            float t = 0f;
+            const float dur = 1.25f;
+            int made = 0;
+            const int bursts = 4;
+            while (t < dur)
+            {
+                float dt = Time.unscaledDeltaTime;
+                if (dt > 0.05f) dt = 0.05f;
+                t += dt;
+                if (screenRt != null)
+                {
+                    float pop = Mathf.Sin(Mathf.Clamp01(t / dur) * Mathf.PI);
+                    screenRt.localScale = Vector3.one * (1f + 0.05f * pop);
+                }
+                if (made < bursts && t >= made * 0.28f)
+                {
+                    int b = made;
+                    made++;
+                    AudioManager.Play(Sfx.Pop);
+                    var origin = new Vector2((b - 1.5f) * 180f, 180f + (b % 2) * 160f);
+                    var col = cols[b % cols.Length];
+                    for (int i = 0; i < 14; i++)
+                    {
+                        var spark = Place(_screen, "Firework", origin, new Vector2(22f, 22f));
+                        var img = spark.gameObject.AddComponent<Image>();
+                        img.sprite = UiArt.Get("glow") ?? SpriteKit.Round;
+                        img.color = col;
+                        img.raycastTarget = false;
+                        float a = i / 14f * Mathf.PI * 2f;
+                        bits.Add(spark);
+                        vel.Add(new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * UnityEngine.Random.Range(220f, 420f));
+                        born.Add(t);
+                        tint.Add(col);
+                    }
+                }
+                for (int i = 0; i < bits.Count; i++)
+                {
+                    if (bits[i] == null) continue;
+                    float age = t - born[i];
+                    vel[i] = new Vector2(vel[i].x, vel[i].y - 420f * dt);
+                    bits[i].anchoredPosition += vel[i] * dt;
+                    var c = tint[i];
+                    c.a = 1f - Mathf.Clamp01(age / 0.7f);
+                    var img = bits[i].GetComponent<Image>();
+                    if (img != null) img.color = c;
+                }
+                yield return null;
+            }
+            for (int i = 0; i < bits.Count; i++)
+                if (bits[i] != null) Destroy(bits[i].gameObject);
+            if (screenRt != null) screenRt.localScale = Vector3.one;
+        }
+
+        List<string> CoveredKeys()
+        {
+            var list = new List<string>();
+            if (_board == null) return list;
+            for (int l = 0; l < _board.Lanes.Count; l++)
+            {
+                var cells = _board.Lanes[l].Cells;
+                for (int c = 0; c < cells.Count; c++)
+                {
+                    var slot = cells[c];
+                    if (slot.Empty || slot.Tunnel || slot.Box || !slot.Car.Hidden) continue;
+                    list.Add(l + ":" + c);
+                }
+            }
+            return list;
+        }
+
+        List<Tap> FreshReveals(List<string> before)
+        {
+            var fresh = new List<Tap>();
+            if (before == null || _board == null) return fresh;
+            for (int i = 0; i < before.Count; i++)
+            {
+                var parts = before[i].Split(':');
+                int l = int.Parse(parts[0]);
+                int c = int.Parse(parts[1]);
+                if ((uint)l >= (uint)_board.Lanes.Count) continue;
+                var cells = _board.Lanes[l].Cells;
+                if ((uint)c >= (uint)cells.Count) continue;
+                var slot = cells[c];
+                if (slot.Empty || slot.Tunnel || slot.Box || slot.Car.Hidden) continue;
+                var tap = new Tap(TapKind.Lane, l, c);
+                fresh.Add(tap);
+                string key = PieceKey(tap);
+                _bagCover.Add(key);
+                _revealLock.Add(key);
+            }
+            return fresh;
+        }
+
+        IEnumerator RevealBags(List<Tap> taps)
+        {
+            if (taps == null || taps.Count == 0) yield break;
+            AudioManager.Play(Sfx.BoxTear, 0.45f);
+            float dur = 0.52f;
+            float t = 0f;
+            bool sparked = false;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                for (int i = 0; i < taps.Count; i++)
+                {
+                    RectTransform piece;
+                    if (!_pieceAt.TryGetValue(PieceKey(taps[i]), out piece) || piece == null) continue;
+                    float puff = u < 0.45f ? 1f + 0.14f * Mathf.Sin(u / 0.45f * Mathf.PI) : Mathf.Lerp(1.08f, 1f, (u - 0.45f) / 0.55f);
+                    piece.localScale = new Vector3(puff, puff * (u < 0.45f ? 1f : 0.92f + 0.08f * (u - 0.45f) / 0.55f), 1f);
+                    piece.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(u * 28f) * 6f * (1f - u));
+                    if (u > 0.42f)
+                    {
+                        var img = piece.GetComponent<Image>();
+                        if (img != null && (uint)taps[i].Index < (uint)_board.Lanes.Count)
+                        {
+                            var slot = _board.Lanes[taps[i].Index].Cells[taps[i].Cell];
+                            img.sprite = CarArt.For(slot.Car.Color, true);
+                        }
+                    }
+                }
+                if (!sparked && u > 0.4f)
+                {
+                    sparked = true;
+                    for (int i = 0; i < taps.Count; i++)
+                    {
+                        RectTransform piece;
+                        if (_pieceAt.TryGetValue(PieceKey(taps[i]), out piece) && piece != null)
+                            Sparkle(piece.anchoredPosition, Color.white, 5);
+                    }
+                }
+                yield return null;
+            }
+            for (int i = 0; i < taps.Count; i++)
+            {
+                string key = PieceKey(taps[i]);
+                _bagCover.Remove(key);
+                _revealLock.Remove(key);
+                RectTransform piece;
+                if (_pieceAt.TryGetValue(key, out piece) && piece != null)
+                {
+                    piece.localScale = Vector3.one;
+                    piece.localRotation = Quaternion.identity;
+                }
+            }
+        }
+
+        int ExitLaneOf(Tap tap)
+        {
+            if (_board == null) return -1;
+            if (tap.Kind == TapKind.Side)
+            {
+                if ((uint)tap.Index >= (uint)_board.Sides.Count) return -1;
+                return _board.Sides[tap.Index].Lane;
+            }
+            if (tap.Kind != TapKind.Lane) return -1;
+            var steps = new List<DriveStep>();
+            if (!ExitPath.TryRoute(_board, tap.Index, tap.Cell, steps)) return tap.Index;
+            for (int i = 0; i < steps.Count; i++)
+                if (steps[i].Cell < 0) return steps[i].Lane;
+            return tap.Index;
+        }
+
+        IEnumerator LiftGate(int lane)
+        {
+            if (_screen == null || lane < 0) yield break;
+            var gate = _screen.Find("Gate" + lane) as RectTransform;
+            if (gate == null) yield break;
+            var lightT = gate.Find("Light");
+            var light = lightT != null ? lightT.GetComponent<Image>() : null;
+            AudioManager.Play(Sfx.Gate);
+            var home = gate.anchoredPosition;
+            float t = 0f;
+            const float up = 0.28f;
+            const float down = 0.32f;
+            while (t < up + down && gate != null)
+            {
+                t += Time.unscaledDeltaTime;
+                float y = t < up ? Mathf.SmoothStep(0f, 78f, t / up) : Mathf.SmoothStep(78f, 0f, (t - up) / down);
+                gate.anchoredPosition = home + new Vector2(0f, y);
+                if (light != null)
+                    light.color = Mathf.Sin(t * 36f) > 0f
+                        ? new Color(1f, 0.92f, 0.45f, 1f)
+                        : new Color(0.45f, 0.32f, 0.16f, 1f);
+                yield return null;
+            }
+            if (gate != null) gate.anchoredPosition = home;
+        }
+
+        RectTransform GarageCount(RectTransform parent, Vector2 pos, int count)
+        {
+            int tile = count < 1 ? 1 : (count > 3 ? 3 : count);
+            var chip = Place(parent, "Count", pos, new Vector2(108f, 72f));
+            var img = chip.gameObject.AddComponent<Image>();
+            img.sprite = UiArt.Get("garage_tile_" + tile) ?? UiArt.Get("chip") ?? SpriteKit.Round;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+            bool painted = count >= 1 && count <= 3 && UiArt.Get("garage_tile_" + tile) != null;
+            var t = AddText(chip, painted ? "" : count.ToString(), 32, Color.white, TextAnchor.MiddleCenter);
+            t.font = ChunkyFont();
+            if (!painted) Outlined(t, new Color(0.05f, 0.08f, 0.16f, 1f), 2f);
+            return chip;
+        }
+
+        IEnumerator GarageCleared(Vector2 pos, RectTransform garage)
+        {
+            AudioManager.Play(Sfx.Chime, 0.55f);
+            var star = Place(_flyLayer, "GarageStar", pos, new Vector2(80f, 80f));
+            var img = star.gameObject.AddComponent<Image>();
+            img.sprite = UiArt.Get("sparkle") ?? SpriteKit.Round;
+            img.color = new Color(1f, 0.92f, 0.4f, 1f);
+            img.raycastTarget = false;
+            float t = 0f;
+            const float dur = 0.68f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                float s = u < 0.35f ? Mathf.Lerp(0.4f, 1.2f, u / 0.35f) : Mathf.Lerp(1.2f, 0.15f, (u - 0.35f) / 0.65f);
+                if (star != null) star.localScale = new Vector3(s, s, 1f);
+                if (garage != null)
+                {
+                    float squash = 1f + 0.12f * Mathf.Sin(u * Mathf.PI);
+                    garage.localScale = new Vector3(squash, 2f - squash, 1f);
+                    var group = garage.GetComponent<CanvasGroup>();
+                    if (group == null) group = garage.gameObject.AddComponent<CanvasGroup>();
+                    group.alpha = 1f - Mathf.Clamp01((u - 0.35f) / 0.65f);
+                }
+                if (img != null)
+                {
+                    var c = img.color;
+                    c.a = 1f - Mathf.Clamp01((u - 0.4f) / 0.6f);
+                    img.color = c;
+                }
+                yield return null;
+            }
+            if (star != null) Destroy(star.gameObject);
+        }
+
         void OnNext()
         {
+            if (_busy) return;
+            StartCoroutine(AdvanceAfterWin());
+        }
+
+        IEnumerator AdvanceAfterWin()
+        {
+            _busy = true;
+            int level = _level != null ? _level.Number : 0;
+            int wins = PlayerPrefs.GetInt(InterstitialWinsKey, 0);
+            var cfg = AdConfig.Load();
+            float since = _lastRewarded < 0f ? -1f : Time.unscaledTime - _lastRewarded;
+            bool tutorial = !LotCoach.Done(PrefsFlags.Shared, CoachLesson.MatchThree);
+            if (InterstitialPlan.Due(level, wins, Vip.Owned, cfg.HasInterstitial, tutorial, since))
+            {
+                if (_ads != null) yield return _ads.ShowInterstitial("next", null);
+                PlayerPrefs.SetInt(InterstitialWinsKey, 0);
+                PlayerPrefs.Save();
+            }
             LoadLevel(Purse.LevelIndex);
             StartLevel();
         }
@@ -3048,6 +3390,7 @@ namespace CarMatch
             bool granted = face == ContinueFace.Crown;
             if (!granted)
             {
+                _lastRewarded = Time.unscaledTime;
                 yield return _ads.ShowRewarded("continue", delegate (bool ok) { granted = ok; });
             }
             if (!granted)
@@ -3328,9 +3671,22 @@ namespace CarMatch
         RectTransform HudPlay()
         {
             var safe = SafeLayer();
-            var home = MakeButton(new Vector2(-400f, -70f), new Vector2(200f, 100f), new Color(0.20f, 0.24f, 0.34f, 1f), "Home", 38, OnHome, "pill", safe);
+            var home = MakeButton(new Vector2(-430f, -86f), new Vector2(LotCoach.MinTapUnits, LotCoach.MinTapUnits), new Color(0.20f, 0.24f, 0.34f, 1f), "", 38, OnHome, "pill", safe);
+            home.gameObject.name = "HomeHouse";
+            var house = UiArt.Get("icon_house");
+            var homeLabel = home.GetComponentInChildren<Text>();
+            if (house != null)
+            {
+                if (homeLabel != null) homeLabel.text = "";
+                var icon = Place(home.transform, "House", Vector2.zero, new Vector2(84f, 84f));
+                var hi = icon.gameObject.AddComponent<Image>();
+                hi.sprite = house;
+                hi.preserveAspect = true;
+                hi.raycastTarget = false;
+            }
+            else if (homeLabel != null) homeLabel.text = "Home";
             ((RectTransform)home.transform).anchorMin = ((RectTransform)home.transform).anchorMax = new Vector2(0.5f, 1f);
-            ((RectTransform)home.transform).anchoredPosition = new Vector2(-400f, -70f);
+            ((RectTransform)home.transform).anchoredPosition = new Vector2(-430f, -86f);
             home.interactable = !_busy && !_driving;
             Pill(safe, new Vector2(-40f, -70f), new Vector2(290f, 96f), UiArt.Get("icon_coin") ?? SpriteKit.Coin, Purse.Wallet.Coins.ToString(), true);
             Pill(safe, new Vector2(320f, -70f), new Vector2(290f, 96f), UiArt.Get("icon_heart") ?? SpriteKit.Heart, LivesLine(), false);
@@ -3526,6 +3882,7 @@ namespace CarMatch
         {
             _busy = true;
             bool granted = false;
+            _lastRewarded = Time.unscaledTime;
             yield return _ads.ShowRewarded("coins", delegate (bool ok) { granted = ok; });
             _busy = false;
             CloseCoinPopup();

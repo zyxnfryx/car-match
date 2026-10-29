@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IosAppKey: 28e26e80d
   IosRewardedAdUnitId: 7q8pk883a0ppo0dt
+  IosInterstitialAdUnitId: 
   AndroidAppKey: 28e275b1d
   AndroidRewardedAdUnitId: wwszvtrebbh4dl2j
+  AndroidInterstitialAdUnitId: 
   TestMode: 1
   StubWhenUnavailable: 1

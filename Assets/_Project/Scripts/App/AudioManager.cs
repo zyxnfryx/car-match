@@ -23,7 +23,11 @@ namespace CarMatch
         BoxTear,
         Clunk,
         Gear,
-        Chime
+        Chime,
+        Oink,
+        Pop,
+        Plane,
+        Gate
     }
 
     // One pooled one-shot host + a music bed, after Flock Five's SfxHost/MixDesk (pool, duck),
@@ -67,7 +71,11 @@ namespace CarMatch
             { Sfx.BoxTear, new Cue("box_tear", 0, 0.8f) },
             { Sfx.Clunk, new Cue("lift_clunk", 0, 0.45f) },
             { Sfx.Gear, new Cue("lift_gear", 0, 0.35f) },
-            { Sfx.Chime, new Cue("lift_chime", 0, 0.4f) }
+            { Sfx.Chime, new Cue("lift_chime", 0, 0.4f) },
+            { Sfx.Oink, new Cue("oink", 0, 0.7f) },
+            { Sfx.Pop, new Cue("soft_pop", 0, 0.35f) },
+            { Sfx.Plane, new Cue("plane_zoom", 0, 0.55f) },
+            { Sfx.Gate, new Cue("gate_click", 0, 0.45f) }
         };
 
         static float VariantTrim(string clip) { return 1f; }

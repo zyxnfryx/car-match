@@ -84,6 +84,18 @@ namespace CarMatch.Tests
         }
 
         [Test]
+        public void Ads_InterstitialPlan()
+        {
+            RuleChecks.InterstitialPlanChecks();
+        }
+
+        [Test]
+        public void Levels_DifficultyKeepsRising()
+        {
+            RuleChecks.DifficultyCurveRises(Json());
+        }
+
+        [Test]
         public void Boosters_ShuffleKeepsColorCounts()
         {
             RuleChecks.ShuffleKeepsColorCounts();

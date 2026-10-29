@@ -14,6 +14,8 @@ namespace CarMatch
 
         readonly AdConfig _cfg;
         LevelPlayRewardedAd _ad;
+        LevelPlayInterstitialAd _inter;
+        bool _interLoaded, _interFailed, _interClosed;
         enum Init { None, Running, Ready, Failed }
         Init _init;
         bool _loaded, _loadFailed, _closed, _rewarded, _displayFailed;
@@ -45,6 +47,46 @@ namespace CarMatch
                     _ad.LoadAd(); // preload next
                 }
                 else Debug.Log("Lot Loop: no rewarded ad available (no fill).");
+            }
+            if (onDone != null) onDone(ok);
+        }
+
+        public IEnumerator ShowInterstitial(string placement, Action<bool> onDone)
+        {
+            bool ok = false;
+            if (_cfg == null || !_cfg.HasInterstitial)
+            {
+                if (onDone != null) onDone(false);
+                yield break;
+            }
+            yield return EnsureInit();
+            if (_init == Init.Ready)
+            {
+                if (_inter == null)
+                {
+                    _inter = new LevelPlayInterstitialAd(_cfg.InterstitialAdUnitId);
+                    _inter.OnAdLoaded += delegate { _interLoaded = true; };
+                    _inter.OnAdLoadFailed += delegate (LevelPlayAdError e) { _interFailed = true; Debug.Log("Lot Loop: interstitial load failed " + e); };
+                    _inter.OnAdDisplayFailed += delegate (LevelPlayAdInfo i, LevelPlayAdError e) { _interClosed = true; Debug.Log("Lot Loop: interstitial show failed " + e); };
+                    _inter.OnAdClosed += delegate { _interClosed = true; };
+                    _interLoaded = _interFailed = false;
+                    _inter.LoadAd();
+                }
+                if (!_inter.IsAdReady())
+                {
+                    _interLoaded = _interFailed = false;
+                    _inter.LoadAd();
+                    float t = 0f;
+                    while (!_interLoaded && !_interFailed && t < LoadTimeout) { t += Time.unscaledDeltaTime; yield return null; }
+                }
+                if (_inter.IsAdReady())
+                {
+                    _interClosed = false;
+                    _inter.ShowAd(placement);
+                    while (!_interClosed) yield return null;
+                    ok = true;
+                    _inter.LoadAd();
+                }
             }
             if (onDone != null) onDone(ok);
         }

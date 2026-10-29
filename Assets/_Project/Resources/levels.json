@@ -5,16 +5,8 @@
    "title": "First Lot",
    "blurb": "Tap the front car. Three of a color clear.",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "coral"
-    ],
-    [
-     "teal",
-     "teal",
-     "teal"
-    ]
+    ["coral", "coral", "coral"],
+    ["teal", "teal", "teal"]
    ]
   },
   {
@@ -22,18 +14,9 @@
    "title": "Three Stalls",
    "blurb": "Three short lanes. Take one car to reach the match.",
    "lanes": [
-    [
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal"
-    ]
+    ["coral", "teal"],
+    ["teal", "coral"],
+    ["coral", "teal"]
    ]
   },
   {
@@ -41,21 +24,9 @@
    "title": "Amber Street",
    "blurb": "A new color. Three ambers clear too.",
    "lanes": [
-    [
-     "amber",
-     "amber",
-     "amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ]
+    ["amber", "amber", "amber"],
+    ["coral", "teal", "coral"],
+    ["coral", "teal", "teal"]
    ]
   },
   {
@@ -63,21 +34,9 @@
    "title": "Under the Tarp",
    "blurb": "A covered car shows its color when the car in front leaves.",
    "lanes": [
-    [
-     "coral",
-     "?coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "amber",
-     "amber"
-    ],
-    [
-     "teal",
-     "amber",
-     "teal"
-    ]
+    ["coral", "?coral", "teal"],
+    ["coral", "amber", "amber"],
+    ["teal", "amber", "teal"]
    ]
   },
   {
@@ -85,28 +44,15 @@
    "title": "Side Lot",
    "blurb": "The side lot opens when its spot is empty.",
    "lanes": [
-    [
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "teal"
-    ],
-    [
-     "amber",
-     "amber"
-    ]
+    ["coral", "teal"],
+    ["teal", "teal"],
+    ["amber", "amber"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral",
-      "amber"
-     ]
+     "cars": ["coral", "coral", "amber"]
     }
    ]
   },
@@ -115,14 +61,8 @@
    "title": "Tunnel Mouth",
    "blurb": "Empty the tunnel before the car behind it can leave.",
    "lanes": [
-    [
-     "tunnel:coral,coral,coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal"
-    ]
+    ["tunnel:coral,coral,coral", "teal", "teal"],
+    ["teal"]
    ]
   },
   {
@@ -130,26 +70,10 @@
    "title": "Four Corners",
    "blurb": "Four lanes and a fourth color. Clear one color at a time.",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "coral"
-    ],
-    [
-     "amber",
-     "amber",
-     "amber"
-    ],
-    [
-     "lime",
-     "teal",
-     "lime"
-    ],
-    [
-     "lime",
-     "teal",
-     "teal"
-    ]
+    ["coral", "coral", "coral"],
+    ["amber", "amber", "amber"],
+    ["lime", "teal", "lime"],
+    ["lime", "teal", "teal"]
    ]
   },
   {
@@ -157,21 +81,9 @@
    "title": "Little Mix",
    "blurb": "No lane is one color. Park a car, then finish the set.",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "coral"
-    ],
-    [
-     "teal",
-     "coral",
-     "teal"
-    ],
-    [
-     "amber",
-     "teal",
-     "amber"
-    ]
+    ["coral", "amber", "coral"],
+    ["teal", "coral", "teal"],
+    ["amber", "teal", "amber"]
    ]
   },
   {
@@ -179,24 +91,9 @@
    "title": "Market Lane",
    "blurb": "Four colors, a little deeper. Finish a set before the bar fills.",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "teal",
-     "lime"
-    ],
-    [
-     "amber",
-     "teal",
-     "lime",
-     "lime"
-    ]
+    ["coral", "teal", "amber", "coral"],
+    ["coral", "amber", "teal", "lime"],
+    ["amber", "teal", "lime", "lime"]
    ]
   },
   {
@@ -204,37 +101,17 @@
    "title": "Orchard Bay",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "?amber"
-    ],
-    [
-     "lime",
-     "coral",
-     "teal"
-    ],
-    [
-     "amber",
-     "lime",
-     "coral"
-    ],
-    [
-     "teal",
-     "amber",
-     "lime"
-    ]
+    ["coral", "teal", "?amber"],
+    ["lime", "coral", "teal"],
+    ["amber", "lime", "coral"],
+    ["teal", "amber", "lime"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral", "coral"]
     }
    ],
    "garages": [
@@ -250,19 +127,8 @@
    "title": "Sunny Lane",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "amber",
-     "teal",
-     "amber"
-    ],
-    [
-     "coral",
-     "amber",
-     "teal",
-     "teal"
-    ]
+    ["coral", "coral", "amber", "teal", "amber"],
+    ["coral", "amber", "teal", "teal"]
    ]
   },
   {
@@ -270,19 +136,8 @@
    "title": "Garden Court",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "amber",
-     "teal",
-     "amber"
-    ],
-    [
-     "amber",
-     "teal",
-     "teal",
-     "coral"
-    ]
+    ["coral", "coral", "amber", "teal", "?amber"],
+    ["amber", "teal", "teal", "coral"]
    ]
   },
   {
@@ -290,21 +145,9 @@
    "title": "Rooftop Bay",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "coral",
-     "amber",
-     "amber"
-    ]
+    ["coral", "teal", "?amber"],
+    ["coral", "teal", "teal"],
+    ["coral", "amber", "amber"]
    ]
   },
   {
@@ -312,21 +155,9 @@
    "title": "Corner Yard",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "amber",
-     "amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ]
+    ["teal", "?amber", "?amber"],
+    ["coral", "coral", "?amber"],
+    ["coral", "teal", "teal"]
    ]
   },
   {
@@ -334,24 +165,9 @@
    "title": "Rooftop Lot",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "teal",
-     "amber",
-     "amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber",
-     "coral"
-    ]
+    ["teal", "?teal", "?amber", "?amber"],
+    ["coral", "coral", "?coral", "?coral"],
+    ["coral", "teal", "amber", "coral"]
    ]
   },
   {
@@ -359,26 +175,14 @@
    "title": "Curb Cut",
    "blurb": "Side lots open when the lane mouth is clear.",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ]
+    ["coral", "coral", "teal"],
+    ["coral", "teal", "teal"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -387,31 +191,15 @@
    "title": "Maple Court",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "amber"
-    ]
+    ["coral", "coral", "teal"],
+    ["coral", "teal", "coral"],
+    ["coral", "amber", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "amber",
-      "coral",
-      "teal"
-     ]
+     "cars": ["amber", "coral", "teal"]
     }
    ]
   },
@@ -420,31 +208,15 @@
    "title": "Lantern Stop",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "teal",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber"
-    ],
-    [
-     "coral",
-     "amber",
-     "amber"
-    ]
+    ["teal", "teal", "coral", "coral"],
+    ["coral", "teal", "amber"],
+    ["coral", "amber", "amber"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral"]
     }
    ]
   },
@@ -453,31 +225,15 @@
    "title": "Park Block",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber"
-    ],
-    [
-     "teal",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "amber"
-    ]
+    ["coral", "?teal", "?amber"],
+    ["teal", "coral", "amber"],
+    ["coral", "coral", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "teal",
-      "coral",
-      "coral"
-     ]
+     "cars": ["teal", "coral", "coral"]
     }
    ]
   },
@@ -486,38 +242,16 @@
    "title": "Meadow Block",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "lime",
-     "coral"
-    ],
-    [
-     "teal",
-     "amber",
-     "lime",
-     "violet",
-     "coral"
-    ],
-    [
-     "amber",
-     "lime",
-     "violet",
-     "teal",
-     "?violet"
-    ]
+    ["coral", "teal", "amber", "lime", "coral"],
+    ["teal", "amber", "lime", "violet", "coral"],
+    ["amber", "lime", "violet", "teal", "?violet"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral", "coral"]
     }
    ],
    "garages": [
@@ -533,34 +267,15 @@
    "title": "Underground",
    "blurb": "Clear the spots on a hatch and more cars drive up from below.",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "coral",
-     "amber"
-    ],
-    [
-     "amber",
-     "amber",
-     "coral"
-    ]
+    ["coral", "teal", "teal"],
+    ["teal", "coral", "amber"],
+    ["amber", "amber", "coral"]
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [0, 1],
+     "cars": ["lime", "lime", "lime"]
     }
    ]
   },
@@ -569,45 +284,22 @@
    "title": "Canal Lane",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "amber",
-     "amber",
-     "amber"
-    ]
+    ["teal", "coral", "coral"],
+    ["coral", "teal", "coral"],
+    ["amber", "amber", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "teal",
-      "coral",
-      "coral"
-     ]
+     "cars": ["teal", "coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [1, 2],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -616,45 +308,22 @@
    "title": "Station Deck",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "amber",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber"
-    ]
+    ["coral", "coral", "amber", "coral"],
+    ["coral", "teal", "coral"],
+    ["coral", "teal", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "teal",
-      "amber"
-     ]
+     "cars": ["teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [0, 1],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -663,45 +332,22 @@
    "title": "Hilltop Yard",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "teal",
-     "amber",
-     "coral"
-    ],
-    [
-     "teal",
-     "coral",
-     "coral"
-    ],
-    [
-     "amber",
-     "coral",
-     "amber"
-    ]
+    ["teal", "teal", "amber", "coral"],
+    ["teal", "coral", "coral"],
+    ["amber", "coral", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -710,48 +356,22 @@
    "title": "Harbor Bay",
    "blurb": "",
    "lanes": [
-    [
-     "lime",
-     "teal",
-     "coral",
-     "lime",
-     "amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "coral",
-     "amber"
-    ],
-    [
-     "teal",
-     "teal",
-     "amber",
-     "coral"
-    ]
+    ["lime", "teal", "?coral", "?lime", "?amber"],
+    ["coral", "coral", "coral", "amber"],
+    ["teal", "teal", "amber", "coral"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "lime",
-      "coral"
-     ]
+     "cars": ["lime", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [0, 1],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -760,26 +380,14 @@
    "title": "Mystery Boxes",
    "blurb": "Clear a match next to a box to break it open.",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "teal",
-     "box:amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "coral"
-    ]
+    ["coral", "teal", "?teal", "box:amber"],
+    ["coral", "teal", "coral"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "amber",
-      "amber"
-     ]
+     "cars": ["amber", "amber"]
     }
    ]
   },
@@ -788,48 +396,22 @@
    "title": "Canal Yard",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "box:amber",
-     "teal",
-     "lime"
-    ],
-    [
-     "teal",
-     "coral",
-     "teal",
-     "lime"
-    ]
+    ["coral", "amber", "amber", "lime"],
+    ["coral", "box:amber", "teal", "lime"],
+    ["teal", "coral", "teal", "lime"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [1, 2],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -838,48 +420,22 @@
    "title": "Cedar Strip",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "coral",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "box:lime",
-     "amber",
-     "amber"
-    ]
+    ["coral", "teal", "coral", "lime"],
+    ["coral", "teal", "amber", "lime"],
+    ["coral", "box:lime", "amber", "amber"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "teal",
-      "coral",
-      "coral"
-     ]
+     "cars": ["teal", "coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [0, 1],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -888,48 +444,22 @@
    "title": "River Loop",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "box:teal",
-     "amber",
-     "lime",
-     "coral"
-    ],
-    [
-     "teal",
-     "teal",
-     "coral",
-     "lime"
-    ],
-    [
-     "coral",
-     "coral",
-     "amber",
-     "coral"
-    ]
+    ["amber", "box:teal", "amber", "lime", "coral"],
+    ["teal", "teal", "coral", "lime"],
+    ["coral", "coral", "amber", "coral"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "lime",
-      "coral"
-     ]
+     "cars": ["lime", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [0, 1],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -938,57 +468,24 @@
    "title": "Pier Strip",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "box:amber",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "teal",
-     "lime",
-     "coral",
-     "teal"
-    ],
-    [
-     "lime",
-     "coral",
-     "amber",
-     "amber"
-    ],
-    [
-     "coral",
-     "amber",
-     "teal",
-     "lime"
-    ]
+    ["coral", "coral", "box:amber", "teal", "?teal"],
+    ["teal", "teal", "lime", "coral", "teal"],
+    ["lime", "coral", "amber", "amber"],
+    ["coral", "amber", "teal", "lime"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "amber",
-      "coral",
-      "amber"
-     ]
+     "cars": ["amber", "coral", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["lime", "lime", "lime"]
     }
    ]
   },
@@ -997,26 +494,14 @@
    "title": "Mystery Row",
    "blurb": "A '?' car shows its color once the car in front leaves.",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "box:amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "?teal"
-    ]
+    ["coral", "?coral", "box:amber"],
+    ["coral", "teal", "?teal"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "amber",
-      "teal",
-      "amber"
-     ]
+     "cars": ["amber", "teal", "amber"]
     }
    ]
   },
@@ -1025,51 +510,22 @@
    "title": "Rooftop Strip",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "teal",
-     "amber",
-     "lime",
-     "teal",
-     "teal"
-    ],
-    [
-     "coral",
-     "coral",
-     "teal",
-     "lime",
-     "coral"
-    ],
-    [
-     "coral",
-     "?teal",
-     "amber",
-     "box:teal",
-     "coral"
-    ]
+    ["amber", "teal", "amber", "lime", "teal", "teal"],
+    ["coral", "coral", "teal", "lime", "coral"],
+    ["coral", "?teal", "amber", "box:teal", "coral"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "lime",
-      "coral"
-     ]
+     "cars": ["lime", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [1, 2],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -1078,51 +534,22 @@
    "title": "Meadow Garage",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "box:teal",
-     "lime",
-     "teal"
-    ],
-    [
-     "coral",
-     "amber",
-     "?amber",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal",
-     "lime",
-     "lime"
-    ]
+    ["coral", "teal", "amber", "box:teal", "lime", "teal"],
+    ["coral", "amber", "?amber", "teal", "coral"],
+    ["coral", "teal", "teal", "lime", "lime"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [2, 3],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -1131,51 +558,22 @@
    "title": "River Lot",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "box:lime",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "amber",
-     "amber",
-     "teal"
-    ],
-    [
-     "teal",
-     "coral",
-     "?lime",
-     "coral",
-     "coral"
-    ]
+    ["coral", "teal", "box:lime", "amber", "lime"],
+    ["coral", "teal", "amber", "amber", "teal"],
+    ["teal", "coral", "?lime", "coral", "coral"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "coral",
-      "teal",
-      "teal"
-     ]
+     "cars": ["coral", "teal", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [0, 1],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1184,53 +582,23 @@
    "title": "Garden Garage",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "teal",
-     "coral"
-    ],
-    [
-     "coral",
-     "?lime",
-     "lime",
-     "coral"
-    ],
-    [
-     "coral",
-     "box:amber",
-     "teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "amber",
-     "amber",
-     "teal"
-    ]
+    ["coral", "teal", "teal", "?coral"],
+    ["coral", "?lime", "lime", "coral"],
+    ["coral", "box:amber", "teal", "coral"],
+    ["teal", "amber", "amber", "teal"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "teal",
-      "lime"
-     ]
+     "cars": ["teal", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [1, 2],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1239,26 +607,15 @@
    "title": "Tunnel Mouth",
    "blurb": "Empty the tunnel before the cars behind it can leave.",
    "lanes": [
-    [
-     "coral"
-    ],
-    [
-     "coral",
-     "tunnel:teal,teal,teal"
-    ],
-    [
-     "coral"
-    ]
+    ["coral", "?coral", "?coral"],
+    ["coral", "tunnel:teal,teal,teal"],
+    ["coral", "?coral"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -1267,51 +624,23 @@
    "title": "Willow Strip",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "coral",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "?amber",
-     "teal"
-    ],
-    [
-     "tunnel:coral,teal,coral",
-     "teal",
-     "amber",
-     "box:lime"
-    ],
-    [
-     "lime",
-     "amber",
-     "lime"
-    ]
+    ["teal", "coral", "coral", "coral"],
+    ["coral", "?amber", "teal"],
+    ["tunnel:coral,teal,coral", "teal", "amber", "box:lime"],
+    ["lime", "amber", "lime"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "teal",
-      "teal"
-     ]
+     "cars": ["teal", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [2, 3],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -1320,59 +649,23 @@
    "title": "Lantern Drive",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?teal",
-     "box:teal",
-     "box:teal",
-     "teal"
-    ],
-    [
-     "coral",
-     "tunnel:lime,lime,coral,amber",
-     "amber",
-     "lime",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "?lime",
-     "lime",
-     "amber",
-     "teal"
-    ],
-    [
-     "teal",
-     "amber",
-     "coral",
-     "amber",
-     "coral"
-    ]
+    ["coral", "?teal", "box:teal", "box:teal", "teal"],
+    ["coral", "tunnel:lime,lime,coral,amber", "amber", "lime", "coral", "amber"],
+    ["coral", "?lime", "lime", "amber", "teal"],
+    ["teal", "amber", "coral", "amber", "coral"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "coral",
-      "coral",
-      "lime"
-     ]
+     "cars": ["coral", "coral", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [2, 3],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -1381,51 +674,23 @@
    "title": "Maple Bay",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "box:amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "box:amber",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:teal,coral,coral",
-     "?lime",
-     "amber"
-    ]
+    ["coral", "coral", "box:amber", "lime"],
+    ["coral", "teal", "teal"],
+    ["teal", "box:amber", "coral"],
+    ["teal", "tunnel:teal,coral,coral", "?lime", "amber"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "lime",
-      "teal"
-     ]
+     "cars": ["lime", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [0, 1],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1434,59 +699,25 @@
    "title": "Canal Loop",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "?amber",
-     "lime",
-     "lime"
-    ],
-    [
-     "amber",
-     "amber",
-     "box:lime",
-     "teal"
-    ],
-    [
-     "teal",
-     "coral",
-     "lime"
-    ],
-    [
-     "tunnel:amber,coral,teal,coral",
-     "amber",
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "box:coral",
-     "lime"
-    ]
+    ["teal", "?amber", "?lime", "?lime"],
+    ["amber", "amber", "box:lime", "teal"],
+    ["teal", "coral", "lime"],
+    ["tunnel:amber,coral,teal,coral", "amber", "coral", "teal"],
+    ["teal", "box:coral", "lime"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "coral",
-      "amber",
-      "lime"
-     ]
+     "cars": ["coral", "amber", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [1, 2],
+     "cars": ["lime", "lime", "lime"]
     }
    ]
   },
@@ -1495,53 +726,23 @@
    "title": "Pier Court",
    "blurb": "",
    "lanes": [
-    [
-     "lime",
-     "coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "box:teal",
-     "lime",
-     "amber"
-    ],
-    [
-     "tunnel:violet,teal,coral,lime",
-     "box:coral",
-     "?teal",
-     "coral"
-    ],
-    [
-     "amber",
-     "?violet",
-     "coral"
-    ]
+    ["lime", "coral", "coral", "teal"],
+    ["teal", "box:teal", "lime", "amber"],
+    ["tunnel:violet,teal,coral,lime", "box:coral", "?teal", "coral"],
+    ["amber", "?violet", "coral"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "teal",
-      "amber",
-      "violet"
-     ]
+     "cars": ["teal", "amber", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [2, 3],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -1550,62 +751,28 @@
    "title": "Park Lot",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "coral",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "?coral",
-     "?amber",
-     "violet"
-    ],
-    [
-     "tunnel:teal,amber,coral,lime",
-     "box:violet",
-     "box:teal",
-     "coral",
-     "violet"
-    ],
-    [
-     "amber",
-     "teal",
-     "lime"
-    ]
+    ["teal", "coral", "amber", "lime"],
+    ["coral", "?coral", "?amber", "violet"],
+    ["tunnel:teal,amber,coral,lime", "box:violet", "box:teal", "coral", "violet"],
+    ["amber", "teal", "lime"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "teal",
-      "amber"
-     ]
+     "cars": ["teal", "amber"]
     },
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "amber",
-      "teal",
-      "coral"
-     ]
+     "cars": ["amber", "teal", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [1, 2],
+     "cars": ["coral", "coral", "coral"]
     }
    ]
   },
@@ -1614,56 +781,23 @@
    "title": "Rooftop Loop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "lime",
-     "lime",
-     "coral"
-    ],
-    [
-     "coral",
-     "teal",
-     "box:amber",
-     "box:coral",
-     "?violet"
-    ],
-    [
-     "coral",
-     "?amber",
-     "violet",
-     "teal"
-    ],
-    [
-     "tunnel:amber,amber,teal,amber",
-     "lime",
-     "amber",
-     "violet",
-     "coral"
-    ]
+    ["coral", "teal", "lime", "lime", "coral"],
+    ["coral", "teal", "box:amber", "box:coral", "?violet"],
+    ["coral", "?amber", "violet", "teal"],
+    ["tunnel:amber,amber,teal,amber", "lime", "amber", "violet", "coral"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "teal",
-      "teal"
-     ]
+     "cars": ["teal", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [0, 1],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -1672,57 +806,23 @@
    "title": "Library Loop",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "coral",
-     "amber",
-     "violet",
-     "?coral"
-    ],
-    [
-     "teal",
-     "tunnel:teal,teal,teal",
-     "amber",
-     "?lime",
-     "amber",
-     "coral"
-    ],
-    [
-     "coral",
-     "box:coral",
-     "lime",
-     "box:violet"
-    ],
-    [
-     "amber",
-     "lime",
-     "teal",
-     "violet"
-    ]
+    ["teal", "coral", "amber", "violet", "?coral"],
+    ["teal", "tunnel:teal,teal,teal", "amber", "?lime", "amber", "coral"],
+    ["coral", "box:coral", "lime", "box:violet"],
+    ["amber", "lime", "teal", "violet"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "amber",
-      "amber",
-      "coral"
-     ]
+     "cars": ["amber", "amber", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [1, 2],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1731,62 +831,28 @@
    "title": "Sunny Garage",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:lime,amber,teal,lime",
-     "box:amber",
-     "?coral",
-     "coral",
-     "teal"
-    ],
-    [
-     "amber",
-     "violet",
-     "?coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "box:lime",
-     "amber"
-    ],
-    [
-     "amber",
-     "teal",
-     "coral"
-    ]
+    ["tunnel:lime,amber,teal,lime", "box:amber", "?coral", "coral", "teal"],
+    ["amber", "violet", "?coral", "teal"],
+    ["coral", "box:lime", "amber"],
+    ["amber", "teal", "coral"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "teal",
-      "coral",
-      "violet"
-     ]
+     "cars": ["teal", "coral", "violet"]
     },
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "violet",
-      "teal",
-      "amber"
-     ]
+     "cars": ["violet", "teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "violet",
-      "violet",
-      "violet"
-     ]
+     "cells": [1, 2],
+     "cars": ["violet", "violet", "violet"]
     }
    ]
   },
@@ -1795,62 +861,23 @@
    "title": "Festival Loop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?lime",
-     "amber",
-     "?lime",
-     "teal",
-     "amber"
-    ],
-    [
-     "coral",
-     "amber",
-     "amber",
-     "teal",
-     "box:amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "violet",
-     "violet",
-     "?lime",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:violet,lime,amber,teal",
-     "box:lime",
-     "teal",
-     "coral",
-     "violet"
-    ]
+    ["coral", "?lime", "amber", "?lime", "teal", "amber"],
+    ["coral", "amber", "amber", "teal", "box:amber", "lime"],
+    ["coral", "teal", "violet", "violet", "?lime", "coral"],
+    ["teal", "tunnel:violet,lime,amber,teal", "box:lime", "teal", "coral", "violet"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "violet",
-      "coral",
-      "violet"
-     ]
+     "cars": ["violet", "coral", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [1, 2],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -1859,60 +886,23 @@
    "title": "Seaside Lot",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "coral",
-     "box:lime",
-     "amber",
-     "teal",
-     "lime"
-    ],
-    [
-     "coral",
-     "tunnel:lime,amber,lime",
-     "amber",
-     "amber",
-     "amber",
-     "coral"
-    ],
-    [
-     "coral",
-     "violet",
-     "lime",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "?violet",
-     "box:violet",
-     "?coral",
-     "amber"
-    ]
+    ["teal", "coral", "box:lime", "amber", "teal", "lime"],
+    ["coral", "tunnel:lime,amber,lime", "amber", "amber", "amber", "coral"],
+    ["coral", "violet", "lime", "teal", "teal"],
+    ["teal", "?violet", "box:violet", "?coral", "amber"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "coral",
-      "lime",
-      "teal"
-     ]
+     "cars": ["coral", "lime", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [4, 5],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1921,74 +911,28 @@
    "title": "Lantern Garage",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?coral",
-     "lime",
-     "violet",
-     "box:amber",
-     "violet",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "lime",
-     "lime",
-     "violet",
-     "box:teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:teal,teal,amber,lime",
-     "amber",
-     "teal",
-     "?amber",
-     "coral",
-     "amber",
-     "violet"
-    ],
-    [
-     "teal",
-     "teal",
-     "amber",
-     "?coral",
-     "?coral",
-     "violet"
-    ]
+    ["coral", "?coral", "lime", "violet", "box:amber", "violet", "lime"],
+    ["coral", "teal", "lime", "lime", "violet", "box:teal", "coral"],
+    ["teal", "tunnel:teal,teal,amber,lime", "amber", "teal", "?amber", "coral", "amber", "violet"],
+    ["teal", "teal", "amber", "?coral", "?coral", "violet"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "lime",
-      "teal"
-     ]
+     "cars": ["lime", "teal"]
     },
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "coral",
-      "violet",
-      "coral"
-     ]
+     "cars": ["coral", "violet", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "teal", "teal"]
     }
    ]
   },
@@ -1997,57 +941,23 @@
    "title": "Library Row",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "amber",
-     "violet",
-     "violet",
-     "violet"
-    ],
-    [
-     "teal",
-     "coral",
-     "lime",
-     "?coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "tunnel:amber,coral,amber",
-     "lime",
-     "amber",
-     "box:amber",
-     "?teal"
-    ],
-    [
-     "teal",
-     "box:coral",
-     "lime",
-     "teal"
-    ]
+    ["teal", "amber", "violet", "violet", "violet"],
+    ["teal", "coral", "lime", "?coral", "coral"],
+    ["coral", "tunnel:amber,coral,amber", "lime", "amber", "box:amber", "?teal"],
+    ["teal", "box:coral", "lime", "teal"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "teal",
-      "amber"
-     ]
+     "cars": ["teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["lime", "lime", "lime"]
     }
    ]
   },
@@ -2056,65 +966,25 @@
    "title": "River Bay",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "box:teal",
-     "?violet",
-     "lime",
-     "lime"
-    ],
-    [
-     "coral",
-     "coral",
-     "coral",
-     "teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "amber",
-     "violet",
-     "coral",
-     "lime"
-    ],
-    [
-     "teal",
-     "tunnel:violet,amber,teal,violet",
-     "amber",
-     "lime",
-     "amber",
-     "?amber"
-    ],
-    [
-     "coral",
-     "box:lime",
-     "box:amber",
-     "violet"
-    ]
+    ["coral", "box:teal", "?violet", "?lime", "?lime"],
+    ["coral", "coral", "coral", "teal", "teal"],
+    ["teal", "amber", "violet", "coral", "lime"],
+    ["teal", "tunnel:violet,amber,teal,violet", "amber", "lime", "amber", "?amber"],
+    ["coral", "box:lime", "box:amber", "violet"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "violet",
-      "lime"
-     ]
+     "cars": ["violet", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [2, 3],
+     "cars": ["amber", "amber", "amber"]
     }
    ]
   },
@@ -2123,66 +993,28 @@
    "title": "Full Lot",
    "blurb": "Everything together.",
    "lanes": [
-    [
-     "coral",
-     "box:teal",
-     "teal",
-     "lime"
-    ],
-    [
-     "teal",
-     "coral",
-     "box:coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:teal",
-     "amber"
-    ],
-    [
-     "tunnel:teal,violet,lime",
-     "teal",
-     "?violet",
-     "?lime",
-     "amber"
-    ]
+    ["coral", "box:teal", "teal", "lime"],
+    ["teal", "coral", "box:coral", "amber"],
+    ["coral", "?amber", "box:teal", "amber"],
+    ["tunnel:teal,violet,lime", "teal", "?violet", "?lime", "amber"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "violet",
-      "amber"
-     ]
+     "cars": ["violet", "amber"]
     },
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "coral",
-      "amber",
-      "coral"
-     ]
+     "cars": ["coral", "amber", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "coral",
-      "teal",
-      "coral",
-      "teal",
-      "coral",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["coral", "teal", "coral", "teal", "coral", "teal"]
     }
    ]
   },
@@ -2191,60 +1023,23 @@
    "title": "Midtown Lane",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "lime",
-     "violet",
-     "?amber",
-     "amber"
-    ],
-    [
-     "teal",
-     "tunnel:coral,coral,teal",
-     "box:teal",
-     "box:lime",
-     "teal",
-     "amber"
-    ],
-    [
-     "teal",
-     "?amber",
-     "?lime",
-     "violet"
-    ],
-    [
-     "coral",
-     "amber",
-     "box:coral",
-     "coral"
-    ]
+    ["coral", "lime", "violet", "?amber", "amber"],
+    ["teal", "tunnel:coral,coral,teal", "box:teal", "box:lime", "teal", "amber"],
+    ["teal", "?amber", "?lime", "violet"],
+    ["coral", "amber", "box:coral", "coral"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 1,
-     "cars": [
-      "teal",
-      "violet",
-      "amber"
-     ]
+     "cars": ["teal", "violet", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "coral",
-      "coral",
-      "amber",
-      "coral"
-     ]
+     "cells": [4, 5],
+     "cars": ["amber", "amber", "coral", "coral", "amber", "coral"]
     }
    ]
   },
@@ -2253,61 +1048,23 @@
    "title": "Park Loop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "violet",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "tunnel:amber,amber",
-     "?lime",
-     "box:coral",
-     "?amber",
-     "violet"
-    ],
-    [
-     "amber",
-     "teal",
-     "box:teal",
-     "teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "?lime",
-     "teal"
-    ]
+    ["coral", "amber", "?violet", "?coral", "?teal"],
+    ["coral", "tunnel:amber,amber", "?lime", "box:coral", "?amber", "violet"],
+    ["amber", "teal", "box:teal", "teal", "coral"],
+    ["teal", "box:lime", "?lime", "teal"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "amber",
-      "coral",
-      "violet"
-     ]
+     "cars": ["amber", "coral", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "violet",
-      "violet",
-      "teal",
-      "teal",
-      "violet",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["violet", "violet", "teal", "teal", "violet", "teal"]
     }
    ]
   },
@@ -2316,66 +1073,28 @@
    "title": "Arcade Strip",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "box:teal",
-     "?coral",
-     "violet"
-    ],
-    [
-     "coral",
-     "tunnel:coral,teal,coral",
-     "amber",
-     "teal",
-     "violet"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:lime",
-     "coral"
-    ],
-    [
-     "lime",
-     "box:amber",
-     "?lime"
-    ]
+    ["teal", "box:teal", "?coral", "violet"],
+    ["coral", "tunnel:coral,teal,coral", "amber", "teal", "violet"],
+    ["coral", "?amber", "box:lime", "coral"],
+    ["lime", "box:amber", "?lime"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cars": ["amber", "amber", "amber"]
     },
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "teal",
-      "teal",
-      "violet"
-     ]
+     "cars": ["teal", "teal", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "teal",
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "teal", "teal", "lime", "lime", "lime"]
     }
    ]
   },
@@ -2384,61 +1103,23 @@
    "title": "Willow Lot",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "box:coral",
-     "lime"
-    ],
-    [
-     "tunnel:amber,teal",
-     "coral",
-     "?teal",
-     "lime",
-     "violet",
-     "box:lime"
-    ],
-    [
-     "amber",
-     "amber",
-     "?coral",
-     "violet",
-     "teal"
-    ],
-    [
-     "teal",
-     "box:amber",
-     "violet",
-     "coral",
-     "?teal"
-    ]
+    ["coral", "teal", "?amber", "box:coral", "?lime"],
+    ["tunnel:amber,teal", "coral", "?teal", "lime", "violet", "box:lime"],
+    ["amber", "amber", "?coral", "violet", "teal"],
+    ["teal", "box:amber", "violet", "coral", "?teal"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "amber",
-      "coral"
-     ]
+     "cars": ["amber", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber",
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [1, 2],
+     "cars": ["amber", "amber", "amber", "amber", "amber", "amber"]
     }
    ]
   },
@@ -2447,65 +1128,23 @@
    "title": "Corner Stop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "violet",
-     "teal",
-     "box:coral",
-     "?amber",
-     "teal"
-    ],
-    [
-     "coral",
-     "lime",
-     "amber",
-     "?amber",
-     "amber",
-     "amber"
-    ],
-    [
-     "teal",
-     "?lime",
-     "?teal",
-     "violet",
-     "violet",
-     "violet"
-    ],
-    [
-     "coral",
-     "tunnel:lime,coral,violet,amber",
-     "box:teal",
-     "teal",
-     "box:lime",
-     "lime"
-    ]
+    ["coral", "violet", "teal", "box:coral", "?amber", "teal"],
+    ["coral", "lime", "amber", "?amber", "amber", "amber"],
+    ["teal", "?lime", "?teal", "violet", "violet", "violet"],
+    ["coral", "tunnel:lime,coral,violet,amber", "box:teal", "teal", "box:lime", "lime"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "violet",
-      "lime",
-      "coral"
-     ]
+     "cars": ["violet", "lime", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime",
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [1, 2],
+     "cars": ["lime", "lime", "lime", "amber", "amber", "amber"]
     }
    ]
   },
@@ -2514,76 +1153,28 @@
    "title": "Library Lot",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "tunnel:violet,amber",
-     "amber",
-     "coral",
-     "violet",
-     "violet",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "coral",
-     "?amber",
-     "box:amber",
-     "?lime",
-     "?teal",
-     "violet"
-    ],
-    [
-     "lime",
-     "box:lime",
-     "teal",
-     "coral",
-     "amber",
-     "sky"
-    ],
-    [
-     "teal",
-     "box:coral",
-     "teal",
-     "sky",
-     "violet",
-     "lime"
-    ]
+    ["teal", "tunnel:violet,amber", "amber", "coral", "violet", "violet", "coral", "amber"],
+    ["coral", "coral", "?amber", "box:amber", "?lime", "?teal", "violet"],
+    ["lime", "box:lime", "teal", "coral", "amber", "sky"],
+    ["teal", "box:coral", "teal", "sky", "violet", "lime"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "violet",
-      "lime"
-     ]
+     "cars": ["violet", "lime"]
     },
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "teal",
-      "lime",
-      "sky"
-     ]
+     "cars": ["teal", "lime", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "teal",
-      "teal",
-      "teal",
-      "sky"
-     ]
+     "cells": [1, 2],
+     "cars": ["sky", "sky", "teal", "teal", "teal", "sky"]
     }
    ]
   },
@@ -2592,72 +1183,24 @@
    "title": "Harbor Yard",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "lime",
-     "sky",
-     "?lime",
-     "box:violet",
-     "lime"
-    ],
-    [
-     "coral",
-     "coral",
-     "coral",
-     "teal",
-     "box:teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:violet,lime",
-     "sky",
-     "coral",
-     "violet",
-     "teal"
-    ],
-    [
-     "violet",
-     "amber",
-     "?teal",
-     "box:sky",
-     "teal"
-    ],
-    [
-     "lime",
-     "tunnel:amber,violet,sky,lime",
-     "?sky",
-     "?violet",
-     "amber",
-     "amber"
-    ]
+    ["amber", "lime", "sky", "?lime", "box:violet", "lime"],
+    ["coral", "coral", "coral", "teal", "box:teal", "coral"],
+    ["teal", "tunnel:violet,lime", "sky", "coral", "violet", "teal"],
+    ["violet", "amber", "?teal", "box:sky", "teal"],
+    ["lime", "tunnel:amber,violet,sky,lime", "?sky", "?violet", "amber", "amber"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "sky",
-      "coral",
-      "amber"
-     ]
+     "cars": ["sky", "coral", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "violet",
-      "lime",
-      "lime",
-      "violet",
-      "violet",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["violet", "lime", "lime", "violet", "violet", "lime"]
     }
    ]
   },
@@ -2666,65 +1209,24 @@
    "title": "Cedar Block",
    "blurb": "",
    "lanes": [
-    [
-     "lime",
-     "teal",
-     "?coral",
-     "violet"
-    ],
-    [
-     "tunnel:amber,lime,lime",
-     "box:coral",
-     "box:teal",
-     "?lime",
-     "violet"
-    ],
-    [
-     "teal",
-     "?amber",
-     "teal",
-     "sky"
-    ],
-    [
-     "amber",
-     "coral",
-     "amber",
-     "amber"
-    ],
-    [
-     "tunnel:sky,teal,teal,violet",
-     "sky",
-     "coral",
-     "box:lime",
-     "amber"
-    ]
+    ["lime", "teal", "?coral", "violet"],
+    ["tunnel:amber,lime,lime", "box:coral", "box:teal", "?lime", "violet"],
+    ["teal", "?amber", "teal", "sky"],
+    ["amber", "coral", "amber", "amber"],
+    ["tunnel:sky,teal,teal,violet", "sky", "coral", "box:lime", "amber"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 0,
-     "cars": [
-      "coral",
-      "coral",
-      "lime"
-     ]
+     "cars": ["coral", "coral", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "violet",
-      "lime",
-      "violet",
-      "lime",
-      "violet",
-      "lime"
-     ]
+     "cells": [2, 3],
+     "cars": ["violet", "lime", "violet", "lime", "violet", "lime"]
     }
    ]
   },
@@ -2733,82 +1235,31 @@
    "title": "Harbor Bay",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:violet,amber,lime,sky",
-     "?lime",
-     "teal",
-     "amber",
-     "coral",
-     "box:amber"
-    ],
-    [
-     "coral",
-     "teal",
-     "violet",
-     "coral",
-     "sky"
-    ],
-    [
-     "coral",
-     "violet",
-     "teal",
-     "amber"
-    ],
-    [
-     "tunnel:coral,sky,lime,violet",
-     "box:lime",
-     "amber",
-     "?sky",
-     "?lime"
-    ],
-    [
-     "violet",
-     "coral",
-     "box:sky",
-     "teal"
-    ],
-    [
-     "coral",
-     "lime",
-     "teal",
-     "teal"
-    ]
+    ["tunnel:violet,amber,lime,sky", "?lime", "teal", "amber", "coral", "box:amber"],
+    ["coral", "teal", "violet", "coral", "sky"],
+    ["coral", "violet", "teal", "amber"],
+    ["tunnel:coral,sky,lime,violet", "box:lime", "amber", "?sky", "?lime"],
+    ["violet", "coral", "box:sky", "teal"],
+    ["coral", "lime", "teal", "teal"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "violet",
-      "sky",
-      "amber"
-     ]
+     "cars": ["violet", "sky", "amber"]
     },
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [4, 5],
+     "cars": ["coral", "coral", "coral", "coral", "coral", "coral"]
     }
    ]
   },
@@ -2817,65 +1268,24 @@
    "title": "Orchard Square",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "box:teal",
-     "sky",
-     "lime",
-     "teal"
-    ],
-    [
-     "amber",
-     "?amber",
-     "violet",
-     "lime"
-    ],
-    [
-     "tunnel:sky,coral,lime",
-     "box:lime",
-     "?sky",
-     "lime",
-     "amber"
-    ],
-    [
-     "tunnel:coral,amber,violet,teal",
-     "box:coral",
-     "teal",
-     "?teal",
-     "violet"
-    ],
-    [
-     "coral",
-     "?teal",
-     "coral",
-     "amber"
-    ]
+    ["coral", "box:teal", "sky", "lime", "teal"],
+    ["amber", "?amber", "violet", "lime"],
+    ["tunnel:sky,coral,lime", "box:lime", "?sky", "lime", "amber"],
+    ["tunnel:coral,amber,violet,teal", "box:coral", "teal", "?teal", "violet"],
+    ["coral", "?teal", "coral", "amber"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "amber",
-      "lime"
-     ]
+     "cars": ["amber", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "sky",
-      "lime",
-      "lime",
-      "lime",
-      "sky",
-      "sky"
-     ]
+     "cells": [0, 1],
+     "cars": ["sky", "lime", "lime", "lime", "sky", "sky"]
     }
    ]
   },
@@ -2884,66 +1294,24 @@
    "title": "Rooftop Block",
    "blurb": "",
    "lanes": [
-    [
-     "lime",
-     "tunnel:teal,sky",
-     "teal",
-     "box:violet",
-     "sky",
-     "teal"
-    ],
-    [
-     "teal",
-     "lime",
-     "?amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "box:teal",
-     "box:amber",
-     "coral"
-    ],
-    [
-     "coral",
-     "?violet",
-     "?coral",
-     "violet"
-    ],
-    [
-     "coral",
-     "tunnel:amber,lime,teal,sky",
-     "box:amber",
-     "?coral",
-     "amber"
-    ]
+    ["lime", "tunnel:teal,sky", "teal", "box:violet", "sky", "teal"],
+    ["teal", "lime", "?amber", "lime"],
+    ["coral", "box:teal", "box:amber", "coral"],
+    ["coral", "?violet", "?coral", "violet"],
+    ["coral", "tunnel:amber,lime,teal,sky", "box:amber", "?coral", "amber"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "lime",
-      "lime",
-      "amber"
-     ]
+     "cars": ["lime", "lime", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [2, 3],
+     "cars": ["coral", "coral", "coral", "coral", "coral", "coral"]
     }
    ]
   },
@@ -2952,77 +1320,29 @@
    "title": "Maple Row",
    "blurb": "",
    "lanes": [
-    [
-     "lime",
-     "box:coral",
-     "?lime",
-     "box:sky",
-     "sky"
-    ],
-    [
-     "teal",
-     "tunnel:lime,sky",
-     "teal",
-     "lime",
-     "coral",
-     "teal"
-    ],
-    [
-     "violet",
-     "coral",
-     "?violet",
-     "?coral",
-     "lime"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:amber",
-     "coral"
-    ],
-    [
-     "tunnel:teal,amber",
-     "teal",
-     "amber",
-     "box:violet",
-     "amber"
-    ]
+    ["lime", "box:coral", "?lime", "box:sky", "sky"],
+    ["teal", "tunnel:lime,sky", "teal", "lime", "coral", "teal"],
+    ["violet", "coral", "?violet", "?coral", "lime"],
+    ["coral", "?amber", "box:amber", "coral"],
+    ["tunnel:teal,amber", "teal", "amber", "box:violet", "amber"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "violet",
-      "violet",
-      "amber"
-     ]
+     "cars": ["violet", "violet", "amber"]
     },
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "violet",
-      "teal",
-      "lime"
-     ]
+     "cars": ["violet", "teal", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "sky",
-      "sky",
-      "sky",
-      "sky"
-     ]
+     "cells": [0, 1],
+     "cars": ["sky", "sky", "sky", "sky", "sky", "sky"]
     }
    ]
   },
@@ -3031,69 +1351,24 @@
    "title": "Library Deck",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "?violet",
-     "coral",
-     "lime",
-     "violet"
-    ],
-    [
-     "coral",
-     "tunnel:lime,coral",
-     "coral",
-     "sky",
-     "violet",
-     "amber"
-    ],
-    [
-     "amber",
-     "box:sky",
-     "?amber",
-     "box:sky",
-     "teal"
-    ],
-    [
-     "teal",
-     "box:violet",
-     "?lime",
-     "?coral",
-     "teal"
-    ],
-    [
-     "tunnel:amber,violet,coral,lime",
-     "teal",
-     "lime",
-     "box:amber",
-     "teal",
-     "lime"
-    ]
+    ["teal", "?violet", "coral", "lime", "violet"],
+    ["coral", "tunnel:lime,coral", "coral", "sky", "violet", "amber"],
+    ["amber", "box:sky", "?amber", "box:sky", "teal"],
+    ["teal", "box:violet", "?lime", "?coral", "teal"],
+    ["tunnel:amber,violet,coral,lime", "teal", "lime", "box:amber", "teal", "lime"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 0,
-     "cars": [
-      "amber",
-      "violet"
-     ]
+     "cars": ["amber", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "sky",
-      "teal",
-      "teal",
-      "sky",
-      "sky",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["sky", "teal", "teal", "sky", "sky", "teal"]
     }
    ]
   },
@@ -3102,80 +1377,24 @@
    "title": "Canal Court",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "tunnel:coral,teal,violet",
-     "amber",
-     "box:coral",
-     "teal",
-     "violet",
-     "amber",
-     "violet",
-     "sky"
-    ],
-    [
-     "amber",
-     "teal",
-     "?sky",
-     "coral",
-     "teal",
-     "lime",
-     "sky"
-    ],
-    [
-     "teal",
-     "?coral",
-     "violet",
-     "?coral",
-     "teal",
-     "lime",
-     "coral"
-    ],
-    [
-     "lime",
-     "tunnel:coral,teal,teal,amber",
-     "box:lime",
-     "box:violet",
-     "box:sky",
-     "?lime",
-     "amber",
-     "violet"
-    ],
-    [
-     "amber",
-     "?coral",
-     "sky",
-     "coral",
-     "?amber",
-     "lime",
-     "sky"
-    ]
+    ["teal", "tunnel:coral,teal,violet", "amber", "box:coral", "teal", "violet", "amber", "violet", "sky"],
+    ["amber", "teal", "?sky", "coral", "teal", "lime", "sky"],
+    ["teal", "?coral", "violet", "?coral", "teal", "lime", "coral"],
+    ["lime", "tunnel:coral,teal,teal,amber", "box:lime", "box:violet", "box:sky", "?lime", "amber", "violet"],
+    ["amber", "?coral", "sky", "coral", "?amber", "lime", "sky"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 0,
-     "cars": [
-      "amber",
-      "amber"
-     ]
+     "cars": ["amber", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      6,
-      7
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "sky",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [6, 7],
+     "cars": ["sky", "sky", "sky", "coral", "coral", "coral"]
     }
    ]
   },
@@ -3184,75 +1403,29 @@
    "title": "Station Yard",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "box:lime",
-     "sky",
-     "?amber"
-    ],
-    [
-     "coral",
-     "?amber",
-     "teal",
-     "?coral"
-    ],
-    [
-     "amber",
-     "tunnel:lime,coral,teal",
-     "box:amber",
-     "lime",
-     "box:sky"
-    ],
-    [
-     "teal",
-     "tunnel:teal,coral,amber",
-     "lime",
-     "violet",
-     "sky"
-    ],
-    [
-     "teal",
-     "box:violet",
-     "?violet",
-     "teal"
-    ]
+    ["coral", "coral", "box:lime", "sky", "?amber"],
+    ["coral", "?amber", "teal", "?coral"],
+    ["amber", "tunnel:lime,coral,teal", "box:amber", "lime", "box:sky"],
+    ["teal", "tunnel:teal,coral,amber", "lime", "violet", "sky"],
+    ["teal", "box:violet", "?violet", "teal"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "violet",
-      "violet",
-      "lime"
-     ]
+     "cars": ["violet", "violet", "lime"]
     },
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "violet",
-      "amber",
-      "lime"
-     ]
+     "cars": ["violet", "amber", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [3, 4],
+     "cars": ["coral", "coral", "coral", "coral", "coral", "coral"]
     }
    ]
   },
@@ -3261,72 +1434,24 @@
    "title": "Bakery Block",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:coral,lime",
-     "coral",
-     "violet",
-     "teal",
-     "lime",
-     "?amber",
-     "violet"
-    ],
-    [
-     "coral",
-     "amber",
-     "box:teal",
-     "sky",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
-     "tunnel:sky,lime,teal,coral",
-     "?teal",
-     "?violet",
-     "sky",
-     "teal"
-    ],
-    [
-     "lime",
-     "violet",
-     "sky",
-     "box:amber",
-     "violet"
-    ],
-    [
-     "amber",
-     "?amber",
-     "box:lime",
-     "box:teal",
-     "sky"
-    ]
+    ["tunnel:coral,lime", "coral", "violet", "teal", "lime", "?amber", "violet"],
+    ["coral", "amber", "box:teal", "sky", "coral", "amber"],
+    ["coral", "tunnel:sky,lime,teal,coral", "?teal", "?violet", "sky", "teal"],
+    ["lime", "violet", "sky", "box:amber", "violet"],
+    ["amber", "?amber", "box:lime", "box:teal", "sky"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "sky",
-      "violet",
-      "lime"
-     ]
+     "cars": ["sky", "violet", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "teal",
-      "coral",
-      "coral",
-      "teal",
-      "coral",
-      "teal"
-     ]
+     "cells": [4, 5],
+     "cars": ["teal", "coral", "coral", "teal", "coral", "teal"]
     }
    ]
   },
@@ -3335,69 +1460,24 @@
    "title": "Harbor Strip",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:lime,teal,amber",
-     "coral",
-     "?teal",
-     "?sky",
-     "box:coral",
-     "coral"
-    ],
-    [
-     "lime",
-     "coral",
-     "amber",
-     "box:sky",
-     "sky"
-    ],
-    [
-     "tunnel:violet,violet,amber",
-     "?coral",
-     "?teal",
-     "violet",
-     "lime",
-     "lime"
-    ],
-    [
-     "teal",
-     "box:coral",
-     "violet",
-     "violet",
-     "teal"
-    ],
-    [
-     "lime",
-     "box:amber",
-     "amber",
-     "teal"
-    ]
+    ["tunnel:lime,teal,amber", "coral", "?teal", "?sky", "box:coral", "?coral"],
+    ["lime", "coral", "amber", "box:sky", "sky"],
+    ["tunnel:violet,violet,amber", "?coral", "?teal", "violet", "lime", "lime"],
+    ["teal", "box:coral", "violet", "violet", "teal"],
+    ["lime", "box:amber", "amber", "teal"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "lime",
-      "amber",
-      "violet"
-     ]
+     "cars": ["lime", "amber", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "amber",
-      "violet",
-      "violet",
-      "amber",
-      "amber",
-      "violet"
-     ]
+     "cells": [4, 5],
+     "cars": ["amber", "violet", "violet", "amber", "amber", "violet"]
     }
    ]
   },
@@ -3406,75 +1486,29 @@
    "title": "Festival Strip",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:amber,violet,coral,violet",
-     "coral",
-     "sky",
-     "?violet",
-     "box:coral",
-     "amber"
-    ],
-    [
-     "tunnel:lime,teal",
-     "coral",
-     "?teal",
-     "lime",
-     "?sky",
-     "teal"
-    ],
-    [
-     "coral",
-     "box:teal",
-     "lime",
-     "sky",
-     "teal"
-    ],
-    [
-     "teal",
-     "?amber",
-     "box:amber",
-     "coral"
-    ],
-    [
-     "amber",
-     "box:violet",
-     "lime",
-     "violet"
-    ]
+    ["tunnel:amber,violet,coral,violet", "coral", "sky", "?violet", "box:coral", "amber"],
+    ["tunnel:lime,teal", "coral", "?teal", "lime", "?sky", "teal"],
+    ["coral", "box:teal", "lime", "sky", "teal"],
+    ["teal", "?amber", "box:amber", "coral"],
+    ["amber", "box:violet", "lime", "violet"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "lime",
-      "violet"
-     ]
+     "cars": ["lime", "violet"]
     },
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "lime",
-      "amber"
-     ]
+     "cars": ["lime", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "lime",
-      "lime",
-      "lime",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["lime", "lime", "lime", "lime", "lime", "lime"]
     }
    ]
   },
@@ -3483,81 +1517,26 @@
    "title": "Canal Stop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "box:violet",
-     "lime",
-     "box:violet",
-     "lime"
-    ],
-    [
-     "coral",
-     "?amber",
-     "sky",
-     "coral",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "tunnel:teal,coral,sky,violet",
-     "amber",
-     "lime",
-     "violet",
-     "coral",
-     "teal"
-    ],
-    [
-     "teal",
-     "tunnel:coral,sky",
-     "sky",
-     "box:teal",
-     "?amber",
-     "teal",
-     "sky"
-    ],
-    [
-     "lime",
-     "coral",
-     "teal",
-     "box:sky",
-     "amber"
-    ],
-    [
-     "teal",
-     "?teal",
-     "?violet",
-     "lime",
-     "violet"
-    ]
+    ["coral", "?amber", "box:violet", "?lime", "box:violet", "?lime"],
+    ["coral", "?amber", "sky", "coral", "amber", "lime"],
+    ["coral", "tunnel:teal,coral,sky,violet", "amber", "lime", "violet", "coral", "teal"],
+    ["teal", "tunnel:coral,sky", "sky", "box:teal", "?amber", "teal", "sky"],
+    ["lime", "coral", "teal", "box:sky", "amber"],
+    ["teal", "?teal", "?violet", "lime", "violet"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "coral",
-      "teal"
-     ]
+     "cars": ["coral", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "lime",
-      "teal",
-      "teal",
-      "teal",
-      "lime",
-      "lime"
-     ]
+     "cells": [2, 3],
+     "cars": ["lime", "teal", "teal", "teal", "lime", "lime"]
     }
    ]
   },
@@ -3566,73 +1545,24 @@
    "title": "Park Court",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?amber",
-     "box:amber",
-     "coral",
-     "sky",
-     "teal"
-    ],
-    [
-     "coral",
-     "lime",
-     "box:teal",
-     "?sky",
-     "box:coral",
-     "teal"
-    ],
-    [
-     "amber",
-     "tunnel:violet,sky",
-     "teal",
-     "lime",
-     "?sky",
-     "box:teal",
-     "lime"
-    ],
-    [
-     "tunnel:sky,lime,violet",
-     "coral",
-     "teal",
-     "?coral",
-     "?amber",
-     "violet"
-    ],
-    [
-     "violet",
-     "lime",
-     "violet",
-     "violet",
-     "amber"
-    ]
+    ["coral", "?amber", "box:amber", "coral", "sky", "teal"],
+    ["coral", "lime", "box:teal", "?sky", "box:coral", "teal"],
+    ["amber", "tunnel:violet,sky", "teal", "lime", "?sky", "box:teal", "lime"],
+    ["tunnel:sky,lime,violet", "coral", "teal", "?coral", "?amber", "violet"],
+    ["violet", "lime", "violet", "violet", "amber"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "sky",
-      "lime",
-      "amber"
-     ]
+     "cars": ["sky", "lime", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "sky",
-      "sky",
-      "sky",
-      "sky"
-     ]
+     "cells": [1, 2],
+     "cars": ["sky", "sky", "sky", "sky", "sky", "sky"]
     }
    ]
   },
@@ -3641,85 +1571,29 @@
    "title": "Midtown Square",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:violet,teal,sky,amber",
-     "?amber",
-     "coral",
-     "lime",
-     "sky",
-     "sky",
-     "?teal",
-     "lime"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "box:sky",
-     "amber",
-     "?violet",
-     "coral"
-    ],
-    [
-     "coral",
-     "tunnel:coral,amber,coral,sky",
-     "?violet",
-     "coral",
-     "amber",
-     "box:coral",
-     "lime"
-    ],
-    [
-     "teal",
-     "teal",
-     "?teal",
-     "violet",
-     "lime",
-     "amber"
-    ],
-    [
-     "coral",
-     "box:lime",
-     "violet",
-     "?teal",
-     "?amber",
-     "violet"
-    ]
+    ["tunnel:violet,teal,sky,amber", "?amber", "coral", "lime", "sky", "sky", "?teal", "lime"],
+    ["teal", "box:lime", "box:sky", "amber", "?violet", "coral"],
+    ["coral", "tunnel:coral,amber,coral,sky", "?violet", "coral", "amber", "box:coral", "lime"],
+    ["teal", "teal", "?teal", "violet", "lime", "amber"],
+    ["coral", "box:lime", "violet", "?teal", "?amber", "violet"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "amber",
-      "coral",
-      "teal"
-     ]
+     "cars": ["amber", "coral", "teal"]
     },
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "teal",
-      "amber",
-      "sky"
-     ]
+     "cars": ["teal", "amber", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "violet",
-      "amber",
-      "violet",
-      "amber",
-      "violet",
-      "amber"
-     ]
+     "cells": [3, 4],
+     "cars": ["violet", "amber", "violet", "amber", "violet", "amber"]
     }
    ]
   },
@@ -3728,80 +1602,24 @@
    "title": "Willow Stop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?violet",
-     "amber",
-     "rose",
-     "?lime",
-     "?rose",
-     "lime",
-     "violet"
-    ],
-    [
-     "coral",
-     "teal",
-     "sky",
-     "box:violet",
-     "teal",
-     "?teal",
-     "violet"
-    ],
-    [
-     "coral",
-     "amber",
-     "?lime",
-     "sky",
-     "amber",
-     "coral",
-     "violet"
-    ],
-    [
-     "amber",
-     "tunnel:coral,coral,sky,amber",
-     "box:teal",
-     "violet",
-     "coral",
-     "?teal",
-     "coral",
-     "lime"
-    ],
-    [
-     "tunnel:rose,sky,sky",
-     "teal",
-     "rose",
-     "box:lime",
-     "sky",
-     "box:amber",
-     "rose",
-     "lime"
-    ]
+    ["coral", "?violet", "amber", "rose", "?lime", "?rose", "lime", "violet"],
+    ["coral", "teal", "sky", "box:violet", "teal", "?teal", "violet"],
+    ["coral", "amber", "?lime", "sky", "amber", "coral", "violet"],
+    ["amber", "tunnel:coral,coral,sky,amber", "box:teal", "violet", "coral", "?teal", "coral", "lime"],
+    ["tunnel:rose,sky,sky", "teal", "rose", "box:lime", "sky", "box:amber", "rose", "lime"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "rose",
-      "coral"
-     ]
+     "cars": ["rose", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "violet",
-      "violet",
-      "violet",
-      "sky"
-     ]
+     "cells": [4, 5],
+     "cars": ["sky", "sky", "violet", "violet", "violet", "sky"]
     }
    ]
   },
@@ -3810,77 +1628,24 @@
    "title": "Harbor Square",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "sky",
-     "box:violet",
-     "coral",
-     "box:coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "teal",
-     "?teal",
-     "rose",
-     "box:teal",
-     "box:lime",
-     "lime"
-    ],
-    [
-     "tunnel:sky,violet,rose,amber",
-     "?coral",
-     "violet",
-     "?rose",
-     "lime",
-     "violet",
-     "teal",
-     "violet"
-    ],
-    [
-     "tunnel:sky,lime,rose",
-     "teal",
-     "amber",
-     "?sky",
-     "lime",
-     "coral",
-     "rose"
-    ],
-    [
-     "amber",
-     "lime",
-     "violet",
-     "?amber",
-     "box:sky",
-     "amber"
-    ]
+    ["coral", "amber", "sky", "box:violet", "coral", "box:coral", "teal"],
+    ["coral", "teal", "?teal", "rose", "box:teal", "box:lime", "lime"],
+    ["tunnel:sky,violet,rose,amber", "?coral", "violet", "?rose", "lime", "violet", "teal", "violet"],
+    ["tunnel:sky,lime,rose", "teal", "amber", "?sky", "lime", "coral", "rose"],
+    ["amber", "lime", "violet", "?amber", "box:sky", "amber"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "rose",
-      "sky"
-     ]
+     "cars": ["rose", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "rose",
-      "rose",
-      "rose",
-      "rose",
-      "rose",
-      "rose"
-     ]
+     "cells": [2, 3],
+     "cars": ["rose", "rose", "rose", "rose", "rose", "rose"]
     }
    ]
   },
@@ -3889,80 +1654,29 @@
    "title": "Pier Loop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "?lime",
-     "sky",
-     "rose",
-     "lime"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:lime",
-     "rose",
-     "?teal",
-     "lime"
-    ],
-    [
-     "coral",
-     "?amber",
-     "box:amber",
-     "?sky",
-     "sky"
-    ],
-    [
-     "teal",
-     "tunnel:violet,violet,amber",
-     "violet",
-     "violet",
-     "teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "tunnel:amber,coral,violet,amber",
-     "box:lime",
-     "box:coral",
-     "box:violet",
-     "teal"
-    ]
+    ["coral", "teal", "?lime", "sky", "rose", "lime"],
+    ["coral", "?amber", "box:lime", "rose", "?teal", "lime"],
+    ["coral", "?amber", "box:amber", "?sky", "sky"],
+    ["teal", "tunnel:violet,violet,amber", "violet", "violet", "teal", "coral"],
+    ["teal", "tunnel:amber,coral,violet,amber", "box:lime", "box:coral", "box:violet", "teal"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 0,
-     "cars": [
-      "sky",
-      "sky"
-     ]
+     "cars": ["sky", "sky"]
     },
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "sky",
-      "lime",
-      "rose"
-     ]
+     "cars": ["sky", "lime", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "amber",
-      "amber",
-      "amber",
-      "amber"
-     ]
+     "cells": [3, 4],
+     "cars": ["amber", "amber", "amber", "amber", "amber", "amber"]
     }
    ]
   },
@@ -3971,77 +1685,24 @@
    "title": "Sunny Deck",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "?teal",
-     "?sky",
-     "violet",
-     "box:coral",
-     "coral",
-     "lime"
-    ],
-    [
-     "amber",
-     "box:coral",
-     "violet",
-     "rose",
-     "teal",
-     "teal",
-     "sky"
-    ],
-    [
-     "tunnel:teal,lime,violet,sky",
-     "coral",
-     "box:amber",
-     "box:teal",
-     "box:sky",
-     "?amber",
-     "coral"
-    ],
-    [
-     "tunnel:rose,rose,sky",
-     "teal",
-     "lime",
-     "violet",
-     "sky",
-     "rose",
-     "amber"
-    ],
-    [
-     "lime",
-     "?lime",
-     "rose",
-     "coral",
-     "?amber",
-     "violet"
-    ]
+    ["amber", "?teal", "?sky", "violet", "box:coral", "coral", "lime"],
+    ["amber", "box:coral", "violet", "rose", "teal", "teal", "sky"],
+    ["tunnel:teal,lime,violet,sky", "coral", "box:amber", "box:teal", "box:sky", "?amber", "coral"],
+    ["tunnel:rose,rose,sky", "teal", "lime", "violet", "sky", "rose", "amber"],
+    ["lime", "?lime", "rose", "coral", "?amber", "violet"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "lime",
-      "violet",
-      "rose"
-     ]
+     "cars": ["lime", "violet", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [0, 1],
+     "cars": ["coral", "coral", "coral", "coral", "coral", "coral"]
     }
    ]
   },
@@ -4050,84 +1711,24 @@
    "title": "River Row",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:violet,rose,teal,lime",
-     "amber",
-     "teal",
-     "coral",
-     "?sky",
-     "rose",
-     "sky",
-     "box:violet",
-     "rose"
-    ],
-    [
-     "amber",
-     "tunnel:teal,coral",
-     "box:sky",
-     "lime",
-     "?violet",
-     "amber",
-     "coral",
-     "box:sky",
-     "coral"
-    ],
-    [
-     "teal",
-     "lime",
-     "coral",
-     "rose",
-     "teal",
-     "?coral",
-     "lime",
-     "coral"
-    ],
-    [
-     "amber",
-     "coral",
-     "box:rose",
-     "violet",
-     "?teal",
-     "box:amber",
-     "lime",
-     "sky"
-    ],
-    [
-     "teal",
-     "lime",
-     "violet",
-     "?coral",
-     "?teal",
-     "amber",
-     "sky"
-    ]
+    ["tunnel:violet,rose,teal,lime", "amber", "teal", "coral", "?sky", "rose", "sky", "box:violet", "rose"],
+    ["amber", "tunnel:teal,coral", "box:sky", "lime", "?violet", "amber", "coral", "box:sky", "coral"],
+    ["teal", "lime", "coral", "rose", "teal", "?coral", "lime", "coral"],
+    ["amber", "coral", "box:rose", "violet", "?teal", "box:amber", "lime", "sky"],
+    ["teal", "lime", "violet", "?coral", "?teal", "amber", "sky"]
    ],
    "sides": [
     {
      "lane": 1,
      "at": 0,
-     "cars": [
-      "teal",
-      "violet",
-      "rose"
-     ]
+     "cars": ["teal", "violet", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "lime",
-      "sky",
-      "sky",
-      "sky",
-      "lime",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["lime", "sky", "sky", "sky", "lime", "lime"]
     }
    ]
   },
@@ -4136,83 +1737,29 @@
    "title": "Pier Garage",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "tunnel:lime,teal,rose,violet",
-     "teal",
-     "lime",
-     "sky",
-     "box:rose",
-     "amber"
-    ],
-    [
-     "lime",
-     "?coral",
-     "amber",
-     "?sky",
-     "box:coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "?violet",
-     "?violet",
-     "sky",
-     "amber",
-     "rose"
-    ],
-    [
-     "tunnel:rose,lime,amber",
-     "box:coral",
-     "amber",
-     "teal",
-     "box:rose",
-     "?teal",
-     "violet"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "violet",
-     "coral",
-     "teal"
-    ]
+    ["amber", "tunnel:lime,teal,rose,violet", "teal", "lime", "sky", "box:rose", "amber"],
+    ["lime", "?coral", "amber", "?sky", "box:coral", "coral"],
+    ["coral", "?violet", "?violet", "sky", "amber", "rose"],
+    ["tunnel:rose,lime,amber", "box:coral", "amber", "teal", "box:rose", "?teal", "violet"],
+    ["teal", "box:lime", "violet", "coral", "teal"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "sky",
-      "rose",
-      "sky"
-     ]
+     "cars": ["sky", "rose", "sky"]
     },
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "sky",
-      "violet",
-      "lime"
-     ]
+     "cars": ["sky", "violet", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "amber",
-      "amber",
-      "teal",
-      "amber"
-     ]
+     "cells": [0, 1],
+     "cars": ["teal", "teal", "amber", "amber", "teal", "amber"]
     }
    ]
   },
@@ -4221,79 +1768,24 @@
    "title": "Canal Block",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "coral",
-     "box:lime",
-     "lime",
-     "rose",
-     "amber",
-     "amber"
-    ],
-    [
-     "coral",
-     "lime",
-     "?amber",
-     "?coral",
-     "sky",
-     "box:teal",
-     "box:violet"
-    ],
-    [
-     "tunnel:sky,sky,rose",
-     "teal",
-     "amber",
-     "sky",
-     "violet",
-     "rose",
-     "teal",
-     "box:lime"
-    ],
-    [
-     "teal",
-     "amber",
-     "violet",
-     "teal",
-     "?amber",
-     "coral",
-     "box:violet"
-    ],
-    [
-     "sky",
-     "tunnel:sky,lime",
-     "?teal",
-     "violet",
-     "?coral",
-     "rose",
-     "lime",
-     "violet"
-    ]
+    ["coral", "coral", "box:lime", "lime", "rose", "amber", "amber"],
+    ["coral", "lime", "?amber", "?coral", "sky", "box:teal", "box:violet"],
+    ["tunnel:sky,sky,rose", "teal", "amber", "sky", "violet", "rose", "teal", "box:lime"],
+    ["teal", "amber", "violet", "teal", "?amber", "coral", "box:violet"],
+    ["sky", "tunnel:sky,lime", "?teal", "violet", "?coral", "rose", "lime", "violet"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "rose",
-      "rose"
-     ]
+     "cars": ["rose", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "teal",
-      "teal",
-      "violet",
-      "violet",
-      "teal",
-      "violet"
-     ]
+     "cells": [0, 1],
+     "cars": ["teal", "teal", "violet", "violet", "teal", "violet"]
     }
    ]
   },
@@ -4302,96 +1794,26 @@
    "title": "Lantern Stop",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "teal",
-     "lime",
-     "teal",
-     "amber",
-     "box:lime",
-     "?rose",
-     "sky"
-    ],
-    [
-     "coral",
-     "lime",
-     "amber",
-     "amber",
-     "violet",
-     "box:coral",
-     "coral",
-     "rose"
-    ],
-    [
-     "amber",
-     "?coral",
-     "teal",
-     "rose",
-     "teal",
-     "violet",
-     "violet",
-     "sky"
-    ],
-    [
-     "tunnel:violet,lime,lime",
-     "box:lime",
-     "?violet",
-     "sky",
-     "teal",
-     "coral",
-     "sky",
-     "coral",
-     "lime"
-    ],
-    [
-     "violet",
-     "tunnel:sky,amber,violet,amber",
-     "coral",
-     "amber",
-     "rose",
-     "coral",
-     "lime",
-     "?coral",
-     "teal"
-    ],
-    [
-     "tunnel:sky,teal,teal",
-     "amber",
-     "?rose",
-     "box:sky",
-     "?sky",
-     "violet",
-     "box:lime",
-     "rose",
-     "amber"
-    ]
+    ["teal", "teal", "lime", "teal", "amber", "box:lime", "?rose", "?sky"],
+    ["coral", "lime", "amber", "amber", "violet", "box:coral", "coral", "rose"],
+    ["amber", "?coral", "teal", "rose", "teal", "violet", "violet", "sky"],
+    ["tunnel:violet,lime,lime", "box:lime", "?violet", "sky", "teal", "coral", "sky", "coral", "lime"],
+    ["violet", "tunnel:sky,amber,violet,amber", "coral", "amber", "rose", "coral", "lime", "?coral", "teal"],
+    ["tunnel:sky,teal,teal", "amber", "?rose", "box:sky", "?sky", "violet", "box:lime", "rose", "amber"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "sky",
-      "violet"
-     ]
+     "cars": ["sky", "violet"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "sky",
-      "sky",
-      "sky",
-      "coral",
-      "coral",
-      "coral"
-     ]
+     "cells": [0, 1],
+     "cars": ["sky", "sky", "sky", "coral", "coral", "coral"]
     }
    ]
   },
@@ -4400,94 +1822,30 @@
    "title": "Seaside Lot",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "tunnel:amber,coral",
-     "?amber",
-     "sky",
-     "box:coral",
-     "teal",
-     "?sky",
-     "sky"
-    ],
-    [
-     "amber",
-     "?teal",
-     "sky",
-     "?rose",
-     "coral",
-     "box:teal",
-     "teal"
-    ],
-    [
-     "teal",
-     "violet",
-     "violet",
-     "?coral",
-     "box:amber",
-     "sky"
-    ],
-    [
-     "coral",
-     "lime",
-     "?rose",
-     "amber",
-     "rose",
-     "lime"
-    ],
-    [
-     "coral",
-     "tunnel:violet,violet",
-     "box:lime",
-     "?sky",
-     "amber",
-     "lime",
-     "violet"
-    ],
-    [
-     "teal",
-     "tunnel:teal,coral,teal,rose",
-     "lime",
-     "violet",
-     "amber",
-     "box:lime",
-     "rose"
-    ]
+    ["coral", "tunnel:amber,coral", "?amber", "sky", "box:coral", "teal", "?sky", "sky"],
+    ["amber", "?teal", "sky", "?rose", "coral", "box:teal", "teal"],
+    ["teal", "violet", "violet", "?coral", "box:amber", "sky"],
+    ["coral", "lime", "?rose", "amber", "rose", "lime"],
+    ["coral", "tunnel:violet,violet", "box:lime", "?sky", "amber", "lime", "violet"],
+    ["teal", "tunnel:teal,coral,teal,rose", "lime", "violet", "amber", "box:lime", "rose"]
    ],
    "sides": [
     {
      "lane": 5,
      "at": 1,
-     "cars": [
-      "amber",
-      "coral",
-      "rose"
-     ]
+     "cars": ["amber", "coral", "rose"]
     },
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "teal",
-      "amber"
-     ]
+     "cars": ["teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      5,
-      6
-     ],
-     "cars": [
-      "sky",
-      "rose",
-      "sky",
-      "rose",
-      "sky",
-      "rose"
-     ]
+     "cells": [5, 6],
+     "cars": ["sky", "rose", "sky", "rose", "sky", "rose"]
     }
    ]
   },
@@ -4496,79 +1854,25 @@
    "title": "Seaside Row",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:violet,amber,violet,lime",
-     "amber",
-     "box:coral",
-     "?violet",
-     "box:lime",
-     "box:rose",
-     "rose"
-    ],
-    [
-     "coral",
-     "teal",
-     "rose",
-     "?coral",
-     "amber"
-    ],
-    [
-     "teal",
-     "lime",
-     "amber",
-     "?teal",
-     "sky"
-    ],
-    [
-     "tunnel:sky,coral,rose",
-     "?coral",
-     "violet",
-     "box:rose",
-     "?sky",
-     "teal"
-    ],
-    [
-     "tunnel:lime,lime,violet,rose",
-     "teal",
-     "coral",
-     "violet",
-     "sky",
-     "teal"
-    ],
-    [
-     "amber",
-     "box:lime",
-     "sky",
-     "?coral",
-     "amber"
-    ]
+    ["tunnel:violet,amber,violet,lime", "amber", "box:coral", "?violet", "box:lime", "box:rose", "rose"],
+    ["coral", "teal", "rose", "?coral", "amber"],
+    ["teal", "lime", "amber", "?teal", "sky"],
+    ["tunnel:sky,coral,rose", "?coral", "violet", "box:rose", "?sky", "teal"],
+    ["tunnel:lime,lime,violet,rose", "teal", "coral", "violet", "sky", "teal"],
+    ["amber", "box:lime", "sky", "?coral", "amber"]
    ],
    "sides": [
     {
      "lane": 5,
      "at": 1,
-     "cars": [
-      "coral",
-      "coral",
-      "sky"
-     ]
+     "cars": ["coral", "coral", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "amber",
-      "teal",
-      "teal",
-      "amber",
-      "amber"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "amber", "teal", "teal", "amber", "amber"]
     }
    ]
   },
@@ -4577,89 +1881,25 @@
    "title": "Hilltop Lane",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "tunnel:coral,sky,lime",
-     "?lime",
-     "box:coral",
-     "lime",
-     "rose",
-     "lime",
-     "sky"
-    ],
-    [
-     "violet",
-     "box:amber",
-     "sky",
-     "rose",
-     "amber",
-     "amber",
-     "violet"
-    ],
-    [
-     "coral",
-     "teal",
-     "?lime",
-     "rose",
-     "teal",
-     "box:teal",
-     "coral"
-    ],
-    [
-     "teal",
-     "box:amber",
-     "lime",
-     "?sky",
-     "?teal",
-     "?violet",
-     "sky"
-    ],
-    [
-     "teal",
-     "tunnel:rose,lime,rose",
-     "violet",
-     "sky",
-     "amber",
-     "box:lime",
-     "?rose",
-     "teal"
-    ],
-    [
-     "tunnel:teal,amber,amber,amber",
-     "?coral",
-     "violet",
-     "?amber",
-     "coral",
-     "violet",
-     "coral",
-     "coral"
-    ]
+    ["coral", "tunnel:coral,sky,lime", "?lime", "box:coral", "lime", "rose", "lime", "sky"],
+    ["violet", "box:amber", "sky", "rose", "amber", "amber", "violet"],
+    ["coral", "teal", "?lime", "rose", "teal", "box:teal", "coral"],
+    ["teal", "box:amber", "lime", "?sky", "?teal", "?violet", "sky"],
+    ["teal", "tunnel:rose,lime,rose", "violet", "sky", "amber", "box:lime", "?rose", "teal"],
+    ["tunnel:teal,amber,amber,amber", "?coral", "violet", "?amber", "coral", "violet", "coral", "coral"]
    ],
    "sides": [
     {
      "lane": 5,
      "at": 1,
-     "cars": [
-      "lime",
-      "teal"
-     ]
+     "cars": ["lime", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "rose",
-      "coral",
-      "rose",
-      "coral",
-      "coral",
-      "rose"
-     ]
+     "cells": [4, 5],
+     "cars": ["rose", "coral", "rose", "coral", "coral", "rose"]
     }
    ]
   },
@@ -4668,86 +1908,30 @@
    "title": "Canal Circle",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "box:teal",
-     "teal",
-     "?rose",
-     "lime"
-    ],
-    [
-     "tunnel:rose,coral",
-     "?teal",
-     "amber",
-     "?sky",
-     "box:violet",
-     "lime"
-    ],
-    [
-     "coral",
-     "teal",
-     "box:rose",
-     "coral",
-     "teal"
-    ],
-    [
-     "coral",
-     "box:lime",
-     "sky",
-     "sky",
-     "amber"
-    ],
-    [
-     "amber",
-     "tunnel:sky,sky,coral,teal",
-     "?lime",
-     "box:violet",
-     "?rose",
-     "violet"
-    ],
-    [
-     "amber",
-     "tunnel:violet,amber,violet,lime",
-     "?violet",
-     "lime",
-     "coral",
-     "amber"
-    ]
+    ["coral", "box:teal", "teal", "?rose", "lime"],
+    ["tunnel:rose,coral", "?teal", "amber", "?sky", "box:violet", "lime"],
+    ["coral", "teal", "box:rose", "coral", "teal"],
+    ["coral", "box:lime", "sky", "sky", "amber"],
+    ["amber", "tunnel:sky,sky,coral,teal", "?lime", "box:violet", "?rose", "violet"],
+    ["amber", "tunnel:violet,amber,violet,lime", "?violet", "lime", "coral", "amber"]
    ],
    "sides": [
     {
      "lane": 5,
      "at": 0,
-     "cars": [
-      "coral",
-      "rose",
-      "rose"
-     ]
+     "cars": ["coral", "rose", "rose"]
     },
     {
      "lane": 5,
      "at": 1,
-     "cars": [
-      "coral",
-      "sky"
-     ]
+     "cars": ["coral", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "lime",
-      "coral",
-      "lime",
-      "lime"
-     ]
+     "cells": [1, 2],
+     "cars": ["coral", "coral", "lime", "coral", "lime", "lime"]
     }
    ]
   },
@@ -4756,85 +1940,25 @@
    "title": "River Garage",
    "blurb": "",
    "lanes": [
-    [
-     "amber",
-     "tunnel:teal,coral",
-     "coral",
-     "violet",
-     "rose",
-     "violet",
-     "?lime",
-     "sky"
-    ],
-    [
-     "coral",
-     "?teal",
-     "box:rose",
-     "box:coral",
-     "box:violet",
-     "amber"
-    ],
-    [
-     "lime",
-     "lime",
-     "coral",
-     "sky",
-     "teal",
-     "coral"
-    ],
-    [
-     "amber",
-     "?teal",
-     "?sky",
-     "?sky",
-     "lime",
-     "rose"
-    ],
-    [
-     "coral",
-     "tunnel:violet,coral,rose",
-     "?lime",
-     "?rose",
-     "teal",
-     "teal",
-     "lime"
-    ],
-    [
-     "tunnel:teal,rose,sky",
-     "amber",
-     "box:teal",
-     "violet",
-     "box:sky",
-     "violet",
-     "amber"
-    ]
+    ["amber", "tunnel:teal,coral", "coral", "violet", "rose", "?violet", "?lime", "?sky"],
+    ["coral", "?teal", "box:rose", "box:coral", "box:violet", "amber"],
+    ["lime", "lime", "coral", "sky", "teal", "coral"],
+    ["amber", "?teal", "?sky", "?sky", "lime", "rose"],
+    ["coral", "tunnel:violet,coral,rose", "?lime", "?rose", "teal", "teal", "lime"],
+    ["tunnel:teal,rose,sky", "amber", "box:teal", "violet", "box:sky", "violet", "amber"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "amber",
-      "coral",
-      "teal"
-     ]
+     "cars": ["amber", "coral", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "sky",
-      "sky",
-      "teal",
-      "teal",
-      "sky"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "sky", "sky", "teal", "teal", "sky"]
     }
    ]
   },
@@ -4843,89 +1967,25 @@
    "title": "Meadow Garage",
    "blurb": "",
    "lanes": [
-    [
-     "violet",
-     "amber",
-     "?violet",
-     "?sky",
-     "amber",
-     "teal",
-     "sky"
-    ],
-    [
-     "tunnel:coral,amber",
-     "teal",
-     "rose",
-     "amber",
-     "rose",
-     "?amber",
-     "lime",
-     "lime"
-    ],
-    [
-     "coral",
-     "coral",
-     "rose",
-     "sky",
-     "coral",
-     "sky",
-     "rose"
-    ],
-    [
-     "teal",
-     "?lime",
-     "lime",
-     "box:coral",
-     "?violet",
-     "box:amber",
-     "rose"
-    ],
-    [
-     "tunnel:teal,coral,coral,teal",
-     "?lime",
-     "coral",
-     "box:teal",
-     "amber",
-     "?violet",
-     "box:violet",
-     "lime"
-    ],
-    [
-     "tunnel:amber,lime,lime,amber",
-     "box:teal",
-     "violet",
-     "sky",
-     "coral",
-     "?teal",
-     "teal"
-    ]
+    ["violet", "amber", "?violet", "?sky", "amber", "teal", "sky"],
+    ["tunnel:coral,amber", "teal", "rose", "amber", "rose", "?amber", "lime", "lime"],
+    ["coral", "coral", "rose", "sky", "coral", "sky", "rose"],
+    ["teal", "?lime", "lime", "box:coral", "?violet", "box:amber", "rose"],
+    ["tunnel:teal,coral,coral,teal", "?lime", "coral", "box:teal", "amber", "?violet", "box:violet", "lime"],
+    ["tunnel:amber,lime,lime,amber", "box:teal", "violet", "sky", "coral", "?teal", "teal"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "lime",
-      "sky",
-      "rose"
-     ]
+     "cars": ["lime", "sky", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "rose",
-      "rose",
-      "violet",
-      "violet",
-      "rose",
-      "violet"
-     ]
+     "cells": [0, 1],
+     "cars": ["rose", "rose", "violet", "violet", "rose", "violet"]
     }
    ]
   },
@@ -4934,83 +1994,30 @@
    "title": "Cedar Stop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "tunnel:teal,violet,sky",
-     "sky",
-     "box:violet",
-     "?violet",
-     "amber"
-    ],
-    [
-     "tunnel:violet,rose,sky",
-     "coral",
-     "?amber",
-     "?lime",
-     "rose",
-     "lime"
-    ],
-    [
-     "tunnel:lime,coral,amber,lime",
-     "coral",
-     "box:amber",
-     "?violet",
-     "?sky",
-     "coral"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "box:rose",
-     "coral"
-    ],
-    [
-     "teal",
-     "teal",
-     "rose",
-     "teal"
-    ],
-    [
-     "amber",
-     "box:lime",
-     "?sky",
-     "amber"
-    ]
+    ["coral", "tunnel:teal,violet,sky", "sky", "box:violet", "?violet", "amber"],
+    ["tunnel:violet,rose,sky", "coral", "?amber", "?lime", "rose", "lime"],
+    ["tunnel:lime,coral,amber,lime", "coral", "box:amber", "?violet", "?sky", "coral"],
+    ["teal", "box:lime", "box:rose", "coral"],
+    ["teal", "teal", "rose", "teal"],
+    ["amber", "box:lime", "?sky", "amber"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "teal",
-      "sky",
-      "rose"
-     ]
+     "cars": ["teal", "sky", "rose"]
     },
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "violet",
-      "rose"
-     ]
+     "cars": ["violet", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "amber",
-      "lime",
-      "lime",
-      "amber",
-      "lime",
-      "amber"
-     ]
+     "cells": [1, 2],
+     "cars": ["amber", "lime", "lime", "amber", "lime", "amber"]
     }
    ]
   },
@@ -5019,89 +2026,25 @@
    "title": "Meadow Court",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "box:lime",
-     "violet",
-     "rose",
-     "box:teal",
-     "coral",
-     "violet"
-    ],
-    [
-     "tunnel:sky,sky",
-     "?coral",
-     "?rose",
-     "?amber",
-     "?lime",
-     "coral",
-     "amber",
-     "lime"
-    ],
-    [
-     "coral",
-     "?lime",
-     "amber",
-     "rose",
-     "teal",
-     "box:lime",
-     "sky"
-    ],
-    [
-     "teal",
-     "sky",
-     "?sky",
-     "coral",
-     "?violet",
-     "rose",
-     "lime"
-    ],
-    [
-     "teal",
-     "tunnel:teal,teal,coral,rose",
-     "amber",
-     "?teal",
-     "violet",
-     "violet",
-     "box:amber",
-     "coral"
-    ],
-    [
-     "tunnel:teal,amber,lime,rose",
-     "violet",
-     "box:sky",
-     "coral",
-     "teal",
-     "lime",
-     "amber"
-    ]
+    ["coral", "box:lime", "violet", "rose", "box:teal", "coral", "violet"],
+    ["tunnel:sky,sky", "?coral", "?rose", "?amber", "?lime", "coral", "amber", "lime"],
+    ["coral", "?lime", "amber", "rose", "teal", "box:lime", "sky"],
+    ["teal", "sky", "?sky", "coral", "?violet", "rose", "lime"],
+    ["teal", "tunnel:teal,teal,coral,rose", "amber", "?teal", "violet", "violet", "box:amber", "coral"],
+    ["tunnel:teal,amber,lime,rose", "violet", "box:sky", "coral", "teal", "lime", "amber"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "amber",
-      "amber",
-      "lime"
-     ]
+     "cars": ["amber", "amber", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "lime",
-      "lime",
-      "sky",
-      "sky",
-      "sky",
-      "lime"
-     ]
+     "cells": [2, 3],
+     "cars": ["lime", "lime", "sky", "sky", "sky", "lime"]
     }
    ]
   },
@@ -5110,88 +2053,25 @@
    "title": "Harbor Lane",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "?rose",
-     "rose",
-     "coral",
-     "amber",
-     "sky"
-    ],
-    [
-     "coral",
-     "tunnel:coral,sky,gold,violet",
-     "?amber",
-     "violet",
-     "sky",
-     "teal",
-     "amber",
-     "violet"
-    ],
-    [
-     "coral",
-     "box:teal",
-     "sky",
-     "gold",
-     "?coral",
-     "amber",
-     "violet"
-    ],
-    [
-     "teal",
-     "tunnel:gold,coral",
-     "lime",
-     "violet",
-     "box:teal",
-     "gold",
-     "lime",
-     "gold"
-    ],
-    [
-     "amber",
-     "tunnel:rose,rose",
-     "box:teal",
-     "lime",
-     "?rose",
-     "box:coral",
-     "box:lime",
-     "rose"
-    ],
-    [
-     "lime",
-     "?violet",
-     "?gold",
-     "sky",
-     "teal",
-     "lime"
-    ]
+    ["coral", "amber", "?rose", "rose", "coral", "amber", "sky"],
+    ["coral", "tunnel:coral,sky,gold,violet", "?amber", "violet", "sky", "teal", "amber", "violet"],
+    ["coral", "box:teal", "sky", "gold", "?coral", "amber", "violet"],
+    ["teal", "tunnel:gold,coral", "lime", "violet", "box:teal", "gold", "lime", "gold"],
+    ["amber", "tunnel:rose,rose", "box:teal", "lime", "?rose", "box:coral", "box:lime", "rose"],
+    ["lime", "?violet", "?gold", "sky", "teal", "lime"]
    ],
    "sides": [
     {
      "lane": 5,
      "at": 1,
-     "cars": [
-      "coral",
-      "sky"
-     ]
+     "cars": ["coral", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      6,
-      7
-     ],
-     "cars": [
-      "violet",
-      "lime",
-      "lime",
-      "lime",
-      "violet",
-      "violet"
-     ]
+     "cells": [6, 7],
+     "cars": ["violet", "lime", "lime", "lime", "violet", "violet"]
     }
    ]
   },
@@ -5200,106 +2080,31 @@
    "title": "Corner Drive",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "amber",
-     "sky",
-     "rose",
-     "amber",
-     "gold",
-     "?rose",
-     "?rose"
-    ],
-    [
-     "coral",
-     "teal",
-     "violet",
-     "coral",
-     "coral",
-     "teal",
-     "violet",
-     "rose"
-    ],
-    [
-     "coral",
-     "?amber",
-     "violet",
-     "?rose",
-     "amber",
-     "teal",
-     "lime",
-     "gold"
-    ],
-    [
-     "tunnel:coral,amber,lime",
-     "teal",
-     "violet",
-     "lime",
-     "gold",
-     "coral",
-     "?lime",
-     "gold",
-     "sky"
-    ],
-    [
-     "tunnel:teal,coral",
-     "amber",
-     "box:lime",
-     "gold",
-     "sky",
-     "teal",
-     "box:violet",
-     "box:lime",
-     "box:sky"
-    ],
-    [
-     "coral",
-     "tunnel:sky,coral,teal,teal",
-     "lime",
-     "sky",
-     "amber",
-     "rose",
-     "?violet",
-     "gold",
-     "box:lime"
-    ]
+    ["teal", "amber", "sky", "rose", "amber", "gold", "?rose", "?rose"],
+    ["coral", "teal", "violet", "coral", "coral", "teal", "violet", "rose"],
+    ["coral", "?amber", "violet", "?rose", "amber", "teal", "lime", "gold"],
+    ["tunnel:coral,amber,lime", "teal", "violet", "lime", "gold", "coral", "?lime", "gold", "sky"],
+    ["tunnel:teal,coral", "amber", "box:lime", "gold", "sky", "teal", "box:violet", "box:lime", "box:sky"],
+    ["coral", "tunnel:sky,coral,teal,teal", "lime", "sky", "amber", "rose", "?violet", "gold", "box:lime"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "amber",
-      "violet",
-      "amber"
-     ]
+     "cars": ["amber", "violet", "amber"]
     },
     {
      "lane": 5,
      "at": 0,
-     "cars": [
-      "violet",
-      "violet",
-      "lime"
-     ]
+     "cars": ["violet", "violet", "lime"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "sky",
-      "amber",
-      "sky",
-      "amber",
-      "sky",
-      "amber"
-     ]
+     "cells": [4, 5],
+     "cars": ["sky", "amber", "sky", "amber", "sky", "amber"]
     }
    ]
   },
@@ -5308,94 +2113,25 @@
    "title": "Cedar Court",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:coral,gold,amber",
-     "amber",
-     "coral",
-     "?violet",
-     "sky",
-     "box:teal",
-     "?teal",
-     "violet",
-     "rose"
-    ],
-    [
-     "tunnel:rose,amber,coral,amber",
-     "?coral",
-     "lime",
-     "?sky",
-     "?coral",
-     "rose",
-     "amber",
-     "box:violet",
-     "sky"
-    ],
-    [
-     "teal",
-     "amber",
-     "lime",
-     "?rose",
-     "coral",
-     "box:amber",
-     "violet",
-     "teal"
-    ],
-    [
-     "teal",
-     "tunnel:lime,lime,coral,rose",
-     "coral",
-     "sky",
-     "gold",
-     "amber",
-     "lime",
-     "sky",
-     "gold"
-    ],
-    [
-     "teal",
-     "box:amber",
-     "rose",
-     "violet",
-     "coral",
-     "lime",
-     "gold",
-     "teal"
-    ],
-    [
-     "lime",
-     "violet",
-     "gold",
-     "?gold",
-     "box:teal",
-     "lime",
-     "sky"
-    ]
+    ["tunnel:coral,gold,amber", "amber", "coral", "?violet", "sky", "box:teal", "?teal", "violet", "rose"],
+    ["tunnel:rose,amber,coral,amber", "?coral", "lime", "?sky", "?coral", "rose", "amber", "box:violet", "sky"],
+    ["teal", "amber", "lime", "?rose", "coral", "box:amber", "violet", "teal"],
+    ["teal", "tunnel:lime,lime,coral,rose", "coral", "sky", "gold", "amber", "lime", "sky", "gold"],
+    ["teal", "box:amber", "rose", "violet", "coral", "lime", "gold", "teal"],
+    ["lime", "violet", "gold", "?gold", "box:teal", "lime", "sky"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "lime",
-      "teal"
-     ]
+     "cars": ["lime", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 2,
-     "cells": [
-      4,
-      5
-     ],
-     "cars": [
-      "rose",
-      "rose",
-      "teal",
-      "teal",
-      "rose",
-      "teal"
-     ]
+     "cells": [4, 5],
+     "cars": ["rose", "rose", "teal", "teal", "rose", "teal"]
     }
    ]
   },
@@ -5404,90 +2140,25 @@
    "title": "River Stop",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "tunnel:teal,teal,coral,amber",
-     "coral",
-     "sky",
-     "gold",
-     "box:coral",
-     "violet",
-     "lime",
-     "rose"
-    ],
-    [
-     "teal",
-     "tunnel:gold,gold,rose,sky",
-     "amber",
-     "?violet",
-     "amber",
-     "?coral",
-     "?teal",
-     "amber"
-    ],
-    [
-     "teal",
-     "rose",
-     "rose",
-     "violet",
-     "amber",
-     "amber",
-     "violet"
-    ],
-    [
-     "amber",
-     "lime",
-     "sky",
-     "box:lime",
-     "?teal",
-     "coral",
-     "violet"
-    ],
-    [
-     "coral",
-     "box:sky",
-     "violet",
-     "?gold",
-     "lime",
-     "?sky",
-     "lime"
-    ],
-    [
-     "tunnel:amber,coral,gold,coral",
-     "teal",
-     "box:lime",
-     "box:rose",
-     "?gold",
-     "teal",
-     "rose",
-     "sky"
-    ]
+    ["coral", "tunnel:teal,teal,coral,amber", "coral", "sky", "gold", "box:coral", "violet", "lime", "rose"],
+    ["teal", "tunnel:gold,gold,rose,sky", "amber", "?violet", "amber", "?coral", "?teal", "amber"],
+    ["teal", "rose", "rose", "violet", "amber", "amber", "violet"],
+    ["amber", "lime", "sky", "box:lime", "?teal", "coral", "violet"],
+    ["coral", "box:sky", "violet", "?gold", "lime", "?sky", "lime"],
+    ["tunnel:amber,coral,gold,coral", "teal", "box:lime", "box:rose", "?gold", "teal", "rose", "sky"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 0,
-     "cars": [
-      "teal",
-      "amber"
-     ]
+     "cars": ["teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "amber",
-      "amber",
-      "amber",
-      "coral"
-     ]
+     "cells": [0, 1],
+     "cars": ["coral", "coral", "amber", "amber", "amber", "coral"]
     }
    ]
   },
@@ -5496,94 +2167,30 @@
    "title": "Market Block",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:rose,gold,lime,violet",
-     "teal",
-     "violet",
-     "sky",
-     "violet",
-     "coral",
-     "teal",
-     "?violet"
-    ],
-    [
-     "tunnel:sky,violet",
-     "?coral",
-     "lime",
-     "rose",
-     "gold",
-     "coral",
-     "amber",
-     "sky"
-    ],
-    [
-     "coral",
-     "lime",
-     "violet",
-     "?sky",
-     "box:coral",
-     "amber"
-    ],
-    [
-     "teal",
-     "box:teal",
-     "amber",
-     "gold",
-     "teal",
-     "box:lime"
-    ],
-    [
-     "tunnel:gold,rose",
-     "?amber",
-     "?lime",
-     "box:rose",
-     "rose",
-     "teal",
-     "lime"
-    ],
-    [
-     "coral",
-     "amber",
-     "box:sky",
-     "gold",
-     "amber",
-     "?sky"
-    ]
+    ["tunnel:rose,gold,lime,violet", "teal", "violet", "sky", "violet", "coral", "?teal", "?violet"],
+    ["tunnel:sky,violet", "?coral", "lime", "rose", "gold", "coral", "amber", "sky"],
+    ["coral", "lime", "violet", "?sky", "box:coral", "amber"],
+    ["teal", "box:teal", "amber", "gold", "teal", "box:lime"],
+    ["tunnel:gold,rose", "?amber", "?lime", "box:rose", "rose", "teal", "lime"],
+    ["coral", "amber", "box:sky", "gold", "amber", "?sky"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "coral",
-      "coral"
-     ]
+     "cars": ["coral", "coral"]
     },
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "coral",
-      "gold",
-      "rose"
-     ]
+     "cars": ["coral", "gold", "rose"]
     }
    ],
    "garages": [
     {
      "lane": 1,
-     "cells": [
-      2,
-      3
-     ],
-     "cars": [
-      "teal",
-      "rose",
-      "rose",
-      "teal",
-      "rose",
-      "teal"
-     ]
+     "cells": [2, 3],
+     "cars": ["teal", "rose", "rose", "teal", "rose", "teal"]
     }
    ]
   },
@@ -5592,91 +2199,25 @@
    "title": "Canal Court",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "teal",
-     "amber",
-     "teal",
-     "rose",
-     "gold",
-     "amber",
-     "rose"
-    ],
-    [
-     "coral",
-     "?coral",
-     "amber",
-     "box:coral",
-     "?amber",
-     "?lime",
-     "sky"
-    ],
-    [
-     "sky",
-     "lime",
-     "violet",
-     "rose",
-     "violet",
-     "box:gold",
-     "lime"
-    ],
-    [
-     "tunnel:rose,coral,teal",
-     "amber",
-     "?lime",
-     "box:sky",
-     "?coral",
-     "teal",
-     "box:violet",
-     "sky"
-    ],
-    [
-     "teal",
-     "tunnel:gold,coral,rose",
-     "violet",
-     "lime",
-     "rose",
-     "box:teal",
-     "amber",
-     "lime"
-    ],
-    [
-     "teal",
-     "tunnel:gold,teal",
-     "?violet",
-     "sky",
-     "gold",
-     "coral",
-     "violet",
-     "sky"
-    ]
+    ["coral", "teal", "amber", "teal", "rose", "gold", "amber", "rose"],
+    ["coral", "?coral", "amber", "box:coral", "?amber", "?lime", "sky"],
+    ["sky", "lime", "violet", "rose", "violet", "box:gold", "lime"],
+    ["tunnel:rose,coral,teal", "amber", "?lime", "box:sky", "?coral", "teal", "box:violet", "sky"],
+    ["teal", "tunnel:gold,coral,rose", "violet", "lime", "rose", "box:teal", "amber", "lime"],
+    ["teal", "tunnel:gold,teal", "?violet", "sky", "gold", "coral", "violet", "sky"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "teal",
-      "gold",
-      "coral"
-     ]
+     "cars": ["teal", "gold", "coral"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      1,
-      2
-     ],
-     "cars": [
-      "amber",
-      "violet",
-      "amber",
-      "violet",
-      "amber",
-      "violet"
-     ]
+     "cells": [1, 2],
+     "cars": ["amber", "violet", "amber", "violet", "amber", "violet"]
     }
    ]
   },
@@ -5685,91 +2226,25 @@
    "title": "Harbor Yard",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "lime",
-     "?gold",
-     "rose",
-     "?teal",
-     "violet",
-     "amber",
-     "rose"
-    ],
-    [
-     "teal",
-     "amber",
-     "lime",
-     "box:coral",
-     "coral",
-     "lime",
-     "rose",
-     "sky"
-    ],
-    [
-     "coral",
-     "amber",
-     "rose",
-     "sky",
-     "box:lime",
-     "teal",
-     "amber"
-    ],
-    [
-     "coral",
-     "tunnel:teal,coral",
-     "teal",
-     "sky",
-     "gold",
-     "box:gold",
-     "box:sky",
-     "gold"
-    ],
-    [
-     "tunnel:coral,gold",
-     "?teal",
-     "?lime",
-     "violet",
-     "violet",
-     "coral",
-     "violet",
-     "lime"
-    ],
-    [
-     "tunnel:violet,rose,coral,gold",
-     "?amber",
-     "violet",
-     "sky",
-     "rose",
-     "?teal",
-     "box:amber",
-     "sky"
-    ]
+    ["coral", "lime", "?gold", "rose", "?teal", "?violet", "?amber", "?rose"],
+    ["teal", "amber", "lime", "box:coral", "coral", "lime", "rose", "sky"],
+    ["coral", "amber", "rose", "sky", "box:lime", "teal", "amber"],
+    ["coral", "tunnel:teal,coral", "teal", "sky", "gold", "box:gold", "box:sky", "gold"],
+    ["tunnel:coral,gold", "?teal", "?lime", "violet", "violet", "coral", "violet", "lime"],
+    ["tunnel:violet,rose,coral,gold", "?amber", "violet", "sky", "rose", "?teal", "box:amber", "sky"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "teal",
-      "teal"
-     ]
+     "cars": ["teal", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "rose",
-      "lime",
-      "lime",
-      "rose",
-      "rose",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["rose", "lime", "lime", "rose", "rose", "lime"]
     }
    ]
   },
@@ -5778,105 +2253,30 @@
    "title": "Rooftop Deck",
    "blurb": "",
    "lanes": [
-    [
-     "tunnel:lime,teal",
-     "?teal",
-     "amber",
-     "amber",
-     "?sky",
-     "teal",
-     "violet",
-     "box:teal",
-     "gold",
-     "rose"
-    ],
-    [
-     "coral",
-     "?lime",
-     "teal",
-     "gold",
-     "box:violet",
-     "amber",
-     "violet",
-     "coral"
-    ],
-    [
-     "coral",
-     "lime",
-     "rose",
-     "box:teal",
-     "coral",
-     "amber",
-     "violet",
-     "gold"
-    ],
-    [
-     "tunnel:teal,rose,coral",
-     "lime",
-     "sky",
-     "?rose",
-     "?coral",
-     "gold",
-     "lime",
-     "box:sky",
-     "coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "box:violet",
-     "gold",
-     "amber",
-     "lime",
-     "?sky",
-     "rose"
-    ],
-    [
-     "tunnel:amber,violet,amber,lime",
-     "?teal",
-     "violet",
-     "rose",
-     "coral",
-     "?sky",
-     "lime",
-     "sky",
-     "gold"
-    ]
+    ["tunnel:lime,teal", "?teal", "amber", "amber", "?sky", "teal", "violet", "box:teal", "gold", "rose"],
+    ["coral", "?lime", "teal", "gold", "box:violet", "amber", "violet", "coral"],
+    ["coral", "lime", "rose", "box:teal", "coral", "amber", "violet", "gold"],
+    ["tunnel:teal,rose,coral", "lime", "sky", "?rose", "?coral", "gold", "lime", "box:sky", "coral"],
+    ["coral", "amber", "box:violet", "gold", "amber", "lime", "?sky", "rose"],
+    ["tunnel:amber,violet,amber,lime", "?teal", "violet", "rose", "coral", "?sky", "lime", "sky", "gold"]
    ],
    "sides": [
     {
      "lane": 4,
      "at": 1,
-     "cars": [
-      "violet",
-      "lime"
-     ]
+     "cars": ["violet", "lime"]
     },
     {
      "lane": 0,
      "at": 0,
-     "cars": [
-      "violet",
-      "teal",
-      "amber"
-     ]
+     "cars": ["violet", "teal", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      7,
-      8
-     ],
-     "cars": [
-      "amber",
-      "amber",
-      "sky",
-      "amber",
-      "sky",
-      "sky"
-     ]
+     "cells": [7, 8],
+     "cars": ["amber", "amber", "sky", "amber", "sky", "sky"]
     }
    ]
   },
@@ -5885,97 +2285,25 @@
    "title": "Library Block",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "amber",
-     "?lime",
-     "rose",
-     "?coral",
-     "rose",
-     "violet",
-     "rose",
-     "gold"
-    ],
-    [
-     "coral",
-     "amber",
-     "violet",
-     "gold",
-     "sky",
-     "box:violet",
-     "sky",
-     "rose"
-    ],
-    [
-     "coral",
-     "tunnel:amber,rose,lime,teal",
-     "violet",
-     "?violet",
-     "teal",
-     "teal",
-     "amber",
-     "sky",
-     "coral"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "?amber",
-     "box:gold",
-     "box:amber",
-     "coral",
-     "lime",
-     "gold"
-    ],
-    [
-     "teal",
-     "tunnel:coral,teal,coral",
-     "rose",
-     "sky",
-     "?teal",
-     "?lime",
-     "?sky",
-     "?sky",
-     "teal"
-    ],
-    [
-     "tunnel:violet,lime,amber,lime",
-     "teal",
-     "lime",
-     "gold",
-     "amber",
-     "box:coral",
-     "lime",
-     "violet",
-     "gold"
-    ]
+    ["coral", "amber", "?lime", "rose", "?coral", "rose", "violet", "rose", "gold"],
+    ["coral", "amber", "violet", "gold", "sky", "box:violet", "sky", "rose"],
+    ["coral", "tunnel:amber,rose,lime,teal", "violet", "?violet", "teal", "teal", "amber", "sky", "coral"],
+    ["teal", "box:lime", "?amber", "box:gold", "box:amber", "coral", "lime", "gold"],
+    ["teal", "tunnel:coral,teal,coral", "rose", "sky", "?teal", "?lime", "?sky", "?sky", "teal"],
+    ["tunnel:violet,lime,amber,lime", "teal", "lime", "gold", "amber", "box:coral", "lime", "violet", "gold"]
    ],
    "sides": [
     {
      "lane": 2,
      "at": 1,
-     "cars": [
-      "violet",
-      "violet",
-      "amber"
-     ]
+     "cars": ["violet", "violet", "amber"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      0,
-      1
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "rose",
-      "rose",
-      "coral",
-      "rose"
-     ]
+     "cells": [0, 1],
+     "cars": ["coral", "coral", "rose", "rose", "coral", "rose"]
     }
    ]
   },
@@ -5984,91 +2312,25 @@
    "title": "Orchard Court",
    "blurb": "",
    "lanes": [
-    [
-     "teal",
-     "amber",
-     "box:violet",
-     "?rose",
-     "gold",
-     "coral",
-     "box:violet",
-     "amber"
-    ],
-    [
-     "teal",
-     "?coral",
-     "lime",
-     "?rose",
-     "gold",
-     "box:lime",
-     "sky"
-    ],
-    [
-     "tunnel:gold,coral",
-     "coral",
-     "amber",
-     "?violet",
-     "rose",
-     "coral",
-     "violet",
-     "lime"
-    ],
-    [
-     "teal",
-     "box:lime",
-     "sky",
-     "coral",
-     "box:amber",
-     "violet",
-     "sky"
-    ],
-    [
-     "coral",
-     "tunnel:rose,rose",
-     "lime",
-     "gold",
-     "?sky",
-     "?teal",
-     "amber",
-     "gold"
-    ],
-    [
-     "violet",
-     "tunnel:teal,lime,sky,gold",
-     "amber",
-     "teal",
-     "sky",
-     "teal",
-     "rose",
-     "coral"
-    ]
+    ["teal", "amber", "box:violet", "?rose", "gold", "?coral", "box:violet", "?amber"],
+    ["teal", "?coral", "lime", "?rose", "gold", "box:lime", "sky"],
+    ["tunnel:gold,coral", "coral", "amber", "?violet", "rose", "coral", "violet", "lime"],
+    ["teal", "box:lime", "sky", "coral", "box:amber", "violet", "sky"],
+    ["coral", "tunnel:rose,rose", "lime", "gold", "?sky", "?teal", "amber", "gold"],
+    ["violet", "tunnel:teal,lime,sky,gold", "amber", "teal", "sky", "teal", "rose", "coral"]
    ],
    "sides": [
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "teal",
-      "coral",
-      "teal"
-     ]
+     "cars": ["teal", "coral", "teal"]
     }
    ],
    "garages": [
     {
      "lane": 3,
-     "cells": [
-      3,
-      4
-     ],
-     "cars": [
-      "gold",
-      "gold",
-      "lime",
-      "lime",
-      "gold",
-      "lime"
-     ]
+     "cells": [3, 4],
+     "cars": ["gold", "gold", "lime", "lime", "gold", "lime"]
     }
    ]
   },
@@ -6077,108 +2339,30 @@
    "title": "Garden Yard",
    "blurb": "",
    "lanes": [
-    [
-     "coral",
-     "?violet",
-     "violet",
-     "rose",
-     "?gold",
-     "coral",
-     "?violet",
-     "rose",
-     "gold"
-    ],
-    [
-     "amber",
-     "tunnel:coral,teal,teal",
-     "sky",
-     "?sky",
-     "lime",
-     "box:coral",
-     "box:teal",
-     "violet",
-     "sky",
-     "amber"
-    ],
-    [
-     "coral",
-     "amber",
-     "lime",
-     "coral",
-     "?teal",
-     "gold",
-     "box:rose",
-     "sky",
-     "coral"
-    ],
-    [
-     "tunnel:violet,amber",
-     "?coral",
-     "amber",
-     "?rose",
-     "box:teal",
-     "rose",
-     "amber",
-     "gold",
-     "rose",
-     "amber"
-    ],
-    [
-     "teal",
-     "teal",
-     "lime",
-     "amber",
-     "lime",
-     "lime",
-     "violet",
-     "teal"
-    ],
-    [
-     "tunnel:lime,violet,coral,lime",
-     "box:teal",
-     "sky",
-     "violet",
-     "gold",
-     "amber",
-     "?lime",
-     "sky",
-     "gold"
-    ]
+    ["coral", "?violet", "violet", "rose", "?gold", "coral", "?violet", "rose", "gold"],
+    ["amber", "tunnel:coral,teal,teal", "sky", "?sky", "lime", "box:coral", "box:teal", "violet", "sky", "amber"],
+    ["coral", "amber", "lime", "coral", "?teal", "gold", "box:rose", "sky", "coral"],
+    ["tunnel:violet,amber", "?coral", "amber", "?rose", "box:teal", "rose", "amber", "gold", "rose", "amber"],
+    ["teal", "teal", "lime", "amber", "lime", "lime", "violet", "teal"],
+    ["tunnel:lime,violet,coral,lime", "box:teal", "sky", "violet", "gold", "amber", "?lime", "sky", "gold"]
    ],
    "sides": [
     {
      "lane": 3,
      "at": 0,
-     "cars": [
-      "sky",
-      "lime"
-     ]
+     "cars": ["sky", "lime"]
     },
     {
      "lane": 0,
      "at": 1,
-     "cars": [
-      "sky",
-      "violet",
-      "sky"
-     ]
+     "cars": ["sky", "violet", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 0,
-     "cells": [
-      7,
-      8
-     ],
-     "cars": [
-      "coral",
-      "coral",
-      "gold",
-      "gold",
-      "coral",
-      "gold"
-     ]
+     "cells": [7, 8],
+     "cars": ["coral", "coral", "gold", "gold", "coral", "gold"]
     }
    ]
   },
@@ -6187,106 +2371,26 @@
    "title": "Midtown Square",
    "blurb": "",
    "lanes": [
-    [
-     "violet",
-     "lime",
-     "violet",
-     "coral",
-     "teal",
-     "?lime",
-     "lime",
-     "?rose",
-     "coral",
-     "coral"
-    ],
-    [
-     "coral",
-     "amber",
-     "rose",
-     "lime",
-     "sky",
-     "?amber",
-     "violet",
-     "sky",
-     "teal",
-     "amber"
-    ],
-    [
-     "tunnel:rose,lime,violet,gold",
-     "coral",
-     "amber",
-     "rose",
-     "sky",
-     "gold",
-     "teal",
-     "box:amber",
-     "coral",
-     "box:rose",
-     "teal"
-    ],
-    [
-     "lime",
-     "box:amber",
-     "box:teal",
-     "coral",
-     "gold",
-     "gold",
-     "violet",
-     "?sky",
-     "amber"
-    ],
-    [
-     "tunnel:lime,sky,lime",
-     "coral",
-     "?sky",
-     "gold",
-     "rose",
-     "teal",
-     "violet",
-     "?rose",
-     "box:amber",
-     "gold"
-    ],
-    [
-     "tunnel:violet,rose",
-     "teal",
-     "teal",
-     "violet",
-     "coral",
-     "lime",
-     "amber",
-     "sky",
-     "teal",
-     "violet"
-    ]
+    ["violet", "lime", "violet", "coral", "teal", "?lime", "?lime", "?rose", "?coral", "?coral"],
+    ["coral", "amber", "rose", "lime", "sky", "?amber", "violet", "sky", "teal", "amber"],
+    ["tunnel:rose,lime,violet,gold", "coral", "amber", "rose", "sky", "gold", "teal", "box:amber", "coral", "box:rose", "teal"],
+    ["lime", "box:amber", "box:teal", "coral", "gold", "gold", "violet", "?sky", "amber"],
+    ["tunnel:lime,sky,lime", "coral", "?sky", "gold", "rose", "teal", "violet", "?rose", "box:amber", "gold"],
+    ["tunnel:violet,rose", "teal", "teal", "violet", "coral", "lime", "amber", "sky", "teal", "violet"]
    ],
    "tier": "superhard",
    "sides": [
     {
      "lane": 3,
      "at": 1,
-     "cars": [
-      "sky",
-      "rose",
-      "sky"
-     ]
+     "cars": ["sky", "rose", "sky"]
     }
    ],
    "garages": [
     {
      "lane": 4,
-     "cells": [
-      8,
-      9
-     ],
-     "cars": [
-      "rose",
-      "gold",
-      "gold",
-      "rose",
-      "rose",
-      "gold"
-     ]
+     "cells": [8, 9],
+     "cars": ["rose", "gold", "gold", "rose", "rose", "gold"]
     }
    ]
   }

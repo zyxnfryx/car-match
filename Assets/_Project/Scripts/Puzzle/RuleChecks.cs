@@ -830,6 +830,8 @@ namespace CarMatch
             SideLotsSitOutsideTheLot(json);
             UndergroundLiftIsTaughtOnLevel21(json);
             SuperHardLevelsEarnTheLabel(json);
+            DifficultyCurveRises(json);
+            InterstitialPlanChecks();
             BoostersOnEveryLevel(json);
             LevelsAreUnique(json);
             EachBoosterOnceFree();
@@ -1345,6 +1347,35 @@ namespace CarMatch
             Expect(cue.Lesson == CoachLesson.Underground && cue.HasCar && !cue.LockCars, "the glove introduces the lift");
             Expect(cue.Car.Index == level.Board.Garages[0].Lane, "the glove is on the lift's lane");
             Expect(level.Board.Garages[0].Queue.Count == 3, "the badge starts at the cars still below");
+        }
+
+        public static void DifficultyCurveRises(string json)
+        {
+            var levels = LevelJson.Parse(json);
+            var scores = new List<float>(levels.Count);
+            for (int i = 0; i < levels.Count; i++)
+                scores.Add(Difficulty.Measure(levels[i].Board).Value);
+            Difficulty.AssertRising(scores, delegate (bool ok, string message) { Expect(ok, message); });
+            for (int i = 0; i < levels.Count; i++)
+            {
+                if (!levels[i].SuperHard) continue;
+                if (i > 0)
+                    Expect(scores[i] > scores[i - 1], levels[i].Id + " should outscore the level before it");
+                if (i + 1 < levels.Count)
+                    Expect(scores[i] > scores[i + 1], levels[i].Id + " should outscore the level after it");
+            }
+        }
+
+        public static void InterstitialPlanChecks()
+        {
+            Expect(!InterstitialPlan.Due(9, 3, false, true, false, -1f), "before level 10");
+            Expect(!InterstitialPlan.Due(12, 2, false, true, false, -1f), "not every win");
+            Expect(InterstitialPlan.Due(12, 3, false, true, false, -1f), "every third win from level 10");
+            Expect(InterstitialPlan.Due(30, 6, false, true, false, 90f), "the cooldown has elapsed");
+            Expect(!InterstitialPlan.Due(12, 3, true, true, false, -1f), "VIP skips interstitials");
+            Expect(!InterstitialPlan.Due(12, 3, false, false, false, -1f), "no unit id is a no-op");
+            Expect(!InterstitialPlan.Due(12, 3, false, true, true, -1f), "not during the tutorial");
+            Expect(!InterstitialPlan.Due(12, 3, false, true, false, 10f), "not within 90s of a rewarded ad");
         }
 
         public static void SuperHardLevelsEarnTheLabel(string json)
