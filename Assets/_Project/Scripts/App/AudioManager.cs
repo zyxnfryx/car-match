@@ -39,7 +39,7 @@ namespace CarMatch
         public const string MutePref = "lotloop.mute";
         public const string MusicPref = "lotloop.music";
         const int PoolSize = 10;
-        const float MusicVolume = 0.4f;
+        const float MusicVolume = 0.32f; // v8 loop mastered ~2 dB louder (was 0.4)
         const float DuckVolume = 0.25f / 0.4f;
 
         struct Cue

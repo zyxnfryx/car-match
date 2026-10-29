@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CarMatch.Editor
 {
-    // Resources/Audio: SFX decompress on load (Vorbis), the music_* WAV beds stream
+    // Resources/Audio: SFX decompress on load (Vorbis), the music_* beds stream
     // so their loops stays sample-accurate.
     public sealed class AudioImport : AssetPostprocessor
     {
