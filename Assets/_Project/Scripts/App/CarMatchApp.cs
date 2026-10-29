@@ -3079,6 +3079,7 @@ namespace CarMatch
 
         void StartLevel()
         {
+            _lifts.Clear();
             ShowPlay();
             if (_fly != null && _board != null) _fly.StartCoroutine(IntroFx());
         }

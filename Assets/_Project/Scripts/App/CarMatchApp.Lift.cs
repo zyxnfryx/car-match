@@ -19,6 +19,8 @@ namespace CarMatch
             public bool Celebrated;
         }
 
+        // Active elevator runs. Cleared when a level starts so a previous deck cannot lock the next lot.
+        readonly List<LiftRun> _lifts = new List<LiftRun>();
         bool _liftMoving;
 
         void SettleLifts()
