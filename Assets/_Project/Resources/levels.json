@@ -117,10 +117,10 @@
    "lanes": [
     [
      "tunnel:coral,coral,coral",
+     "teal",
      "teal"
     ],
     [
-     "teal",
      "teal"
     ]
    ]
@@ -205,28 +205,45 @@
    "blurb": "",
    "lanes": [
     [
-     "teal",
-     "teal",
      "coral",
      "teal",
+     "?amber"
+    ],
+    [
+     "lime",
+     "coral",
      "teal"
     ],
     [
      "amber",
-     "coral",
-     "amber",
-     "coral",
-     "amber"
+     "lime",
+     "coral"
     ],
     [
-     "coral",
-     "coral",
      "teal",
-     "teal",
-     "coral"
+     "amber",
+     "lime"
     ]
    ],
-   "tier": "superhard"
+   "tier": "superhard",
+   "sides": [
+    {
+     "lane": 0,
+     "at": 0,
+     "cars": [
+      "coral",
+      "coral",
+      "coral"
+     ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 2,
+     "cells": [0, 1],
+     "cars": ["lime", "lime", "lime"]
+    }
+   ]
   },
   {
    "id": "lot-011",
@@ -472,37 +489,42 @@
     [
      "coral",
      "teal",
-     "teal",
-     "amber"
+     "amber",
+     "lime",
+     "coral"
     ],
     [
-     "coral",
-     "amber",
-     "coral",
-     "amber"
-    ],
-    [
-     "coral",
      "teal",
      "amber",
+     "lime",
+     "violet",
      "coral"
     ],
     [
      "amber",
+     "lime",
+     "violet",
      "teal",
-     "teal"
+     "?violet"
     ]
    ],
    "tier": "superhard",
    "sides": [
     {
-     "lane": 2,
-     "at": 1,
+     "lane": 0,
+     "at": 0,
      "cars": [
-      "amber",
-      "teal",
+      "coral",
+      "coral",
       "coral"
      ]
+    }
+   ],
+   "garages": [
+    {
+     "lane": 1,
+     "cells": [0, 1],
+     "cars": ["lime", "lime", "lime"]
     }
    ]
   },

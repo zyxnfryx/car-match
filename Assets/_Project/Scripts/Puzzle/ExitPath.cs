@@ -22,19 +22,43 @@ namespace CarMatch
         }
     }
 
-    // Shared by input, the board view, and the solver. A car can leave only
-    // when every cell between it and the bar (cell 0) is empty.
+    // One cell of a drive. Cell < 0 means the car has left that lane's mouth onto the bar road.
+    public struct DriveStep
+    {
+        public int Lane;
+        public int Cell;
+
+        public DriveStep(int lane, int cell)
+        {
+            Lane = lane;
+            Cell = cell;
+        }
+    }
+
+    // Shared by input, the board view, and the solver.
+    // A car can leave when empty cells connect it to the bar, moving sideways
+    // into a neighboring lane or forward (toward cell 0). The top of every lane
+    // is a hard wall: a step never increases the cell index.
     public static class ExitPath
     {
-        // Cars leave only forward, toward the bar. The top of every lane is a hard wall.
+        const int Stride = 64;
+
+        static readonly List<int> Bfs = new List<int>(64);
+        static readonly Dictionary<int, int> Prev = new Dictionary<int, int>(64);
+
+        // Straight mouth check (no sideways). Side lots still use FrontClear.
         public static bool LaneOpen(Lane lane, int cell)
         {
-            if (lane == null || (uint)cell >= (uint)lane.Cells.Count) return false;
+            if (!Occupant(lane, cell)) return false;
             var slot = lane.Cells[cell];
-            if (slot.Empty) return false;
-            if (slot.Tunnel && slot.TunnelCount <= 0) return false;
-            if (slot.Box) return false;
+            if (!slot.Tunnel && slot.Car.Hidden) return false;
             return FrontClear(lane, cell);
+        }
+
+        // Board-wide rule: sideways through empty stalls, then forward to the bar.
+        public static bool LaneOpen(Board board, int lane, int cell)
+        {
+            return CanReachBar(board, lane, cell);
         }
 
         public static bool FrontClear(Lane lane, int cell)
@@ -52,26 +76,64 @@ namespace CarMatch
             return true;
         }
 
-        // The back of every lane is a hard wall. Lane taps never leave that way, and a side
-        // car that has pulled into its cell leaves only toward the bar.
+        // The back of every lane is a hard wall. Nothing drives out that way.
         public static bool ExitsBack(Board board, Tap tap)
         {
-            if (board == null) return false;
-            if (tap.Kind == TapKind.Lane) return false;
-            if (tap.Kind == TapKind.Side) return false;
             return false;
+        }
+
+        public static bool CanReachBar(Board board, int lane, int cell)
+        {
+            return TryRoute(board, lane, cell, null);
+        }
+
+        // Route includes the parked cell and ends with Cell < 0 on the lane it actually leaves.
+        // Cells along the way never increase. into may be null when only the yes/no is needed.
+        public static bool TryRoute(Board board, int lane, int cell, List<DriveStep> into)
+        {
+            if (into != null) into.Clear();
+            if (!CanStart(board, lane, cell)) return false;
+
+            Bfs.Clear();
+            Prev.Clear();
+            int start = Pack(lane, cell);
+            Prev[start] = -1;
+            Bfs.Add(start);
+            int found = -1;
+            int read = 0;
+            while (read < Bfs.Count)
+            {
+                int cur = Bfs[read++];
+                Unpack(cur, out int cl, out int cc);
+                if (cc == 0)
+                {
+                    found = cur;
+                    break;
+                }
+                Visit(board, cur, cl, cc - 1);
+                Visit(board, cur, cl - 1, cc);
+                Visit(board, cur, cl + 1, cc);
+            }
+            if (found < 0) return false;
+            if (into == null) return true;
+
+            var rev = new List<int>(8);
+            for (int n = found; n != -1; n = Prev[n]) rev.Add(n);
+            for (int i = rev.Count - 1; i >= 0; i--)
+            {
+                Unpack(rev[i], out int rl, out int rc);
+                into.Add(new DriveStep(rl, rc));
+            }
+            Unpack(found, out int exitLane, out int ignored);
+            into.Add(new DriveStep(exitLane, -1));
+            return true;
         }
 
         public static bool IsLegal(Board board, Tap tap)
         {
             if (board == null || board.Won || board.Failed) return false;
             if (tap.Kind == TapKind.Lane)
-            {
-                if ((uint)tap.Index >= (uint)board.Lanes.Count) return false;
-                var lane = board.Lanes[tap.Index];
-                if ((uint)tap.Cell >= (uint)lane.Cells.Count) return false;
-                return LaneOpen(lane, tap.Cell);
-            }
+                return CanReachBar(board, tap.Index, tap.Cell);
             if ((uint)tap.Index >= (uint)board.Sides.Count) return false;
             return SideLotGate.IsOpen(board, tap.Index);
         }
@@ -85,9 +147,8 @@ namespace CarMatch
                 var cells = board.Lanes[lane].Cells;
                 for (int cell = 0; cell < cells.Count; cell++)
                 {
-                    if (!LaneOpen(board.Lanes[lane], cell)) continue;
+                    if (!CanReachBar(board, lane, cell)) continue;
                     into.Add(new Tap(TapKind.Lane, lane, cell));
-                    break;
                 }
             }
             for (int s = 0; s < board.Sides.Count; s++)
@@ -104,6 +165,52 @@ namespace CarMatch
                 return slot.Car.Color;
             }
             return board.Sides[tap.Index].Queue[0].Color;
+        }
+
+        static void Visit(Board board, int from, int lane, int cell)
+        {
+            if (!OpenCell(board, lane, cell)) return;
+            int key = Pack(lane, cell);
+            if (Prev.ContainsKey(key)) return;
+            Prev[key] = from;
+            Bfs.Add(key);
+        }
+
+        static bool OpenCell(Board board, int lane, int cell)
+        {
+            if (board == null || lane < 0 || lane >= board.Lanes.Count) return false;
+            var cells = board.Lanes[lane].Cells;
+            if (cell < 0 || cell >= cells.Count) return false;
+            return cells[cell].Empty;
+        }
+
+        static bool CanStart(Board board, int lane, int cell)
+        {
+            if (board == null || board.Won || board.Failed) return false;
+            if (lane < 0 || lane >= board.Lanes.Count) return false;
+            return Occupant(board.Lanes[lane], cell) && !HiddenCar(board.Lanes[lane].Cells[cell]);
+        }
+
+        static bool Occupant(Lane lane, int cell)
+        {
+            if (lane == null || cell < 0 || cell >= lane.Cells.Count) return false;
+            var slot = lane.Cells[cell];
+            if (slot.Empty || slot.Box) return false;
+            if (slot.Tunnel && slot.TunnelCount <= 0) return false;
+            return true;
+        }
+
+        static bool HiddenCar(Slot slot)
+        {
+            return slot != null && !slot.Tunnel && !slot.Empty && slot.Car.Hidden;
+        }
+
+        static int Pack(int lane, int cell) { return lane * Stride + cell; }
+
+        static void Unpack(int key, out int lane, out int cell)
+        {
+            lane = key / Stride;
+            cell = key % Stride;
         }
     }
 }

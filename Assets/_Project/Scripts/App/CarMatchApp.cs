@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace CarMatch
 {
-    public sealed class CarMatchApp : MonoBehaviour
+    public sealed partial class CarMatchApp : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoBoot()
@@ -151,6 +151,7 @@ namespace CarMatch
         void Update()
         {
             if (_screen == null) return; // still booting under the studio card
+            if (_phase == Phase.Play) SettleLifts();
             if (Time.unscaledTime < _tick) return;
             _tick = Time.unscaledTime + 0.5f;
             int lives = Purse.Wallet.Lives;
@@ -263,8 +264,6 @@ namespace CarMatch
                 blink.Closed = UiArt.Get("mascot_blink");
             }
             Logo(new Vector2(0f, 560f), new Vector2(940f, 398f));
-            var tag = Label(new Vector2(0f, -250f), new Vector2(900f, 64f), "Clear the lane. Match three.", 44, Cream, TextAnchor.MiddleCenter);
-            Outlined(tag, new Color(0.10f, 0.12f, 0.28f, 0.8f), 3f);
             int number = NextNumber();
             bool canPlay = _levels.Count > 0 && Purse.Wallet.Lives > 0;
             var play = MakeButton(new Vector2(0f, -470f), new Vector2(700f, 256f), Green, "Level " + number, 84, canPlay ? (UnityEngine.Events.UnityAction)OnPlay : null, "btn_green");
@@ -335,6 +334,7 @@ namespace CarMatch
             DrawBoosters();
             if (_level != null && _level.SuperHard) SuperHardBadge(new Vector2(0f, 650f));
             if (_fly != null) GarageRampFx();
+            DrawCoach();
             if (_pendingBoxBreaks.Count > 0)
             {
                 var breaks = new List<int[]>(_pendingBoxBreaks);
@@ -363,10 +363,10 @@ namespace CarMatch
                 RectTransform car;
                 _pieceAt.TryGetValue(PieceKey(new Tap(TapKind.Lane, cell[0], cell[1])), out car);
                 var target = LaneAnchor(cell[0], cell[1]);
-                var size = car != null ? car.sizeDelta : _metrics.Piece;
+                var size = MysteryBoxSize();
                 CanvasGroup hide = null;
                 if (car != null) { hide = car.gameObject.AddComponent<CanvasGroup>(); hide.alpha = 0f; }
-                var box = Place(_screen, "BoxBreak", target, size * 0.96f);
+                var box = Place(_screen, "BoxBreak", target, size);
                 var bimg = box.gameObject.AddComponent<Image>();
                 bimg.sprite = UiArt.Get("box_mystery") ?? SpriteKit.Round;
                 bimg.preserveAspect = true;
@@ -420,6 +420,16 @@ namespace CarMatch
                 }
             }
             _busy = false;
+        }
+
+        // 88% of the stall, which is inside the lane with a margin. The old crate was 96% of the
+        // truck sprite and hung over the lines. The painted crate also keeps its own shadow inset.
+        Vector2 MysteryBoxSize()
+        {
+            float stall = Mathf.Min(_metrics.CellW, _metrics.CellH);
+            if (stall < 8f) stall = _metrics.Piece.x;
+            float side = stall * 0.88f;
+            return new Vector2(side, side);
         }
 
         // Red 'SUPER HARD' badge (shown on the level button and over the lot title).
@@ -529,6 +539,7 @@ namespace CarMatch
                 {
                     var slot = cells[cell];
                     if (slot.Empty) continue;
+                    if (CellOnLift(lane, cell)) continue;
                     var tap = new Tap(TapKind.Lane, lane, cell);
                     DrawPiece(LaneAnchor(lane, cell), piece, slot, _legal.IsLegal(tap), tap);
                 }
@@ -713,39 +724,10 @@ namespace CarMatch
 
         readonly Dictionary<int, int> _garageOpens = new Dictionary<int, int>();
 
-        // Underground garages: a striped hatch under its spots with the count still below.
-        // When a hatch has just opened, the new cars ride a curved ramp (a small loop) up into place.
+        // Underground lift: a car elevator under two stalls. The badge is how many cars are still below.
         void DrawGarages()
         {
-            for (int gi = 0; gi < _board.Garages.Count; gi++)
-            {
-                var g = _board.Garages[gi];
-                if (g.Cells.Count == 0) continue;
-                float y0 = float.MaxValue, y1 = float.MinValue;
-                for (int i = 0; i < g.Cells.Count; i++)
-                {
-                    var a = LaneAnchor(g.Lane, g.Cells[i]);
-                    y0 = Mathf.Min(y0, a.y); y1 = Mathf.Max(y1, a.y);
-                }
-                var c = new Vector2(LaneAnchor(g.Lane, 0).x, (y0 + y1) * 0.5f);
-                var size = new Vector2(_metrics.CellW - 14f, y1 - y0 + _metrics.CellH - 14f);
-                Bar("GarageRim", c, size + new Vector2(12f, 12f), new Color(0.98f, 0.80f, 0.15f, g.Queue.Count > 0 ? 1f : 0.35f));
-                Bar("GarageHatch", c, size, new Color(0.12f, 0.12f, 0.15f, 1f));
-                for (float sy = -size.y * 0.5f + 18f; sy < size.y * 0.5f - 10f; sy += 36f)
-                    Bar("GarageStripe", c + new Vector2(0f, sy), new Vector2(size.x - 16f, 6f), new Color(0.98f, 0.80f, 0.15f, 0.35f));
-                if (g.Queue.Count > 0)
-                {
-                    var badge = Place(_screen, "GarageCount", c + new Vector2(size.x * 0.5f - 26f, size.y * 0.5f - 26f), new Vector2(64f, 52f));
-                    var bi = badge.gameObject.AddComponent<Image>();
-                    bi.sprite = SpriteKit.Round;
-                    bi.type = Image.Type.Sliced;
-                    bi.color = new Color(0.98f, 0.80f, 0.15f, 1f);
-                    bi.raycastTarget = false;
-                    var t = AddText(badge, g.Queue.Count.ToString(), 34, Ink, TextAnchor.MiddleCenter);
-                    t.font = ChunkyFont();
-                    badge.SetAsLastSibling();
-                }
-            }
+            DrawLiftBays();
         }
 
         void GarageRampFx()
@@ -805,11 +787,22 @@ namespace CarMatch
 
         Vector2 SideAnchor(SideLot side)
         {
-            float x = _metrics.Left + side.Lane * (_metrics.CellW + _metrics.Gap);
-            float dir = side.Lane < _metrics.Lanes * 0.5f ? -1f : 1f;
-            if (_metrics.Lanes <= 1) dir = -1f;
-            x += dir * (_metrics.CellW + _metrics.Gap); // one full lane pitch: snug, never overlapping
-            return new Vector2(x, _metrics.BaseY + side.Cell * _metrics.CellH);
+            int lanes = _metrics.Lanes < 1 ? 1 : _metrics.Lanes;
+            int ordinal = 0;
+            bool left = side.Lane * 2 < lanes;
+            if (_board != null)
+            {
+                for (int i = 0; i < _board.Sides.Count; i++)
+                {
+                    var other = _board.Sides[i];
+                    if (other == side) break;
+                    bool otherLeft = other.Lane * 2 < lanes;
+                    if (otherLeft == left) ordinal++;
+                }
+            }
+            float index = SideLotLayout.CenterIndex(lanes, side.Lane, ordinal);
+            float pitch = _metrics.CellW + _metrics.Gap;
+            return new Vector2(SideLotLayout.CenterX(_metrics.Left, pitch, index), _metrics.BaseY + side.Cell * _metrics.CellH);
         }
 
         // Slot centers for 'count' cars: the usual seven, squeezed a little when matched sets
@@ -848,11 +841,8 @@ namespace CarMatch
                 }
                 _pieceAt[PieceKey(tap)] = rt;
                 // Car Match style: a big white count sitting on top of the garage arch.
-                var count = Place(rt, "Count", new Vector2(0f, size.y * 0.40f), new Vector2(size.x * 0.8f, size.y * 0.34f));
-                var countText = AddText(count, slot.TunnelCount.ToString(), Mathf.RoundToInt(Mathf.Clamp(size.y * 0.30f, 36f, 96f)), Color.white, TextAnchor.MiddleCenter);
-                countText.font = ChunkyFont();
-                countText.raycastTarget = false;
-                Outlined(countText, new Color(0.08f, 0.10f, 0.28f, 1f), 4f);
+                var count = Place(rt, "Count", new Vector2(size.x * 0.22f, -size.y * 0.28f), new Vector2(size.x * 0.46f, size.y * 0.28f));
+                CountChip(count, Vector2.zero, slot.TunnelCount, new Color(0.12f, 0.18f, 0.38f, 1f), true);
                 string tunnelKey = PieceKey(tap);
                 int lastCount;
                 if (_tunnelCounts.TryGetValue(tunnelKey, out lastCount) && lastCount > slot.TunnelCount && rt.Find("Peek") != null)
@@ -864,8 +854,8 @@ namespace CarMatch
             }
             if (slot.Box)
             {
-                // Mystery box: cardboard '?' over the car; tapping it just wiggles.
-                var box = Place(_screen, "Box", pos, size * 0.96f);
+                // Shipping crate, sized to the stall so it does not hang over the lane or the gate.
+                var box = Place(_screen, "Box", pos, MysteryBoxSize());
                 _pieceAt[PieceKey(tap)] = box;
                 var boxImage = box.gameObject.AddComponent<Image>();
                 boxImage.sprite = UiArt.Get("box_mystery") ?? SpriteKit.Round;
@@ -929,7 +919,7 @@ namespace CarMatch
             AnimateEyes(rt, image, car, open, tap);
             if (queueCount > 1)
             {
-                CountChip(rt, new Vector2(size.x * 0.34f, size.y * 0.34f), queueCount);
+                CountChip(rt, new Vector2(size.x * 0.28f, size.y * 0.30f), queueCount, new Color(0.86f, 0.16f, 0.22f, 1f), true);
             }
             if (!car.Hidden)
             {
@@ -1022,15 +1012,26 @@ namespace CarMatch
             return UiArt.Get("tarp") ?? SpriteKit.Hidden;
         }
 
-        void CountChip(RectTransform parent, Vector2 pos, int count)
+        void CountChip(RectTransform parent, Vector2 pos, int count, Color plate, bool carIcon)
         {
-            var chip = Place(parent, "Count", pos, new Vector2(60f, 60f));
+            var chip = Place(parent, "Count", pos, carIcon ? new Vector2(108f, 64f) : new Vector2(64f, 64f));
             var img = chip.gameObject.AddComponent<Image>();
             img.sprite = UiArt.Get("chip") ?? SpriteKit.Round;
+            img.color = plate;
             img.raycastTarget = false;
-            var t = AddText(chip, count.ToString(), 34, Color.white, TextAnchor.MiddleCenter);
+            if (carIcon)
+            {
+                var mark = Place(chip, "MiniCar", new Vector2(-30f, 0f), new Vector2(36f, 36f));
+                var markImage = mark.gameObject.AddComponent<Image>();
+                markImage.sprite = CarArt.For(CarColor.Coral, true);
+                markImage.preserveAspect = true;
+                markImage.color = new Color(1f, 1f, 1f, 0.95f);
+                markImage.raycastTarget = false;
+            }
+            var t = AddText(chip, count.ToString(), 32, Color.white, TextAnchor.MiddleCenter);
             t.font = ChunkyFont();
-            Outlined(t, new Color(0.45f, 0.05f, 0.12f, 1f), 2f);
+            if (carIcon) t.rectTransform.offsetMin = new Vector2(28f, 0f);
+            Outlined(t, new Color(0.05f, 0.06f, 0.12f, 1f), 2f);
         }
 
         void Hook(RectTransform rt, Tap tap)
@@ -1185,6 +1186,8 @@ namespace CarMatch
         void OnTap(Tap tap, RectTransform piece)
         {
             if (_busy || _phase != Phase.Play || _board == null || _board.Won || _board.Failed) return;
+            if (TapBlockedByLift(tap)) return;
+            if (_cue.LockCars && !LotCoach.Allows(_cue, tap)) return;
             if (_metrics.Lanes <= 0 || !_legal.IsLegal(tap)) return;
             var color = ExitPath.ColorOf(_board, tap);
             bool hidden = PieceHidden(tap);
@@ -1192,8 +1195,12 @@ namespace CarMatch
             if (piece != null) points[0] = piece.anchoredPosition;
             var size = piece != null ? piece.sizeDelta : _metrics.Piece;
             var boxesBefore = BoxCells(_board);
+            var opensBefore = GarageOpens();
             var move = BoardRules.Play(_board, _history, tap);
             if (!move.Accepted) return;
+            if (_cue.Lesson == CoachLesson.MatchThree && move.Matched)
+                LotCoach.Complete(PrefsFlags.Shared, CoachLesson.MatchThree);
+            NoteLifts(opensBefore);
             foreach (var bc in boxesBefore)
                 if (!_board.Lanes[bc[0]].Cells[bc[1]].Box) _pendingBoxBreaks.Add(bc);
             _lastMatch = move.Matched;
@@ -1463,7 +1470,6 @@ namespace CarMatch
 #if !UNITY_WEBGL
             Haptics.Success();
 #endif
-            if (_shake != null) _shake.Punch(0.22f, 9f, 0.6f);
             var set = new List<RectTransform>();
             for (int i = 0; i < spots.Count; i++)
             {
@@ -2187,7 +2193,6 @@ namespace CarMatch
 #if !UNITY_WEBGL
             Haptics.Success();
 #endif
-            if (_shake != null) _shake.Punch(0.2f, 8f, 0.5f);
             if (FxSheet("fx_magnet_impact", magnetPos, new Vector2(840f, 840f), 20f, false) == null)
             {
                 Sparkle(magnetPos, new Color(1f, 0.9f, 0.4f, 1f), 16);
@@ -2438,7 +2443,6 @@ namespace CarMatch
                     if (!punched)
                     {
                         punched = true;
-                        if (_shake != null) _shake.Punch(0.28f, 11f, 3.5f);
                     }
                     if (!cheered)
                     {
@@ -2725,8 +2729,10 @@ namespace CarMatch
 
             LoseHero(card);
 
-            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -80f), 780f, 150f, "Park 3 Cars", 64, OnContinue, false);
-            cont.interactable = !_busy;
+            var face = ContinueOffer.Face(Vip.Owned, _ads != null && _ads.RewardedReady);
+            var cont = LoseButton(card, "lose_btn_continue", new Vector2(0f, -80f), 780f, 150f, "Park 3 Cars", 64, ContinueOffer.CanPress(face) ? (UnityEngine.Events.UnityAction)OnContinue : null, false);
+            cont.interactable = ContinueOffer.CanPress(face) && !_busy;
+            ContinueBadge(cont, face);
             _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -250f), 780f, 150f, "Retry", 68, OnRetry, false);
             RetryLifeBadge(_retryButton);
             _retryButton.interactable = !_busy && Purse.Wallet.Lives > 0;
@@ -2854,33 +2860,141 @@ namespace CarMatch
             Purse.TrySpendLife(); // a fail costs a heart and pays no coins
         }
 
-        void OnContinue()
+        // Play triangle for a rewarded continue, crown when VIP skips the ad.
+        void ContinueBadge(Button button, ContinueFace face)
         {
-            if (_busy) return;
-            StartCoroutine(Continue());
+            if (face == ContinueFace.Unavailable) return;
+            var rt = (RectTransform)button.transform;
+            float h = rt.sizeDelta.y;
+            var badge = Place(rt, "ContinueBadge", new Vector2(-rt.sizeDelta.x * 0.36f, h * 0.04f), new Vector2(h * 0.46f, h * 0.46f));
+            var img = badge.gameObject.AddComponent<Image>();
+            img.sprite = UiArt.Get(face == ContinueFace.Crown ? "vip_crown" : "ad_play") ?? SpriteKit.Round;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+            if (face == ContinueFace.Crown)
+                img.color = new Color(1f, 0.84f, 0.25f, 1f);
         }
 
         IEnumerator Continue()
         {
+            var face = ContinueOffer.Face(Vip.Owned, _ads != null && _ads.RewardedReady);
+            if (!ContinueOffer.CanPress(face)) yield break;
             _busy = true;
             if (_retryButton != null) _retryButton.interactable = false;
-            bool granted = false;
-            yield return _ads.ShowRewarded("continue", delegate (bool ok) { granted = ok; });
-            _busy = false;
+            bool granted = face == ContinueFace.Crown;
             if (!granted)
             {
+                yield return _ads.ShowRewarded("continue", delegate (bool ok) { granted = ok; });
+            }
+            if (!granted)
+            {
+                // No fill, or the player closed the ad. The bar stays full. Nothing is parked.
+                _busy = false;
                 ShowFail(null);
                 yield break;
             }
+            int drop = _history.Count >= 3 ? 3 : _history.Count;
+            if (drop < 1)
+            {
+                _busy = false;
+                ShowFail(null);
+                yield break;
+            }
+            var peek = _history[_history.Count - drop];
+            var trips = ContinuePark.Returning(_board, peek);
+            int slot = peek.Bar.Count;
             Board restored;
             if (!BoosterKit.SuperUndo(_history, out restored))
             {
+                _busy = false;
                 ShowFail(null);
                 yield break;
             }
             _board = restored;
             _lastMatch = false;
             ShowPlay();
+            // ShowPlay stops this behaviour's coroutines. The drive runs on the flight host.
+            if (_fly != null) _fly.StartCoroutine(DriveParkedHome(trips, slot));
+            else _busy = false;
+        }
+
+        // The three undone cars are already back in their stalls in the rules.
+        // Hide those stalls and drive a copy in from the bar so the return is visible.
+        IEnumerator DriveParkedHome(List<ContinuePark.Trip> trips, int firstSlot)
+        {
+            if (trips == null || trips.Count == 0) { _busy = false; yield break; }
+            var pieces = new List<RectTransform>();
+            var flyers = new List<RectTransform>();
+            var from = new List<Vector2>();
+            var to = new List<Vector2>();
+            for (int i = 0; i < trips.Count; i++)
+            {
+                var trip = trips[i];
+                Tap tap;
+                Vector2 goal;
+                if (trip.Side)
+                {
+                    int side = -1;
+                    for (int s = 0; s < _board.Sides.Count; s++)
+                        if (_board.Sides[s].Lane == trip.Lane && _board.Sides[s].Cell == trip.Cell) { side = s; break; }
+                    if (side < 0) continue;
+                    tap = new Tap(TapKind.Side, side, trip.Cell);
+                    goal = SideAnchor(_board.Sides[side]);
+                }
+                else
+                {
+                    tap = new Tap(TapKind.Lane, trip.Lane, trip.Cell);
+                    goal = LaneAnchor(trip.Lane, trip.Cell);
+                }
+                RectTransform piece;
+                if (_pieceAt.TryGetValue(PieceKey(tap), out piece) && piece != null)
+                {
+                    var group = piece.gameObject.AddComponent<CanvasGroup>();
+                    group.alpha = 0f;
+                    pieces.Add(piece);
+                }
+                else pieces.Add(null);
+                int slot = firstSlot + i;
+                if (slot > MatchClear.BarCap - 1) slot = MatchClear.BarCap - 1;
+                var start = BarSlotCenter(slot);
+                var flyer = SpawnFlyer(trip.Color, false, start, _metrics.Piece);
+                flyers.Add(flyer);
+                from.Add(start);
+                to.Add(goal);
+            }
+            AudioManager.Play(Sfx.DriveOut);
+            float t = 0f;
+            const float dur = 0.62f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                float u = Mathf.Clamp01(t / dur);
+                for (int i = 0; i < flyers.Count; i++)
+                {
+                    if (flyers[i] == null) continue;
+                    float lag = Mathf.Clamp01((u - i * 0.06f) / 0.82f);
+                    float e = 1f - (1f - lag) * (1f - lag);
+                    flyers[i].anchoredPosition = Vector2.Lerp(from[i], to[i], e);
+                }
+                yield return null;
+            }
+            for (int i = 0; i < flyers.Count; i++)
+                if (flyers[i] != null) Destroy(flyers[i].gameObject);
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                if (pieces[i] == null) continue;
+                var group = pieces[i].GetComponent<CanvasGroup>();
+                if (group != null) group.alpha = 1f;
+            }
+            AudioManager.Play(Sfx.SlotArrive);
+            _busy = false;
+        }
+
+        void OnContinue()
+        {
+            var face = ContinueOffer.Face(Vip.Owned, _ads != null && _ads.RewardedReady);
+            if (_busy || !ContinueOffer.CanPress(face)) return;
+            StartCoroutine(Continue());
         }
 
         void OnHome()

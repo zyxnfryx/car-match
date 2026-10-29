@@ -8,6 +8,9 @@ namespace CarMatch
     public sealed class StubAdService : IAdService
     {
         public bool WillGrant = true;
+        public bool Ready = true;
+
+        public bool RewardedReady { get { return Ready; } }
 
         public IEnumerator ShowRewarded(string placement, Action<bool> onDone)
         {
