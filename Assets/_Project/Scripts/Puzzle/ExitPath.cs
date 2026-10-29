@@ -23,11 +23,10 @@ namespace CarMatch
     }
 
     // Shared by input, the board view, and the solver. A car can leave only
-    // when every cell between it and the exit is empty.
+    // when every cell between it and the bar (cell 0) is empty.
     public static class ExitPath
     {
-        // A car can leave from either end of its lane: forward to the bar road (cell 0 side),
-        // or backward onto the ring road behind the lot when every cell behind it is empty.
+        // Cars leave only forward, toward the bar. The top of every lane is a hard wall.
         public static bool LaneOpen(Lane lane, int cell)
         {
             if (lane == null || (uint)cell >= (uint)lane.Cells.Count) return false;
@@ -35,7 +34,7 @@ namespace CarMatch
             if (slot.Empty) return false;
             if (slot.Tunnel && slot.TunnelCount <= 0) return false;
             if (slot.Box) return false;
-            return FrontClear(lane, cell) || BackClear(lane, cell);
+            return FrontClear(lane, cell);
         }
 
         public static bool FrontClear(Lane lane, int cell)
@@ -45,6 +44,7 @@ namespace CarMatch
             return true;
         }
 
+        // Every cell behind this one is empty. That road is still walled off: it is not an exit.
         public static bool BackClear(Lane lane, int cell)
         {
             for (int i = cell + 1; i < lane.Cells.Count; i++)
@@ -52,17 +52,14 @@ namespace CarMatch
             return true;
         }
 
-        // Which way a legal lane tap drives: the front (bar side) is preferred when both are clear.
+        // The back of every lane is a hard wall. Lane taps never leave that way, and a side
+        // car that has pulled into its cell leaves only toward the bar.
         public static bool ExitsBack(Board board, Tap tap)
         {
             if (board == null) return false;
-            int lane = tap.Kind == TapKind.Lane ? tap.Index : board.Sides[tap.Index].Lane;
-            int cell = tap.Kind == TapKind.Lane ? tap.Cell : board.Sides[tap.Index].Cell;
-            if ((uint)lane >= (uint)board.Lanes.Count) return false;
-            var l = board.Lanes[lane];
-            if (tap.Kind == TapKind.Side)
-                return !SideLotGate.FrontOpen(board, tap.Index) && SideLotGate.IsOpen(board, tap.Index);
-            return !FrontClear(l, cell) && BackClear(l, cell);
+            if (tap.Kind == TapKind.Lane) return false;
+            if (tap.Kind == TapKind.Side) return false;
+            return false;
         }
 
         public static bool IsLegal(Board board, Tap tap)
@@ -86,15 +83,7 @@ namespace CarMatch
             for (int lane = 0; lane < board.Lanes.Count; lane++)
             {
                 var cells = board.Lanes[lane].Cells;
-                int front = -1;
                 for (int cell = 0; cell < cells.Count; cell++)
-                {
-                    if (!LaneOpen(board.Lanes[lane], cell)) continue;
-                    into.Add(new Tap(TapKind.Lane, lane, cell));
-                    front = cell;
-                    break;
-                }
-                for (int cell = cells.Count - 1; cell > front; cell--)
                 {
                     if (!LaneOpen(board.Lanes[lane], cell)) continue;
                     into.Add(new Tap(TapKind.Lane, lane, cell));

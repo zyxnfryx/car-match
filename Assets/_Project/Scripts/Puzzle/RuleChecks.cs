@@ -108,7 +108,7 @@ namespace CarMatch
             Expect(board.Lanes[0].Cells[0].TunnelCount == 3, "tunnel shows 3");
             var taps = new List<Tap>();
             ExitPath.Collect(board, taps);
-            Expect(taps.Count == 2 && taps[0].Cell == 0 && taps[1].Cell == 3, "the tunnel mouth and the back lime (out the rear) are open");
+            Expect(taps.Count == 1 && taps[0].Cell == 0, "only the tunnel mouth is open; the back lime is walled in");
             BoardRules.Play(board, null, taps[0]);
             Expect(board.Lanes[0].Cells[0].TunnelCount == 2, "count drops when a car leaves");
             Expect(!ExitPath.LaneOpen(board.Lanes[0], 1), "lime stays blocked");
@@ -463,25 +463,27 @@ namespace CarMatch
                             Expect(legal.IsLegal(t) == ExitPath.IsLegal(board, t), "idle never changes legality");
                         }
             }
-            Expect(puffs >= 4 * 30 / 3 - 4, "awake trucks puff every 1.5-3 s (" + puffs + ")");
+            Expect(puffs >= 2 * 30 / 3 - 2, "awake trucks puff every 1.5-3 s (" + puffs + ")");
             Expect(calmPuffs == 0, "blocked trucks never puff");
             Expect(seen[0] && seen[1] && seen[2] && seen[3] && seen[4], "looks ahead, left, right, at the player and at the bar");
             Expect(blinks >= 6 * 30 / 5, "blinks every 2-5 s (" + blinks + ")");
             Expect(squints > 0 && wide > 0, "happy squints and wide eye contact happen");
             Expect(maxAwake > 0.008f && maxAwake <= AliveIdle.HopMax + 1e-4f, "awake sputter hops are small (" + maxAwake + ")");
             Expect(maxCalm == 0f, "sleeping trucks never hop (" + maxCalm + ")");
-            Expect(hops > 4 * 30 * 2, "awake trucks sputter often (" + hops + " hops)");
+            Expect(hops > 2 * 30 * 2, "awake trucks sputter often (" + hops + " hops)");
             var a0 = AliveIdle.Create(1, true); var a1 = AliveIdle.Create(2, true);
             bool diff = false;
             for (int f = 0; f < 60; f++) { a0.Tick(1f / 60f); a1.Tick(1f / 60f); if (System.Math.Abs(a0.HopY - a1.HopY) > 1e-4f) diff = true; }
             Expect(diff, "trucks sputter out of sync");
-            // A tap mid-idle (mid-blink, mid-look) is accepted immediately.
-            var back = new Tap(TapKind.Lane, 0, 2);
-            Expect(legal.IsLegal(back), "the back coral is tappable while idling");
-            var move = BoardRules.Play(board, null, back);
+            // A tap mid-idle (mid-blink, mid-look) is accepted immediately. The back of the lane is a wall.
+            var frontTap = new Tap(TapKind.Lane, 0, 0);
+            Expect(legal.IsLegal(frontTap), "the front teal is tappable while idling");
+            Expect(!legal.IsLegal(new Tap(TapKind.Lane, 0, 2)), "the back coral stays walled in while idling");
+            var move = BoardRules.Play(board, null, frontTap);
             Expect(move.Accepted && board.Bar.Count == 1, "the tap lands on the same frame");
             legal.Rebuild(board);
             Expect(legal.IsLegal(new Tap(TapKind.Lane, 0, 1)), "the next car is tappable right away");
+            Expect(!legal.IsLegal(new Tap(TapKind.Lane, 0, 2)), "the car behind that one stays blocked");
             idles[4].SetAwake(true);
             idles[4].Tick(1f / 60f);
             Expect(idles[4].Awake, "a newly unblocked truck wakes into the alive loop");
@@ -506,21 +508,25 @@ namespace CarMatch
             }
         }
 
-        // Car Match rule: a car may leave out either end of its lane. The back car of a
-        // stacked lane is awake and tappable (rear exit onto the ring road); middle cars are not.
-        public static void BackOfLaneCanExit()
+        // The back of every lane is a wall. A car with open road behind it still cannot leave,
+        // and it is drawn asleep. Only a clear path toward the bar is an exit.
+        public static void BackOfLaneCannotExit()
         {
             var board = Tiny("[[\"teal\",\"teal\",\"coral\"],[\"amber\",\"coral\",\"amber\"]]");
             var back = new Tap(TapKind.Lane, 0, 2);
-            Expect(ExitPath.IsLegal(board, back), "the back car with open road behind it can leave");
-            Expect(EyeState.IsOpen(board, back), "and it is drawn awake");
-            Expect(ExitPath.ExitsBack(board, back), "it drives out the rear");
+            Expect(ExitPath.BackClear(board.Lanes[0], 2), "the road behind the back car is open");
+            Expect(!ExitPath.IsLegal(board, back), "and it still cannot leave");
+            Expect(!EyeState.IsOpen(board, back), "so it is drawn asleep");
+            Expect(!ExitPath.ExitsBack(board, back), "a lane tap never drives out the rear");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 0)), "the front teal can leave");
             Expect(!ExitPath.ExitsBack(board, new Tap(TapKind.Lane, 0, 0)), "the front car uses the front");
-            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "a middle car is blocked both ways");
-            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 1)), "the middle coral is blocked both ways");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "a middle car is blocked");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 1)), "the middle coral is blocked");
+            Expect(!ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 2)), "the back amber is walled in");
+            Expect(!EyeState.IsOpen(board, new Tap(TapKind.Lane, 1, 2)), "the back amber is asleep");
             var taps = new List<Tap>();
             ExitPath.Collect(board, taps);
-            Expect(taps.Count == 4, "front and back of both lanes are offered");
+            Expect(taps.Count == 2 && taps[0].Cell == 0 && taps[1].Cell == 0, "only the front car of each lane is offered");
             var legal = new LegalMoves();
             legal.Rebuild(board);
             for (int l = 0; l < board.Lanes.Count; l++)
@@ -528,14 +534,30 @@ namespace CarMatch
                 {
                     var t = new Tap(TapKind.Lane, l, c);
                     Expect(legal.IsLegal(t) == ExitPath.IsLegal(board, t), "cache matches the rule at " + l + "," + c);
+                    Expect(legal.IsLegal(t) == EyeState.IsOpen(board, t), "eyes match the rule at " + l + "," + c);
                 }
-            var move = BoardRules.Play(board, null, back);
-            Expect(move.Accepted && board.Bar.Count == 1 && board.Bar[0] == CarColor.Coral, "the rear exit reaches the bar");
-            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "the middle teal is now the back car");
-            BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 2));
-            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 1, 1)), "coral opens from the rear");
-            var m2 = BoardRules.Play(board, null, new Tap(TapKind.Lane, 1, 1));
-            Expect(m2.Accepted && board.Bar.Count == 3 && board.Bar[0] == CarColor.Coral && board.Bar[1] == CarColor.Coral, "two coral grouped, amber after");
+            var refused = BoardRules.Play(board, null, back);
+            Expect(!refused.Accepted && board.Bar.Count == 0, "a rear tap does not reach the bar");
+            Expect(board.Lanes[0].Cells[2].Car.Color == CarColor.Coral, "the back coral stays parked");
+            BoardRules.Play(board, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(!ExitPath.IsLegal(board, back), "the back car stays blocked while a car sits in front");
+            Expect(!ExitPath.ExitsBack(board, new Tap(TapKind.Lane, 0, 1)), "the next opening is still a front exit");
+            Expect(ExitPath.IsLegal(board, new Tap(TapKind.Lane, 0, 1)), "the next car opens toward the bar");
+            Expect(EyeState.IsOpen(board, new Tap(TapKind.Lane, 0, 1)), "and that car wakes up");
+
+            // A side car may enter its cell and leave only when the front of the lane is clear.
+            var side = Tiny("[[\"coral\",\"teal\"]]", "[{\"lane\":0,\"at\":1,\"cars\":[\"amber\",\"amber\",\"amber\"]}]");
+            var curb = new Tap(TapKind.Side, 0, 1);
+            Expect(ExitPath.BackClear(side.Lanes[0], 1), "the side cell has open road behind it");
+            Expect(!SideLotGate.IsOpen(side, 0), "the side car cannot leave out the back");
+            Expect(!ExitPath.ExitsBack(side, curb), "a side tap never takes the rear path");
+            Expect(!EyeState.IsOpen(side, curb), "the side car stays asleep");
+            BoardRules.Play(side, null, new Tap(TapKind.Lane, 0, 0));
+            Expect(!SideLotGate.IsOpen(side, 0), "the side cell is still full");
+            BoardRules.Play(side, null, new Tap(TapKind.Lane, 0, 1));
+            Expect(SideLotGate.IsOpen(side, 0) && SideLotGate.FrontOpen(side, 0), "the side car leaves only once the front path is clear");
+            Expect(!ExitPath.ExitsBack(side, curb), "that leave is toward the bar");
+            Expect(EyeState.IsOpen(side, curb), "the side car wakes when the front path is clear");
         }
 
         public static void OpenEyesOnlyOnAClearExit()
@@ -582,7 +604,7 @@ namespace CarMatch
             Expect(BoosterKit.Shuffle(mix, new System.Random(3)), "shuffle should apply");
             Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 0)), "a shuffle leaves the mouth open");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 1)), "a shuffle leaves a blocked slot closed");
-            Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 2)), "the back of the lane is open out the rear");
+            Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 0, 2)), "the back of the lane stays closed behind the wall");
             Expect(EyeState.IsOpen(mix, new Tap(TapKind.Lane, 1, 0)), "an open lane stays open after a shuffle");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Lane, 9, 0)), "a missing lane is closed");
             Expect(!EyeState.IsOpen(mix, new Tap(TapKind.Side, 0, 0)), "a missing side lot is closed");
@@ -698,7 +720,7 @@ namespace CarMatch
             ShuffleRefusesWhenNothingCanChange();
             RapidMultiTap();
             GarageRefillsWhenSpotsClear();
-            BackOfLaneCanExit();
+            BackOfLaneCannotExit();
             IdleLoopNeverBlocksInput();
             ReservedSlotsMatchInOrder();
             ReservedSlotsCountTowardFail();
