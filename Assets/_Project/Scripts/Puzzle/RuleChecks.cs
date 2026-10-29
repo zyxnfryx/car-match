@@ -1277,12 +1277,22 @@ namespace CarMatch
         public static void DrivewayLiftDropsThenRises()
         {
             Expect(DrivewayLift.Seconds >= 0.6f && DrivewayLift.Seconds <= 0.9f, "the lift takes 0.6-0.9s");
-            Expect(DrivewayLift.Locked(10f, 10.2f) && !DrivewayLift.Locked(10f, 10f + DrivewayLift.Seconds), "that lane stays locked until it settles");
-            Expect(DrivewayLift.Dropping(0.2f) && !DrivewayLift.Dropping(0.7f), "the empty deck drops before the new one rises");
-            float down = DrivewayLift.DeckOffset(0.4f, 100f);
-            float up = DrivewayLift.DeckOffset(0.95f, 100f);
-            Expect(down < -40f && up > -15f, "the deck travels down and back up");
-            Expect(DrivewayLift.Badge(3, 1, 0.5f) == 3 && DrivewayLift.Badge(3, 1, 0.95f) == 1, "the badge ticks down on arrival");
+            // start + Seconds is not a full Seconds of elapsed float time, so the
+            // settled sample steps past the nominal end the way the next frame does.
+            float start = 10f;
+            float sinking = start + DrivewayLift.Seconds * 0.2f;
+            float rising = start + DrivewayLift.Seconds * 0.7f;
+            float settled = start + DrivewayLift.Seconds + 0.05f;
+            float sinkU = DrivewayLift.Along(start, sinking);
+            float riseU = DrivewayLift.Along(start, rising);
+            float doneU = DrivewayLift.Along(start, settled);
+            Expect(DrivewayLift.Locked(start, sinking) && DrivewayLift.Dropping(sinkU), "the lane stays locked while the empty deck sinks");
+            Expect(DrivewayLift.Locked(start, rising) && !DrivewayLift.Dropping(riseU), "the lane stays locked while the new deck rises");
+            Expect(!DrivewayLift.Locked(start, settled) && doneU >= 1f, "the lane unlocks once the deck has settled");
+            Expect(DrivewayLift.DeckOffset(sinkU, 100f) < -20f
+                && DrivewayLift.DeckOffset(riseU, 100f) > DrivewayLift.DeckOffset(sinkU, 100f)
+                && DrivewayLift.DeckOffset(doneU, 100f) > -1f, "the deck sinks, rises, and is home when it unlocks");
+            Expect(DrivewayLift.Badge(3, 1, sinkU) == 3 && DrivewayLift.Badge(3, 1, riseU) == 3 && DrivewayLift.Badge(3, 1, doneU) == 1, "the badge ticks down on arrival");
             Expect(DrivewayLift.FinalWave(0) && !DrivewayLift.FinalWave(1), "the last wave is the one that empties the queue");
             // Two spots, three queued cars: the first opening brings two up and leaves one below.
             var board = Tiny("[[\"coral\",\"teal\"],[\"amber\",\"amber\"],[\"coral\",\"teal\"]]",

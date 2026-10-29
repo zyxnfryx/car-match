@@ -11,13 +11,19 @@ namespace CarMatch
 
         public static bool Locked(float startedAt, float now)
         {
-            return startedAt > 0f && now < startedAt + Seconds;
+            // Shut until the same progress the deck and the badge use reaches 1.
+            // Comparing now with (start + Seconds) stays true on a wider float add:
+            // the rounded end sample is still less than that sum, so the lane never
+            // quite reaches "settled" in the EditMode check.
+            if (startedAt <= 0f) return false;
+            return Along(startedAt, now) < 1f;
         }
 
         public static float Along(float startedAt, float now)
         {
             if (startedAt <= 0f) return 1f;
-            float u = (now - startedAt) / Seconds;
+            float elapsed = now - startedAt;
+            float u = elapsed / Seconds;
             if (u < 0f) return 0f;
             if (u > 1f) return 1f;
             return u;
