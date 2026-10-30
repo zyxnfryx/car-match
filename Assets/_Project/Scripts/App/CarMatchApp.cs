@@ -59,7 +59,6 @@ namespace CarMatch
         Text _livesText;
         Button _retryButton;
         Button _playButton;
-        UiShake _shake;
         readonly List<RectTransform> _barCars = new List<RectTransform>();
         readonly Dictionary<string, bool> _eyes = new Dictionary<string, bool>();
         readonly Dictionary<string, RectTransform> _pieceAt = new Dictionary<string, RectTransform>();
@@ -152,6 +151,7 @@ namespace CarMatch
             yield return null;
             BuildShell();
             ShowHome();
+            DebugShot();
             bool ready = false;
             runner.StartCoroutine(WaitFor(music, () => ready = true));
             yield return card.HoldAndFade(() => ready);
@@ -226,7 +226,6 @@ namespace CarMatch
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
             _screen = screen.transform;
-            _shake = screen.AddComponent<UiShake>();
 
             var fly = new GameObject("Flights", typeof(RectTransform));
             fly.transform.SetParent(canvasGo.transform, false);
@@ -325,6 +324,7 @@ namespace CarMatch
             _winPaid = false;
             _winCheer = false;
             _failPaid = false;
+            _quitAsk = false;
             _lastMatch = false;
             _busy = false;
             KillFlights();
@@ -358,6 +358,8 @@ namespace CarMatch
             if (_fly != null) GarageRampFx();
             RaiseCountBadges();
             DrawCoach();
+            PinBadges();
+            if (_quitAsk) OpenQuitAsk();
             if (_pendingBoxBreaks.Count > 0)
             {
                 var breaks = new List<int[]>(_pendingBoxBreaks);
@@ -396,8 +398,19 @@ namespace CarMatch
             if (_badgeLayer == null) return;
             _badgeLayer.SetAsLastSibling();
             if (_screen == null) return;
+            var lifts = new List<Transform>();
+            for (int i = 0; i < _screen.childCount; i++)
+                if (_screen.GetChild(i).name == "LiftCount") lifts.Add(_screen.GetChild(i));
+            for (int i = 0; i < lifts.Count; i++) lifts[i].SetAsLastSibling();
+            _badgeLayer.SetAsLastSibling();
+            var hint = _screen.Find("LookHint");
+            if (hint != null) hint.SetAsLastSibling();
+            var coach = _screen.Find("CoachLayer");
+            if (coach != null) coach.SetAsLastSibling();
             var glove = _screen.Find("Glove");
             if (glove != null) glove.SetAsLastSibling();
+            var quit = _screen.Find("QuitAsk");
+            if (quit != null) quit.SetAsLastSibling();
         }
 
         static void CollectBadges(Transform root, List<Transform> into)
@@ -652,7 +665,22 @@ namespace CarMatch
             for (int i = 0; i <= lanes; i++)
             {
                 float x = _metrics.Left - _metrics.CellW * 0.5f - _metrics.Gap * 0.5f + i * (_metrics.CellW + _metrics.Gap);
-                Bar("LaneLine", new Vector2(x, cy + 10f), new Vector2(8f, h + 20f), line);
+                bool outer = i == 0 || i == lanes;
+                if (outer)
+                {
+                    // Outer edge of the lot: one solid line.
+                    Bar("LaneLine", new Vector2(x, cy + 10f), new Vector2(8f, h + 20f), line);
+                    continue;
+                }
+                // Interior lines are dashed paint: cars may cross them sideways.
+                const float dash = 54f, gapLen = 36f;
+                float y0 = cy + 10f - (h + 20f) * 0.5f;
+                float y1 = cy + 10f + (h + 20f) * 0.5f;
+                for (float y = y0; y < y1 - 1f; y += dash + gapLen)
+                {
+                    float len = Mathf.Min(dash, y1 - y);
+                    Bar("LaneLine", new Vector2(x, y + len * 0.5f), new Vector2(8f, len), line);
+                }
             }
             for (int i = 0; i < lanes; i++)
             {
@@ -1383,6 +1411,9 @@ namespace CarMatch
             var opensBefore = GarageOpens();
             var move = BoardRules.Play(_board, _history, tap);
             if (!move.Accepted) return;
+            if (_glove != null) _glove.NoteTap();
+            if (_hint.Hint != CoachHint.None)
+                LotCoach.CompleteHint(PrefsFlags.Shared, _hint.Hint);
             if (_cue.Lesson == CoachLesson.MatchThree && move.Matched)
                 LotCoach.Complete(PrefsFlags.Shared, CoachLesson.MatchThree);
             if (_cue.Lesson == CoachLesson.SideLot && tap.Kind == TapKind.Side)
@@ -1437,25 +1468,38 @@ namespace CarMatch
             return slot.Car.Hidden;
         }
 
-        // Control points for a curvy drive (smoothed with Catmull-Rom in Drive). Every car
-        // leaves forward, out of the lane mouth onto the bar road. The back of the lane is a wall,
-        // so nothing pulls out onto the ring road. The drive ends with a curved approach into the slot.
+        // Control points for a drive (smoothed with Catmull-Rom in Drive). The car follows its real
+        // DriveRoute: empty cells only, sideways or forward, out of the lane mouth onto the bar road.
+        // It never crosses a parked car and never leaves out the back. The grid part is densified
+        // so the spline cannot cut a corner over a neighbor. The drive ends with a curved approach into the slot.
+        readonly List<DriveStep> _routeSteps = new List<DriveStep>(16);
+
         List<Vector2> BuildDrivePath(Tap tap, int slotIndex)
         {
-            var points = new List<Vector2>(12);
-            int lane;
-            if (tap.Kind == TapKind.Side)
+            var points = new List<Vector2>(16);
+            int lane = tap.Kind == TapKind.Side ? _board.Sides[tap.Index].Lane : tap.Index;
+            if (tap.Kind == TapKind.Side) points.Add(SideAnchor(_board.Sides[tap.Index]));
+            if (DriveRoute.Exit(_board, tap, _routeSteps))
             {
-                var side = _board.Sides[tap.Index];
-                points.Add(SideAnchor(side));
-                lane = side.Lane;
-                points.Add(LaneAnchor(lane, side.Cell));
+                for (int i = 0; i < _routeSteps.Count; i++)
+                {
+                    var st = _routeSteps[i];
+                    if (st.Cell < 0) { lane = st.Lane; break; }
+                    AddGrid(points, LaneAnchor(st.Lane, st.Cell));
+                }
             }
             else
             {
-                lane = tap.Index;
-                points.Add(LaneAnchor(lane, tap.Cell));
+                // Not routable (should not happen for a legal tap): straight down its own lane.
+                int from = tap.Kind == TapKind.Side ? _board.Sides[tap.Index].Cell : tap.Cell;
+                for (int c = from; c >= 0; c--) AddGrid(points, LaneAnchor(lane, c));
             }
+            return FinishToBar(points, lane, slotIndex);
+        }
+
+        // From the last lane waypoint out of the lane mouth and along the bar road into the slot.
+        List<Vector2> FinishToBar(List<Vector2> points, int lane, int slotIndex)
+        {
             var slotPos = BarSlotCenter(slotIndex);
             var m = _metrics;
             var start = points[points.Count - 1];
@@ -1475,6 +1519,18 @@ namespace CarMatch
             points.Add(new Vector2(slotPos.x + dir * 34f, Mathf.Lerp(bottom, slotPos.y, 0.55f)));
             points.Add(slotPos);
             return points;
+        }
+
+        // Grid waypoints with a midpoint between each pair, so a smoothed path hugs the cells.
+        static void AddGrid(List<Vector2> points, Vector2 p)
+        {
+            if (points.Count > 0)
+            {
+                var last = points[points.Count - 1];
+                if ((p - last).sqrMagnitude < 1f) return;
+                points.Add(Vector2.Lerp(last, p, 0.5f));
+            }
+            points.Add(p);
         }
 
         // Catmull-Rom spline through the control points (centripetal-ish via uniform with clamped ends).
@@ -2107,14 +2163,24 @@ namespace CarMatch
             else if (after.Sides[tap.Index].Queue.Count > 0) color = after.Sides[tap.Index].Queue[0].Color;
             int slot = Mathf.Clamp(after.Bar.Count, 0, MatchClear.BarCap - 1);
             for (int i = before.Bar.Count - 1; i >= 0; i--) if (before.Bar[i] == color) { slot = i; break; }
-            var pts = CatmullRom(BuildDrivePath(tap, slot), 10);
-            pts.Reverse();
+            // Back to its spot along a real clear route (DriveRoute.Return): reverse out of the bar
+            // and back in through the mouth, or around the outer road and in from the top.
+            // No clear way at all: it pops back in place rather than driving over a car.
+            bool forward;
+            var pts = BuildReturnPath(after, tap, slot, out forward);
+            if (pts == null)
+            {
+                if (piece != null) StartCoroutine(Wiggle(piece));
+                _busy = false;
+                yield break;
+            }
+            pts = CatmullRom(pts, 10);
             if (piece != null) piece.gameObject.AddComponent<CanvasGroup>().alpha = 0f;
             var flyer = SpawnFlyer(color, false, pts[0], new Vector2(BarSlotWidth - 8f, BarCarH));
             var image = flyer.GetComponent<Image>();
             var endSize = piece != null ? piece.sizeDelta : _metrics.Piece;
             float t = 0f;
-            const float dur = 0.4f;
+            float dur = forward ? Mathf.Clamp(PathLength(pts) / DriveSpeed, 0.5f, 0.9f) : 0.4f;
             while (t < dur)
             {
                 t += Time.unscaledDeltaTime;
@@ -2123,8 +2189,8 @@ namespace CarMatch
                 Vector2 facing;
                 flyer.anchoredPosition = Along(pts, k, out facing);
                 flyer.sizeDelta = Vector2.Lerp(new Vector2(BarSlotWidth - 8f, BarCarH), endSize, k);
-                // Reversing: the nose points against the travel direction.
-                Steer(flyer, image, color, false, CarFrames.HeadingAngle(-facing), 0f, 1f, 1f);
+                // Reversing out of the bar nose-last; around the outer road it drives nose-first.
+                Steer(flyer, image, color, false, CarFrames.HeadingAngle(forward ? facing : -facing), 0f, 1f, 1f);
                 yield return null;
             }
             Destroy(flyer.gameObject);
@@ -2144,6 +2210,57 @@ namespace CarMatch
                 StartCoroutine(Wiggle(piece));
             }
             _busy = false;
+        }
+
+        readonly List<DriveStep> _returnSteps = new List<DriveStep>(16);
+
+        // Bar slot -> spot for Undo, never over a parked car. forward: the car drives nose-first
+        // around the outer road and pulls in from the top; otherwise the points run bar -> spot and
+        // the car reverses. Null when there is no clear way back.
+        List<Vector2> BuildReturnPath(Board after, Tap tap, int slot, out bool forward)
+        {
+            forward = false;
+            if (after == null) return null;
+            if (tap.Kind == TapKind.Side)
+            {
+                if (!DriveRoute.Exit(after, tap, _returnSteps)) return null;
+                var sidePts = new List<Vector2> { SideAnchor(after.Sides[tap.Index]) };
+                int sideLane = after.Sides[tap.Index].Lane;
+                foreach (var st in _returnSteps) { if (st.Cell < 0) { sideLane = st.Lane; break; } AddGrid(sidePts, LaneAnchor(st.Lane, st.Cell)); }
+                var outSide = FinishToBar(sidePts, sideLane, slot);
+                outSide.Reverse();
+                return outSide;
+            }
+            bool fromTop;
+            if (!DriveRoute.Return(after, tap.Index, tap.Cell, _returnSteps, out fromTop)) return null;
+            if (!fromTop)
+            {
+                // Steps run mouth -> spot; build the exit drive spot -> bar and reverse it.
+                var exitPts = new List<Vector2>();
+                int exitLane = tap.Index;
+                for (int i = _returnSteps.Count - 1; i >= 0; i--)
+                {
+                    var st = _returnSteps[i];
+                    if (st.Cell < 0) { exitLane = st.Lane; continue; }
+                    AddGrid(exitPts, LaneAnchor(st.Lane, st.Cell));
+                }
+                var outPts = FinishToBar(exitPts, exitLane, slot);
+                outPts.Reverse();
+                return outPts;
+            }
+            forward = true;
+            var m = _metrics;
+            var slotPos = BarSlotCenter(slot);
+            var top = LaneAnchor(tap.Index, after.Lanes[tap.Index].Cells.Count - 1);
+            float sideX = top.x < 0f ? m.RingL : m.RingRt;
+            var pts = new List<Vector2> { slotPos };
+            AddGrid(pts, new Vector2(slotPos.x, m.RingBottom));
+            AddGrid(pts, new Vector2(sideX, m.RingBottom));
+            AddGrid(pts, new Vector2(sideX, m.RingTop));
+            AddGrid(pts, new Vector2(top.x, m.RingTop));
+            for (int i = 1; i < _returnSteps.Count; i++)
+                AddGrid(pts, LaneAnchor(_returnSteps[i].Lane, _returnSteps[i].Cell));
+            return pts;
         }
 
         public const float ShuffleDealSec = 0.7f;
@@ -2185,7 +2302,7 @@ namespace CarMatch
                 {
                     if (used[j] || sources[j].Key != nows[i]) continue;
                     used[j] = true;
-                    froms[i] = sources[j].Value;
+                    // Oct 29: no car travels over another; each one re-deals in place (hop, spin, land).
                     break;
                 }
             }
@@ -2219,10 +2336,10 @@ namespace CarMatch
                     else if (lt < lift + move)
                     {
                         float u = EaseInOut((lt - lift) / move);
-                        var arc = new Vector2(0f, 26f + 40f * Mathf.Sin(u * Mathf.PI) * (changed[i] ? 1f : 0.2f));
+                        var arc = new Vector2(0f, 26f + 18f * Mathf.Sin(u * Mathf.PI) * (changed[i] ? 1f : 0.2f));
                         pos = Vector2.Lerp(froms[i], homes[i], u) + arc;
                         sc = 1.15f;
-                        rt.localRotation = Quaternion.Euler(0f, 0f, changed[i] ? Mathf.Sin(u * Mathf.PI) * 10f * (homes[i].x >= froms[i].x ? -1f : 1f) : 0f);
+                        rt.localRotation = Quaternion.Euler(0f, 0f, changed[i] ? Mathf.Sin(u * Mathf.PI * 2f) * 12f : 0f);
                     }
                     else
                     {
@@ -2513,7 +2630,6 @@ namespace CarMatch
         IEnumerator LotCheer()
         {
             const float LapSec = 1.55f;
-            var screenRt = _screen as RectTransform;
             var block = Place(_screen, "CheerBlock", Vector2.zero, new Vector2(4000f, 4000f));
             var blockImage = block.gameObject.AddComponent<Image>();
             blockImage.color = new Color(0f, 0f, 0f, 0.001f);
@@ -2661,14 +2777,8 @@ namespace CarMatch
                 }
                 yield return null;
             }
-            if (screenRt != null)
-            {
-                screenRt.localScale = Vector3.one;
-                screenRt.anchoredPosition = Vector2.zero;
-                screenRt.localRotation = Quaternion.identity;
-            }
             if (UsaPlaneDue()) yield return FlyUsaPlane();
-            yield return LotFireworks(screenRt);
+            yield return LotFireworks();
             ShowWin();
         }
 
@@ -2714,7 +2824,6 @@ namespace CarMatch
                 OnNext = OnNext,
                 OnHome = OnHome,
                 Hud = () => { Hud(0f); return _coinText; },
-                Shake = _shake,
                 HeroColor = _lastClearColor
             });
         }
@@ -2769,37 +2878,91 @@ namespace CarMatch
             return true;
         }
 
+        // Flock Five's shared plane (same art and layout as FlockFiveApp.Plane.cs DrawUsaPlane):
+        // flies right to left, plane in front towing the banner on a sagging rope.
+        // planeH = clamp(132*s, 96, 210) screen px, banner height 0.58*planeH, gap 8*s,
+        // rope from the plane's (0.92w, 0.48h) to the banner's leading edge, banner 0.28*planeH lower.
+        // Lot Loop keeps its own trigger (UsaPlaneDue: once per calendar day).
         IEnumerator FlyUsaPlane()
         {
             AudioManager.Play(Sfx.Plane);
-            float y = _metrics.CellH > 1f ? _metrics.BaseY + 40f : 80f;
-            var plane = Place(_screen, "UsaPlane", new Vector2(-860f, y), new Vector2(240f, 120f));
-            var pi = plane.gameObject.AddComponent<Image>();
-            pi.sprite = UiArt.Get("fx_usa_plane") ?? SpriteKit.Round;
-            pi.preserveAspect = true;
-            pi.raycastTarget = false;
-            var banner = Place(_screen, "UsaBanner", new Vector2(-1040f, y - 36f), new Vector2(300f, 100f));
+            var sr = _screen as RectTransform;
+            var rect = sr != null ? sr.rect : new Rect(-540f, -960f, 1080f, 1920f);
+            float pxH = Mathf.Max(1f, Screen.height);
+            float s = Mathf.Max(pxH / 720f, 1f);
+            float toCanvas = rect.height / pxH;
+            float planeH = Mathf.Clamp(132f * s, 96f, 210f) * toCanvas;
+            var planeSprite = UiArt.Get("fx_usa_plane");
+            var bannerSprite = UiArt.Get("fx_usa_banner");
+            float pAspect = planeSprite != null && planeSprite.rect.height > 2f ? planeSprite.rect.width / planeSprite.rect.height : 1.7f;
+            float bAspect = bannerSprite != null && bannerSprite.rect.height > 2f ? bannerSprite.rect.width / bannerSprite.rect.height : 3.4f;
+            float planeW = planeH * pAspect;
+            float banH = planeH * 0.58f;
+            float banW = banH * bAspect;
+            float gap = 8f * s * toCanvas;
+            float total = planeW + gap + banW;
+            float top = (_metrics.CellH > 1f ? _metrics.RingTop + _metrics.RoadW + planeH * 1.2f : 300f);
+            top = Mathf.Min(top, rect.yMax - 260f);
+
+            var banner = Place(_screen, "UsaBanner", Vector2.zero, new Vector2(banW, banH));
             var bi = banner.gameObject.AddComponent<Image>();
-            bi.sprite = UiArt.Get("fx_usa_banner") ?? SpriteKit.Round;
-            bi.preserveAspect = true;
+            bi.sprite = bannerSprite ?? SpriteKit.Round;
             bi.raycastTarget = false;
+            var rope = new List<RectTransform>();
+            for (int i = 0; i < 6; i++)
+            {
+                var seg = Place(_screen, "UsaRope", Vector2.zero, new Vector2(10f, Mathf.Max(2f, 2.4f * s) * toCanvas));
+                var si = seg.gameObject.AddComponent<Image>();
+                si.color = new Color(0.55f, 0.42f, 0.24f, 0.9f);
+                si.raycastTarget = false;
+                rope.Add(seg);
+            }
+            // Plane drawn last: in front of the rope and banner.
+            var plane = Place(_screen, "UsaPlane", Vector2.zero, new Vector2(planeW, planeH));
+            var pi = plane.gameObject.AddComponent<Image>();
+            pi.sprite = planeSprite ?? SpriteKit.Round;
+            pi.raycastTarget = false;
+
             float t = 0f;
-            const float dur = 1.65f;
+            const float dur = 2.6f; // Flock Five crosses in 6.5 s on its splash; Lot Loop keeps its win pacing
             while (t < dur && plane != null)
             {
                 t += Time.unscaledDeltaTime;
                 float u = Mathf.Clamp01(t / dur);
-                float e = u * u * (3f - 2f * u);
-                float x = Mathf.Lerp(-860f, 900f, e);
-                plane.anchoredPosition = new Vector2(x, y + Mathf.Sin(u * Mathf.PI) * 24f);
-                if (banner != null) banner.anchoredPosition = new Vector2(x - 230f, y - 28f);
+                float bob = Mathf.Sin(u * Mathf.PI * 3f) * 7f * s * toCanvas;
+                float left = Mathf.Lerp(rect.xMax + 12f, rect.xMin - total - 12f, u);
+                float y = top + bob; // top edge of the plane's box, y up
+                plane.anchoredPosition = new Vector2(left + planeW * 0.5f, y - planeH * 0.06f - planeH * 0.5f);
+                float banX = left + planeW + gap;
+                float banTop = y - planeH * 0.28f;
+                float lead = Mathf.Sin(Time.unscaledTime * 3.1f) * banH * 0.04f;
+                if (banner != null)
+                {
+                    banner.anchoredPosition = new Vector2(banX + banW * 0.5f, banTop - banH * 0.5f);
+                    banner.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(Time.unscaledTime * 2.4f) * 1.2f);
+                }
+                var ra = new Vector2(left + planeW * 0.92f, y - planeH * 0.48f);
+                var rb = new Vector2(banX, banTop - banH * 0.45f - lead);
+                for (int i = 0; i < rope.Count; i++)
+                {
+                    float u0 = i / (float)rope.Count, u1 = (i + 1) / (float)rope.Count;
+                    float sag0 = (Mathf.Sin(u0 * Mathf.PI) * 5f + Mathf.Sin(Time.unscaledTime * 2.2f + i) * 1.5f) * s * toCanvas;
+                    float sag1 = (Mathf.Sin(u1 * Mathf.PI) * 5f + Mathf.Sin(Time.unscaledTime * 2.2f + i + 1f) * 1.5f) * s * toCanvas;
+                    var p0 = Vector2.Lerp(ra, rb, u0) - new Vector2(0f, sag0);
+                    var p1 = Vector2.Lerp(ra, rb, u1) - new Vector2(0f, sag1);
+                    var seg = rope[i];
+                    seg.anchoredPosition = (p0 + p1) * 0.5f;
+                    seg.sizeDelta = new Vector2(Vector2.Distance(p0, p1) + 1f, seg.sizeDelta.y);
+                    seg.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(p1.y - p0.y, p1.x - p0.x) * Mathf.Rad2Deg);
+                }
                 yield return null;
             }
             if (plane != null) Destroy(plane.gameObject);
             if (banner != null) Destroy(banner.gameObject);
+            foreach (var seg in rope) if (seg != null) Destroy(seg.gameObject);
         }
 
-        IEnumerator LotFireworks(RectTransform screenRt)
+        IEnumerator LotFireworks()
         {
             AudioManager.Play(Sfx.Win);
             Color[] cols =
@@ -2823,11 +2986,7 @@ namespace CarMatch
                 float dt = Time.unscaledDeltaTime;
                 if (dt > 0.05f) dt = 0.05f;
                 t += dt;
-                if (screenRt != null)
-                {
-                    float pop = Mathf.Sin(Mathf.Clamp01(t / dur) * Mathf.PI);
-                    screenRt.localScale = Vector3.one * (1f + 0.05f * pop);
-                }
+                // Oct 29: no screen/board zoom, scale pulse or shake in the celebration.
                 if (made < bursts && t >= made * 0.28f)
                 {
                     int b = made;
@@ -2864,7 +3023,6 @@ namespace CarMatch
             }
             for (int i = 0; i < bits.Count; i++)
                 if (bits[i] != null) Destroy(bits[i].gameObject);
-            if (screenRt != null) screenRt.localScale = Vector3.one;
         }
 
         List<string> CoveredKeys()
@@ -3105,8 +3263,9 @@ namespace CarMatch
                         cars.Add(new KeyValuePair<RectTransform, Car>(rt, slot.Car));
                 }
             if (cars.Count == 0) yield break;
-            // Fill from the back rows forward so arriving cars do not cross parked ones.
-            cars.Sort((a, b) => b.Key.anchoredPosition.y.CompareTo(a.Key.anchoredPosition.y));
+            // Cars come in off the outer road at the top and pull down their lane, so the front
+            // spots fill first and every later car stops behind them: nobody drives over a parked car.
+            cars.Sort((a, b) => a.Key.anchoredPosition.y.CompareTo(b.Key.anchoredPosition.y));
             _busy = true;
             _introSkip = false;
             var catcher = Place(_flyLayer, "IntroSkip", Vector2.zero, new Vector2(4000f, 4000f));
@@ -3232,13 +3391,11 @@ namespace CarMatch
             if (!LotCoach.Done(PrefsFlags.Shared, CoachLesson.ParkStrip) && ParkStrip.CanReceive(_board))
             {
                 var host = (RectTransform)cont.transform;
-                var glove = Place(host, "Glove", new Vector2(host.sizeDelta.x * 0.28f, host.sizeDelta.y * 0.15f), new Vector2(150f, 150f));
-                var gi = glove.gameObject.AddComponent<Image>();
-                gi.sprite = UiArt.Get("glove") ?? SpriteKit.Round;
-                gi.preserveAspect = true;
-                gi.raycastTarget = false;
-                var pulse = glove.gameObject.AddComponent<Pulse>();
-                pulse.Amount = 0.08f;
+                // Same Flock Five glove as every lesson: fingertip on the button.
+                var sr = _screen as RectTransform;
+                float canvasH = sr != null ? sr.rect.height : 1920f;
+                CoachGlove.Make(host, new Vector2(host.sizeDelta.x * 0.18f, 0f), CoachGlove.HeightFor(canvasH, CoachGlove.Wide()),
+                    new Rect(-2000f, -2000f, 4000f, 4000f));
             }
             _retryButton = LoseButton(card, "lose_btn_retry", new Vector2(0f, -250f), 780f, 150f, "Retry", 68, OnRetry, false);
             RetryLifeBadge(_retryButton);
@@ -3355,6 +3512,7 @@ namespace CarMatch
             _winPaid = false;
             _winCheer = false;
             _failPaid = false;
+            _quitAsk = false;
             _lastMatch = false;
             KillFlights();
             StartLevel();
@@ -3515,9 +3673,24 @@ namespace CarMatch
             StartCoroutine(Continue());
         }
 
+        // Home mid-level asks first (Oct 29): quitting costs one heart, like a fail.
+        bool _quitAsk;
+
         void OnHome()
         {
             if (_busy || _driving) return;
+            if (_phase == Phase.Play && _board != null && !_board.Won && !_board.Failed && _history.Count > 0)
+            {
+                _quitAsk = true;
+                OpenQuitAsk();
+                return;
+            }
+            GoHome();
+        }
+
+        void GoHome()
+        {
+            _quitAsk = false;
             bool celebrate = _phase == Phase.Win;
             if (_phase == Phase.Fail) AcceptFail();
             ShowHome(celebrate);
@@ -3842,6 +4015,46 @@ namespace CarMatch
             if (rt != null) Destroy(rt.gameObject);
         }
 
+        void OpenQuitAsk()
+        {
+            if (_screen == null || _screen.Find("QuitAsk") != null) return;
+            var dim = Place(_screen, "QuitAsk", Vector2.zero, new Vector2(4000f, 4000f));
+            var dimImage = dim.gameObject.AddComponent<Image>();
+            dimImage.color = new Color(0f, 0f, 0f, 0.55f);
+            dimImage.raycastTarget = true;
+            var panel = Place(dim, "Panel", new Vector2(0f, 40f), new Vector2(860f, 640f));
+            var panelImage = panel.gameObject.AddComponent<Image>();
+            panelImage.sprite = UiArt.Get("pill") ?? SpriteKit.Round;
+            panelImage.type = Image.Type.Sliced;
+            panelImage.color = new Color(0.16f, 0.22f, 0.42f, 0.98f);
+            var icon = Place(panel, "Heart", new Vector2(0f, 200f), new Vector2(130f, 130f));
+            var iconImage = icon.gameObject.AddComponent<Image>();
+            iconImage.sprite = UiArt.Get("icon_heart") ?? SpriteKit.Round;
+            iconImage.preserveAspect = true;
+            if (UiArt.Get("icon_heart") == null) iconImage.color = new Color(0.95f, 0.30f, 0.38f, 1f);
+            var title = Place(panel, "Title", new Vector2(0f, 60f), new Vector2(800f, 150f));
+            var titleText = AddText(title, "Quit now and lose a life?", 58, Cream, TextAnchor.MiddleCenter);
+            titleText.font = ChunkyFont();
+            MakeButton(new Vector2(0f, -110f), new Vector2(620f, 140f), new Color(0.2f, 0.7f, 0.3f, 1f), "Keep Playing", 48, CloseQuitAsk, "btn_green", panel);
+            MakeButton(new Vector2(0f, -250f), new Vector2(360f, 110f), new Color(0.85f, 0.30f, 0.30f, 1f), "Quit", 42, QuitLevel, "btn_red", panel);
+            dim.SetAsLastSibling();
+        }
+
+        void CloseQuitAsk()
+        {
+            _quitAsk = false;
+            var ask = _screen != null ? _screen.Find("QuitAsk") : null;
+            if (ask != null) Destroy(ask.gameObject);
+        }
+
+        void QuitLevel()
+        {
+            if (!_quitAsk) return;
+            _quitAsk = false;
+            Purse.TrySpendLife(); // quitting a level mid-way costs one heart
+            GoHome();
+        }
+
         void OpenCoinPopup()
         {
             if (_coinPopup != null) return;
@@ -3910,6 +4123,40 @@ namespace CarMatch
             int n;
             if (m.Success && int.TryParse(m.Groups[1].Value, out n) && n > 0) Purse.Grant(n);
 #endif
+        }
+
+        // Review stills only (WebGL / development builds), from the page URL:
+        //   ?level=N    start straight into level N
+        //   ?skipcoach=1  mark every forced lesson done;  ?seen=mystery,side,liftgate  mark those hints seen
+        //   ?shot=quit  open the quit-a-level dialog;  ?shot=plane  fly the plane
+        void DebugShot()
+        {
+#if UNITY_WEBGL || DEVELOPMENT_BUILD
+            string url = Application.absoluteURL;
+            if (string.IsNullOrEmpty(url)) return;
+            var R = System.Text.RegularExpressions.Regex.Match(url, @"[?&]level=(\d{1,3})");
+            if (!R.Success) return;
+            if (url.Contains("skipcoach=1"))
+                foreach (CoachLesson lesson in System.Enum.GetValues(typeof(CoachLesson))) LotCoach.Complete(PrefsFlags.Shared, lesson);
+            var seen = System.Text.RegularExpressions.Regex.Match(url, @"[?&]seen=([a-z,]+)");
+            if (seen.Success)
+            {
+                if (seen.Groups[1].Value.Contains("mystery")) LotCoach.CompleteHint(PrefsFlags.Shared, CoachHint.Mystery);
+                if (seen.Groups[1].Value.Contains("side")) LotCoach.CompleteHint(PrefsFlags.Shared, CoachHint.SideLot);
+                if (seen.Groups[1].Value.Contains("liftgate")) LotCoach.CompleteHint(PrefsFlags.Shared, CoachHint.LiftGate);
+            }
+            LoadLevel(int.Parse(R.Groups[1].Value) - 1);
+            _lifts.Clear();
+            ShowPlay();
+            if (url.Contains("shot=quit")) { _quitAsk = true; OpenQuitAsk(); }
+            if (url.Contains("shot=plane") && _fly != null) _fly.StartCoroutine(DebugPlanes());
+#endif
+        }
+
+        IEnumerator DebugPlanes()
+        {
+            while (_introHold) yield return null;
+            for (int i = 0; i < 20; i++) yield return FlyUsaPlane();
         }
 
         Text Label(Vector2 pos, Vector2 size, string value, int fontSize, Color color, TextAnchor anchor)

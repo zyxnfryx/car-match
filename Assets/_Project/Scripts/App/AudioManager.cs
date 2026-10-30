@@ -206,6 +206,14 @@ namespace CarMatch
             }
         }
 
+        // Small random pitch keeps repeated cues fresh. The win jingle always plays at its true pitch.
+        public static float CuePitch(Sfx sfx, float pitch, float random)
+        {
+            if (pitch > 0f) return pitch;
+            if (sfx == Sfx.Win) return 1f;
+            return random;
+        }
+
         void PlayCue(Sfx sfx, float scale) { PlayCue(sfx, scale, -1f); }
 
         void PlayCue(Sfx sfx, float scale, float pitch)
@@ -227,7 +235,7 @@ namespace CarMatch
             if (sfx == Sfx.Win || sfx == Sfx.Fail) Duck(clip.length + 0.4f);
             var src = _pool[_next];
             _next = (_next + 1) % _pool.Length;
-            src.pitch = pitch > 0f ? pitch : Random.Range(0.97f, 1.03f);
+            src.pitch = CuePitch(sfx, pitch, Random.Range(0.97f, 1.03f));
             src.PlayOneShot(clip, cue.Volume * VariantTrim(name) * scale);
         }
 

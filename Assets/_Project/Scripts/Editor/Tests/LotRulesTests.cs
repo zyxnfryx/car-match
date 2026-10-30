@@ -304,5 +304,43 @@ namespace CarMatch.Tests
         {
             RuleChecks.SuperHardLevelsEarnTheLabel(Json());
         }
+    
+
+        [Test]
+        public void Drives_NoPathOverlapsAnOccupiedCell()
+        {
+            int routes = RouteChecks.NoPathOverlapsOccupiedCell(Json());
+            Assert.Greater(routes, 100, "routes checked");
+        }
+
+        [Test]
+        public void Drives_ReturnRoutesNeverCrossCars()
+        {
+            RouteChecks.ReturnRoutesNeverCrossCars();
+        }
+
+        [Test]
+        public void Celebration_NeverScalesTheCameraOrBoard()
+        {
+            var root = System.IO.Path.Combine(UnityEngine.Application.dataPath, "_Project/Scripts/App");
+            foreach (var file in System.IO.Directory.GetFiles(root, "*.cs"))
+            {
+                var text = System.IO.File.ReadAllText(file);
+                StringAssert.DoesNotContain("UiShake", text, file);
+                StringAssert.DoesNotContain("orthographicSize", text, file);
+                StringAssert.DoesNotContain("fieldOfView", text, file);
+                StringAssert.DoesNotContain("screenRt.localScale", text, file);
+                StringAssert.DoesNotContain("UiArt.Get(\"glove\")", text, file + " uses the Flock Five glove, not the placeholder");
+            }
+        }
+
+        [Test]
+        public void Audio_WinJingleSkipsRandomPitch()
+        {
+            var file = System.IO.Path.Combine(UnityEngine.Application.dataPath, "_Project/Scripts/App/AudioManager.cs");
+            var text = System.IO.File.ReadAllText(file);
+            StringAssert.Contains("if (sfx == Sfx.Win) return 1f;", text);
+            StringAssert.Contains("src.pitch = CuePitch(sfx, pitch,", text);
+        }
     }
 }

@@ -24,7 +24,6 @@ namespace CarMatch
             public UnityEngine.Events.UnityAction OnNext;
             public UnityEngine.Events.UnityAction OnHome;
             public Func<Text> Hud;
-            public UiShake Shake;
             // Color of the last matched set; picks the hero truck still (red uses the animated idle/cheer).
             public CarColor HeroColor;
         }

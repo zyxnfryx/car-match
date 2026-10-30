@@ -1,7 +1,8 @@
 namespace CarMatch
 {
-    // One glove at a time. Level 1 locks the lot to the guided car. Later lessons
-    // only spotlight; every other tap still works. Completion is a flag the app persists.
+    // One glove at a time. Every tap lesson is forced (Oct 29): the lot locks to the glove's
+    // target, so the player uses each taught tool once. Things that cannot be tapped yet get a
+    // separate look-here hint (CoachHint) instead, which never blocks a tap. Completion is a flag the app persists.
     public enum CoachLesson
     {
         None = 0,
@@ -36,6 +37,22 @@ namespace CarMatch
         public string Booster;
 
         public bool IsBooster { get { return !string.IsNullOrEmpty(Booster); } }
+    }
+
+    public enum CoachHint
+    {
+        None = 0,
+        Mystery = 1,
+        SideLot = 2,
+        LiftGate = 3
+    }
+
+    public struct HintCue
+    {
+        public CoachHint Hint;
+        public Tap Spot;
+        public int Garage;
+        public string Label;
     }
 
     public static class LotCoach
@@ -90,38 +107,88 @@ namespace CarMatch
             if (store == null || world.Board == null) return default;
             Tap tap;
             if (world.Level == 1 && !Done(store, CoachLesson.MatchThree) && TryGuide(world.Board, out tap))
-            {
-                return new CoachCue
-                {
-                    Lesson = CoachLesson.MatchThree,
-                    LockCars = true,
-                    HasCar = true,
-                    Car = tap
-                };
-            }
-            if (world.Level >= CoveredLevel && !Done(store, CoachLesson.Covered) && TryHidden(world.Board, out tap))
-                return CarCue(CoachLesson.Covered, tap);
+                return CarCue(CoachLesson.MatchThree, tap);
+            // Covered / mystery cars cannot be tapped until a neighbor leaves: that is a hint now (see Hint).
             if (world.Level >= SideLevel && !Done(store, CoachLesson.SideLot) && TrySide(world.Board, out tap))
                 return CarCue(CoachLesson.SideLot, tap);
             if (world.Level >= GarageLevel && !Done(store, CoachLesson.Garage) && TryTunnel(world.Board, out tap))
                 return CarCue(CoachLesson.Garage, tap);
             if (world.Level >= UndergroundLevel && !Done(store, CoachLesson.Underground) && TryUnderground(world.Board, out tap))
                 return CarCue(CoachLesson.Underground, tap);
-            if (world.Level >= UndoLevel && world.Moves > 0 && !Done(store, CoachLesson.Undo))
+            if (world.Level >= UndoLevel && world.Moves > 0 && !Done(store, CoachLesson.Undo) && FreeBoosters.IsFree(store, "Undo"))
                 return Boost(CoachLesson.Undo, "Undo");
-            if (world.Level >= ShuffleLevel && world.CanShuffle && !Done(store, CoachLesson.Shuffle))
+            if (world.Level >= ShuffleLevel && world.CanShuffle && !Done(store, CoachLesson.Shuffle) && FreeBoosters.IsFree(store, "Shuffle"))
                 return Boost(CoachLesson.Shuffle, "Shuffle");
-            if (world.Level >= MagnetLevel && world.CanMagnet && !Done(store, CoachLesson.Magnet))
+            if (world.Level >= MagnetLevel && world.CanMagnet && !Done(store, CoachLesson.Magnet) && FreeBoosters.IsFree(store, "Magnet"))
                 return Boost(CoachLesson.Magnet, "Magnet");
-            if (world.Level >= SuperLevel && world.CanSuper && !Done(store, CoachLesson.Super))
+            if (world.Level >= SuperLevel && world.CanSuper && !Done(store, CoachLesson.Super) && FreeBoosters.IsFree(store, "Super"))
                 return Boost(CoachLesson.Super, "Super");
             return default;
         }
 
+        // Forced lesson: only the glove's target takes a tap. A booster lesson blocks every car.
         public static bool Allows(CoachCue cue, Tap tap)
         {
-            if (!cue.LockCars || !cue.HasCar) return true;
+            if (!cue.LockCars) return true;
+            if (!cue.HasCar) return false;
             return cue.Car.Kind == tap.Kind && cue.Car.Index == tap.Index && cue.Car.Cell == tap.Cell;
+        }
+
+        public static bool AllowsBooster(CoachCue cue, string booster)
+        {
+            if (!cue.LockCars) return true;
+            return cue.IsBooster && cue.Booster == booster;
+        }
+
+        public static string HintKey(CoachHint hint)
+        {
+            switch (hint)
+            {
+                case CoachHint.Mystery: return "lotloop.hint.mystery";
+                case CoachHint.SideLot: return "lotloop.hint.side";
+                case CoachHint.LiftGate: return "lotloop.hint.liftgate";
+                default: return "";
+            }
+        }
+
+        public static string HintLabel(CoachHint hint)
+        {
+            switch (hint)
+            {
+                case CoachHint.Mystery: return "Hides a car until a neighbor leaves";
+                case CoachHint.SideLot: return "Opens when its spot is empty";
+                case CoachHint.LiftGate: return "Opens when the spots on top are clear";
+                default: return "";
+            }
+        }
+
+        public static void CompleteHint(IFlagStore store, CoachHint hint)
+        {
+            if (store == null || hint == CoachHint.None) return;
+            string key = HintKey(hint);
+            if (!store.Get(key)) store.Set(key);
+        }
+
+        // Look-here hint on first sight of something that cannot be tapped yet. Never shown while
+        // a forced lesson is running, never locks anything.
+        public static HintCue Hint(IFlagStore store, CoachWorld world)
+        {
+            if (store == null || world.Board == null) return default;
+            Tap tap;
+            if (world.Level >= CoveredLevel && !store.Get(HintKey(CoachHint.Mystery)) && TryHidden(world.Board, out tap))
+                return new HintCue { Hint = CoachHint.Mystery, Spot = tap, Label = HintLabel(CoachHint.Mystery) };
+            if (world.Level >= SideLevel && !store.Get(HintKey(CoachHint.SideLot)) && TryClosedSide(world.Board, out tap))
+                return new HintCue { Hint = CoachHint.SideLot, Spot = tap, Label = HintLabel(CoachHint.SideLot) };
+            if (!store.Get(HintKey(CoachHint.LiftGate)) && world.Board.Garages != null)
+            {
+                for (int i = 0; i < world.Board.Garages.Count; i++)
+                {
+                    var g = world.Board.Garages[i];
+                    if (g.Queue.Count == 0 || g.Cells.Count == 0) continue;
+                    return new HintCue { Hint = CoachHint.LiftGate, Garage = i, Spot = new Tap(TapKind.Lane, g.Lane, g.Cells[0]), Label = HintLabel(CoachHint.LiftGate) };
+                }
+            }
+            return default;
         }
 
         // Finger-down glove (tip at the bottom center) is rotated so the tip sits on the target
@@ -190,12 +257,12 @@ namespace CarMatch
 
         static CoachCue CarCue(CoachLesson lesson, Tap tap)
         {
-            return new CoachCue { Lesson = lesson, HasCar = true, Car = tap };
+            return new CoachCue { Lesson = lesson, LockCars = true, HasCar = true, Car = tap };
         }
 
         static CoachCue Boost(CoachLesson lesson, string name)
         {
-            return new CoachCue { Lesson = lesson, Booster = name };
+            return new CoachCue { Lesson = lesson, LockCars = true, Booster = name };
         }
 
         static bool TryGuide(Board board, out Tap tap)
@@ -248,7 +315,23 @@ namespace CarMatch
             for (int s = 0; s < board.Sides.Count; s++)
             {
                 if (board.Sides[s].Queue.Count == 0) continue;
-                tap = new Tap(TapKind.Side, s, board.Sides[s].Cell);
+                var candidate = new Tap(TapKind.Side, s, board.Sides[s].Cell);
+                if (!ExitPath.IsLegal(board, candidate)) continue;
+                tap = candidate;
+                return true;
+            }
+            return false;
+        }
+
+        static bool TryClosedSide(Board board, out Tap tap)
+        {
+            tap = default;
+            for (int s = 0; s < board.Sides.Count; s++)
+            {
+                if (board.Sides[s].Queue.Count == 0) continue;
+                var candidate = new Tap(TapKind.Side, s, board.Sides[s].Cell);
+                if (ExitPath.IsLegal(board, candidate)) continue;
+                tap = candidate;
                 return true;
             }
             return false;
@@ -263,7 +346,9 @@ namespace CarMatch
                 for (int c = 0; c < cells.Count; c++)
                 {
                     if (!cells[c].Tunnel || cells[c].TunnelCount <= 0) continue;
-                    tap = new Tap(TapKind.Lane, l, c);
+                    var candidate = new Tap(TapKind.Lane, l, c);
+                    if (!ExitPath.IsLegal(board, candidate)) continue;
+                    tap = candidate;
                     return true;
                 }
             }
@@ -277,8 +362,15 @@ namespace CarMatch
             if (board.Garages == null || board.Garages.Count == 0) return false;
             var g = board.Garages[0];
             if (g.Cells.Count == 0) return false;
-            tap = new Tap(TapKind.Lane, g.Lane, g.Cells[0]);
-            return true;
+            // The player clears a stall on top of the lift; teach the first one that can leave now.
+            for (int i = 0; i < g.Cells.Count; i++)
+            {
+                var candidate = new Tap(TapKind.Lane, g.Lane, g.Cells[i]);
+                if (!ExitPath.IsLegal(board, candidate)) continue;
+                tap = candidate;
+                return true;
+            }
+            return false;
         }
     }
 
